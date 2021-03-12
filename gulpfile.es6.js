@@ -1,22 +1,22 @@
 import fs from 'fs';
 import gulp from 'gulp';
-import gutil from 'gulp-util';
-import insert from 'gulp-insert';
 import concat from 'gulp-concat';
+import insert from 'gulp-insert';
+import gutil from 'gulp-util';
 
 const VERSIONS = {
-    EASEL: '0.8.2',
-    PRELOAD: '0.6.2',
-    SOUNDL: '0.6.2',
-    TWEEN: '0.6.2',
-    CREATE: '0.8.2'
+    EASEL: '1.0.0',
+    PRELOAD: '1.0.0',
+    SOUNDL: '1.0.0',
+    TWEEN: '1.0.0',
+    CREATE: '1.0.0'
 };
 
 const SRC = {
-    EASEL: `./vendor_modules/EaselJS-${VERSIONS.EASEL}/lib/easeljs-${VERSIONS.EASEL}.combined.js`,
-    PRELOAD: `./vendor_modules/PreloadJS-${VERSIONS.PRELOAD}/lib/preloadjs-${VERSIONS.PRELOAD}.combined.js`,
-    SOUND: `./vendor_modules/SoundJS-${VERSIONS.SOUND}/lib/soundjs-${VERSIONS.SOUND}.combined.js`,
-    TWEEN: `./vendor_modules/TweenJS-${VERSIONS.TWEEN}/lib/tweenjs-${VERSIONS.TWEEN}.combined.js`
+    EASEL: `./node_modules/easeljs/lib/easeljs.js`,
+    PRELOAD: `./node_modules/preloadjs/lib/preloadjs.js`,
+    SOUND: `./node_modules/soundjs/lib/soundjs.js`,
+    TWEEN: `./node_modules/tweenjs/lib/tweenjs.js`
 };
 
 const DEST = {
@@ -31,8 +31,7 @@ function string_src(filename, string) {
     };
     return src
 }
-
-gulp.task('compile', () => {
+function compile() {
     return gulp.src([
         SRC.EASEL,
         SRC.PRELOAD,
@@ -43,13 +42,16 @@ gulp.task('compile', () => {
         .pipe(insert.prepend('var createjs = (this.createjs = (this.createjs || {}));\n'))
         .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;'))
         .pipe(gulp.dest(DEST.CREATE));
-});
+}
 
-gulp.task('package', () => {
+
+function doPackage() {
     let pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
     pkg.version = VERSIONS.CREATE;
     return string_src('package.json', JSON.stringify(pkg, null, 4))
-        .pipe(gulp.dest(DEST.CREATE));
-});
+    .pipe(gulp.dest(DEST.CREATE));
+}
 
-gulp.task('default', ['compile', 'package']);
+gulp.task('compile', gulp.series(compile));
+gulp.task('package', gulp.series(doPackage));
+gulp.task('default', gulp.series(compile, doPackage));
