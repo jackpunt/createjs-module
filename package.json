@@ -1,6 +1,6 @@
 {
     "name": "@nomadreservations/createjs-module",
-    "version": "1.0.0-beta.4",
+    "version": "1.0.0-beta.5",
     "description": "Collection of libraries in the CreateJS suite for Angular and Ionic.",
     "author": "AJ Barry <ajbarry3@gmail.com>",
     "main": "./createjs.js",

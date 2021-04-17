@@ -17,7 +17,7 @@
 
 // rename the native MouseEvent, to avoid conflict with createjs's MouseEvent
 interface NativeMouseEvent extends MouseEvent {}
-export namespace createjs {
+declare namespace createjs {
   export class Event {
     constructor(type: string, bubbles: boolean, cancelable: boolean);
 
@@ -2780,3 +2780,5 @@ export namespace createjs {
     static version: string;
   }
 }
+
+export default createjs;
