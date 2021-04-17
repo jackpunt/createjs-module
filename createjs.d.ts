@@ -1662,6 +1662,104 @@ export namespace createjs {
     update(...arg: any[]): void;
   }
 
+  export class BitmapCache {
+    constructor();
+
+    cacheID: number;
+
+    define(
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      scale?: number,
+      options?: any
+    ): void;
+    draw(ctx: CanvasRenderingContext2D): boolean;
+    getBounds(): Rectangle;
+    getCacheDateUrl(): string;
+    static getFilterBounds(
+      target: DisplayObject,
+      output?: Rectangle
+    ): Rectangle;
+    release(): void;
+    toString(): string;
+    update(compositeOperation?: string): void;
+  }
+
+  export class StageGL extends Container {
+    constructor(canvas: HTMLCanvasElement | string | Object);
+
+    // properties
+    autoClear: boolean;
+    canvas: HTMLCanvasElement | Object;
+    drawRect: Rectangle;
+    handleEvent: Function;
+    mouseInBounds: boolean;
+    mouseMoveOutside: boolean;
+    mouseX: number;
+    mouseY: number;
+    nextStage: Stage;
+    static readonly COVER_FRAGMENT_BODY: string;
+    static readonly COVER_FRAGMENT_HEADER: string;
+    static readonly COVER_UV: Float32Array;
+    static readonly COVER_UV_FLIP: Float32Array;
+    static readonly COVER_VARYING_HEADER: string;
+    static readonly COVER_VERT: Float32Array;
+    static readonly COVER_VERTEX_BODY: string;
+    static readonly COVER_VERTEX_HEADER: string;
+    static readonly DEFAULT_MAX_BATCH_SIZE: number;
+    static readonly INDICIES_PER_CARD: number;
+    readonly isWebGL: boolean;
+    static readonly PARTICLE_FRAGMENT_BODY: string;
+    static readonly PARTICLE_VERTEX_BODY: string;
+    static readonly REGULAR_FRAGMENT_BODY: string;
+    static readonly REGULAR_FRAGMENT_HEADER: string;
+    static readonly REGULAR_VARYING_HEADER: string;
+    static readonly REGULAR_VERTEX_BODY: string;
+    static readonly REGULAR_VERTEX_HEADER: string;
+    static readonly UV_RECT: any;
+    static readonly VERTEX_PROPERTY_COUNT: number;
+    vocalDebug: boolean;
+    static readonly WEBGL_MAX_INDEX_NUM: number;
+    /**
+     * @deprecated
+     */
+    preventSelection: boolean;
+    snapToPixelEnabled: boolean; // deprecated
+    tickOnUpdate: boolean;
+
+    // methods
+    clear(): void;
+    clone(): Stage;
+    enableDOMEvents(enable?: boolean): void;
+    enableMouseOver(frequency?: number): void;
+    tick(props?: Object): void;
+    toDataURL(backgroundColor: string, mimeType: string): string;
+    update(...arg: any[]): void;
+    cacheDraw(
+      target: DisplayObject,
+      filters: any[],
+      manager: BitmapCache
+    ): boolean;
+    getBaseTexture(w?: number, h?: number): any;
+    getFilterShader(filter: Filter | any): WebGLProgram;
+    getRenderBufferTexture(w: number, h: number): any;
+    getTargetRenderTexture(target: DisplayObject, w: number, h: number): any;
+    isWebGLActive(ctx: any): boolean;
+    protectTextureSlot(id: number, lock?: boolean): void;
+    purgeTextures(count?: number): void;
+    releaseTexture(item: DisplayObject, safe: boolean): void;
+    setTextureParams(gl: WebGLRenderingContext, isPOT?: boolean): void;
+    updateSimultaneousTextureCount(count?: number): void;
+    updateViewport(width: number, height: number): void;
+    static buildUVRects(
+      spriteSheet: SpriteSheet,
+      target?: number,
+      onlyTarget?: boolean
+    ): any;
+  }
+
   export class Text extends DisplayObject {
     constructor(text?: string, font?: string, color?: string);
 
