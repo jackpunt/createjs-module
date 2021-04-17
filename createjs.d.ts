@@ -479,13 +479,14 @@ export namespace createjs {
     regX: number;
     regY: number;
     rotation: number;
+    scale: number;
     scaleX: number;
     scaleY: number;
     shadow: Shadow;
     skewX: number;
     skewY: number;
     snapToPixel: boolean;
-    stage: Stage;
+    stage: Stage | StageGL;
     static suppressCrossDomainErrors: boolean;
     tickEnabled: boolean;
     transformMatrix: Matrix2D;
@@ -511,7 +512,7 @@ export namespace createjs {
     /**
      * @deprecated
      */
-    getStage(): Stage;
+    getStage(): Stage | StageGL;
     getTransformedBounds(): Rectangle;
     globalToLocal(x: number, y: number, pt?: Point | Object): Point;
     hitTest(x: number, y: number): boolean;
@@ -1644,7 +1645,7 @@ export namespace createjs {
     mouseMoveOutside: boolean;
     mouseX: number;
     mouseY: number;
-    nextStage: Stage;
+    nextStage: Stage | StageGL;
     /**
      * @deprecated
      */
@@ -1654,7 +1655,7 @@ export namespace createjs {
 
     // methods
     clear(): void;
-    clone(): Stage;
+    clone(): Stage | StageGL;
     enableDOMEvents(enable?: boolean): void;
     enableMouseOver(frequency?: number): void;
     tick(props?: Object): void;
@@ -1687,8 +1688,18 @@ export namespace createjs {
     update(compositeOperation?: string): void;
   }
 
+  export interface StageGLOptions {
+    preserveBuffer?: boolean;
+    antialias?: boolean;
+    transparent?: boolean;
+    premultiply?: boolean;
+    autoPurge?: number;
+  }
   export class StageGL extends Container {
-    constructor(canvas: HTMLCanvasElement | string | Object);
+    constructor(
+      canvas: HTMLCanvasElement | string | Object,
+      options: StageGLOptions
+    );
 
     // properties
     autoClear: boolean;
@@ -1699,7 +1710,7 @@ export namespace createjs {
     mouseMoveOutside: boolean;
     mouseX: number;
     mouseY: number;
-    nextStage: Stage;
+    nextStage: Stage | StageGL;
     static readonly COVER_FRAGMENT_BODY: string;
     static readonly COVER_FRAGMENT_HEADER: string;
     static readonly COVER_UV: Float32Array;
@@ -1731,7 +1742,7 @@ export namespace createjs {
 
     // methods
     clear(): void;
-    clone(): Stage;
+    clone(): Stage | StageGL;
     enableDOMEvents(enable?: boolean): void;
     enableMouseOver(frequency?: number): void;
     tick(props?: Object): void;
@@ -1845,9 +1856,9 @@ export namespace createjs {
     // EventDispatcher mixins
     static addEventListener(
       type: string,
-      listener: Stage,
+      listener: Stage | StageGL,
       useCapture?: boolean
-    ): Stage;
+    ): Stage | StageGL;
     static addEventListener(
       type: string,
       listener: (eventObj: Object) => boolean,
@@ -1968,9 +1979,9 @@ export namespace createjs {
 
   export class Touch {
     // methods
-    static disable(stage: Stage): void;
+    static disable(stage: Stage | StageGL): void;
     static enable(
-      stage: Stage,
+      stage: Stage | StageGL,
       singleTouch?: boolean,
       allowDefault?: boolean
     ): boolean;
