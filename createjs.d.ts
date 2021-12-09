@@ -466,6 +466,7 @@ declare namespace createjs {
     // properties
     alpha: number;
     cacheCanvas: HTMLCanvasElement | Object;
+    bitmapCache: BitmapCache | null;
     cacheID: number;
     compositeOperation: string;
     cursor: string;
