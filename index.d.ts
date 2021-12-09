@@ -339,7 +339,7 @@ declare namespace createjs {
         y: number;
 
         // methods
-        cache(x: number, y: number, width: number, height: number, scale?: number): void;
+        cache(x: number, y: number, width: number, height: number, scale?: number, options?: { useGL?: ("new" | "stage" | StageGL) }): void;
         clone(): DisplayObject;
         draw(ctx: CanvasRenderingContext2D, ignoreCache?: boolean): boolean;
         getBounds(): Rectangle;
