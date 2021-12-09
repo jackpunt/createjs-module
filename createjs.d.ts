@@ -1662,6 +1662,13 @@ declare namespace createjs {
     constructor();
 
     cacheID: number;
+    width: number | undefined;
+		height: number | undefined;
+		x: number | undefined;
+		y: number | undefined;
+		scale: number;
+		offX: number;
+    offY: number;
 
     define(
       x: number,
