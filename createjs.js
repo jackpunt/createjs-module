@@ -843,6 +843,7 @@ this.createjs = this.createjs || {};
 // Ticker.js
 //##############################################################################
 
+// namespace:
 this.createjs = this.createjs || {};
 
 (function () {
@@ -1004,6 +1005,12 @@ this.createjs = this.createjs || {};
      **/
     Ticker.paused = false;
 
+    // Deprecated Paused methods
+    Ticker._setPaused = function (value) { Ticker.paused = value; };
+    Ticker._getPaused = function () { return Ticker.paused; };
+    Ticker.getPaused = createjs.deprecate(Ticker._getPaused, "Ticker.getPaused");
+    Ticker.setPaused = createjs.deprecate(Ticker._setPaused, "Ticker.getPaused");
+
 
     // mix-ins:
     // EventDispatcher methods:
@@ -1128,6 +1135,12 @@ this.createjs = this.createjs || {};
         if (!Ticker._inited) { return; }
         Ticker._setupTick();
     };
+
+    /**
+     * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+     * @method setInterval
+     * @deprecated
+     */
     // Ticker.setInterval is @deprecated. Remove for 1.1+
     Ticker.setInterval = createjs.deprecate(Ticker._setInterval, "Ticker.setInterval");
 
@@ -1141,6 +1154,12 @@ this.createjs = this.createjs || {};
     Ticker._getInterval = function () {
         return Ticker._interval;
     };
+
+    /**
+     * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+     * @method getInterval
+     * @deprecated
+     */
     // Ticker.getInterval is @deprecated. Remove for 1.1+
     Ticker.getInterval = createjs.deprecate(Ticker._getInterval, "Ticker.getInterval");
 
@@ -1154,6 +1173,12 @@ this.createjs = this.createjs || {};
     Ticker._setFPS = function (value) {
         Ticker._setInterval(1000 / value);
     };
+
+    /**
+     * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+     * @method setFPS
+     * @deprecated
+     */
     // Ticker.setFPS is @deprecated. Remove for 1.1+
     Ticker.setFPS = createjs.deprecate(Ticker._setFPS, "Ticker.setFPS");
 
@@ -1167,6 +1192,12 @@ this.createjs = this.createjs || {};
     Ticker._getFPS = function () {
         return 1000 / Ticker._interval;
     };
+
+    /**
+     * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+     * @method getFPS
+     * @deprecated
+     */
     // Ticker.getFPS is @deprecated. Remove for 1.1+
     Ticker.getFPS = createjs.deprecate(Ticker._getFPS, "Ticker.getFPS");
 
@@ -1294,7 +1325,7 @@ this.createjs = this.createjs || {};
      * @method getEventTime
      * @static
      * @param runTime {Boolean} [runTime=false] If true, the runTime property will be returned instead of time.
-     * @returns {number} The time or runTime property from the most recent tick event or -1.
+     * @return {number} The time or runTime property from the most recent tick event or -1.
      */
     Ticker.getEventTime = function (runTime) {
         return Ticker._startTime ? (Ticker._lastTime || Ticker._startTime) - (runTime ? Ticker._pausedTime : 0) : -1;
@@ -1426,100 +1457,100 @@ this.createjs = this.createjs || {};
 // VideoBuffer.js
 //##############################################################################
 
-this.createjs = this.createjs || {};
+this.createjs = this.createjs||{};
 
-(function () {
-    "use strict";
-
-
-    // constructor:
-    /**
-     * When an HTML video seeks, including when looping, there is an indeterminate period before a new frame is available.
-     * This can result in the video blinking or flashing when it is drawn to a canvas. The VideoBuffer class resolves
-     * this issue by drawing each frame to an off-screen canvas and preserving the prior frame during a seek.
-     * 
-     * 	var myBuffer = new createjs.VideoBuffer(myVideo);
-     * 	var myBitmap = new Bitmap(myBuffer);
-     * 
-     * @class VideoBuffer
-     * @param {HTMLVideoElement} video The HTML video element to buffer.
-     * @constructor
-     **/
-    function VideoBuffer(video) {
-
-        // private properties:
-        /**
-         * Used by Bitmap to determine when the video buffer is ready to be drawn. Not intended for general use.
-         * @property readyState
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this.readyState = video.readyState;
-
-        /**
-         * @property _video
-         * @protected
-         * @type {HTMLVideoElement}
-         * @default 0
-         **/
-        this._video = video;
-
-        /**
-         * @property _canvas
-         * @protected
-         * @type {HTMLCanvasElement}
-         * @default 0
-         **/
-        this._canvas = null;
-
-        /**
-         * @property _lastTime
-         * @protected
-         * @type {Number}
-         * @default -1
-         **/
-        this._lastTime = -1;
-
-        if (this.readyState < 2) { video.addEventListener("canplaythrough", this._videoReady.bind(this)); } //once:true isn't supported everywhere, but its a non-critical optimization here.
-    }
-    var p = VideoBuffer.prototype;
+(function() {
+	"use strict";
 
 
-    // public methods:
-    /**
-     * Gets an HTML canvas element showing the current video frame, or the previous frame if in a seek / loop.
-     * Primarily for use by {{#crossLink "Bitmap"}}{{/crossLink}}.
-     * @method getImage
-     **/
-    p.getImage = function () {
-        if (this.readyState < 2) { return; }
-        var canvas = this._canvas, video = this._video;
-        if (!canvas) {
-            canvas = this._canvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-        }
-        if (video.readyState >= 2 && video.currentTime !== this._lastTime) {
-            var ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            this._lastTime = video.currentTime;
-        }
-        return canvas;
-    };
+// constructor:
+	/**
+	 * When an HTML video seeks, including when looping, there is an indeterminate period before a new frame is available.
+	 * This can result in the video blinking or flashing when it is drawn to a canvas. The VideoBuffer class resolves
+	 * this issue by drawing each frame to an off-screen canvas and preserving the prior frame during a seek.
+	 * 
+	 * 	var myBuffer = new createjs.VideoBuffer(myVideo);
+	 * 	var myBitmap = new createjs.Bitmap(myBuffer);
+	 * 
+	 * @class VideoBuffer
+	 * @param {HTMLVideoElement} video The HTML video element to buffer.
+	 * @constructor
+	 **/
+	function VideoBuffer(video) {
+		
+	// private properties:
+		/**
+		 * Used by Bitmap to determine when the video buffer is ready to be drawn. Not intended for general use.
+		 * @property readyState
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.readyState = video.readyState;
+		
+		/**
+		 * @property _video
+		 * @protected
+		 * @type {HTMLVideoElement}
+		 * @default 0
+		 **/
+		this._video = video;
+		
+		/**
+		 * @property _canvas
+		 * @protected
+		 * @type {HTMLCanvasElement}
+		 * @default 0
+		 **/
+		this._canvas = null;
+		
+		/**
+		 * @property _lastTime
+		 * @protected
+		 * @type {Number}
+		 * @default -1
+		 **/
+		this._lastTime = -1;
+		
+		if (this.readyState < 2) { video.addEventListener("canplaythrough", this._videoReady.bind(this)); } //once:true isn't supported everywhere, but its a non-critical optimization here.
+	}
+	var p = VideoBuffer.prototype;
+	
+	
+// public methods:
+	/**
+	 * Gets an HTML canvas element showing the current video frame, or the previous frame if in a seek / loop.
+	 * Primarily for use by {{#crossLink "Bitmap"}}{{/crossLink}}.
+	 * @method getImage
+	 **/
+	p.getImage = function() {
+		if (this.readyState < 2) { return; }
+		var canvas=this._canvas, video = this._video;
+		if (!canvas) {
+			canvas = this._canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight;
+		}
+		if (video.readyState >= 2 && video.currentTime !== this._lastTime) {
+			var ctx = canvas.getContext("2d");
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			ctx.drawImage(video,0,0,canvas.width,canvas.height);
+			this._lastTime = video.currentTime;
+		}
+		return canvas;
+	};
+	
+// private methods:
+	/**
+	 * @method _videoReady
+	 * @protected
+	 **/
+	p._videoReady = function() {
+		this.readyState = 2;
+	};
 
-    // private methods:
-    /**
-     * @method _videoReady
-     * @protected
-     **/
-    p._videoReady = function () {
-        this.readyState = 2;
-    };
 
-
-    createjs.VideoBuffer = VideoBuffer;
+	createjs.VideoBuffer = VideoBuffer;
 }());
 
 //##############################################################################
@@ -1697,502 +1728,502 @@ this.createjs = this.createjs || {};
 // Matrix2D.js
 //##############################################################################
 
-this.createjs = this.createjs || {};
+this.createjs = this.createjs||{};
 
-(function () {
-    "use strict";
-
-
-    // constructor:
-    /**
-     * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
-     *
-     * This matrix can be visualized as:
-     *
-     * 	[ a  c  tx
-     * 	  b  d  ty
-     * 	  0  0  1  ]
-     *
-     * Note the locations of b and c.
-     *
-     * @class Matrix2D
-     * @param {Number} [a=1] Specifies the a property for the new matrix.
-     * @param {Number} [b=0] Specifies the b property for the new matrix.
-     * @param {Number} [c=0] Specifies the c property for the new matrix.
-     * @param {Number} [d=1] Specifies the d property for the new matrix.
-     * @param {Number} [tx=0] Specifies the tx property for the new matrix.
-     * @param {Number} [ty=0] Specifies the ty property for the new matrix.
-     * @constructor
-     **/
-    function Matrix2D(a, b, c, d, tx, ty) {
-        this.setValues(a, b, c, d, tx, ty);
-
-        // public properties:
-        // assigned in the setValues method.
-        /**
-         * Position (0, 0) in a 3x3 affine transformation matrix.
-         * @property a
-         * @type Number
-         **/
-
-        /**
-         * Position (0, 1) in a 3x3 affine transformation matrix.
-         * @property b
-         * @type Number
-         **/
-
-        /**
-         * Position (1, 0) in a 3x3 affine transformation matrix.
-         * @property c
-         * @type Number
-         **/
-
-        /**
-         * Position (1, 1) in a 3x3 affine transformation matrix.
-         * @property d
-         * @type Number
-         **/
-
-        /**
-         * Position (2, 0) in a 3x3 affine transformation matrix.
-         * @property tx
-         * @type Number
-         **/
-
-        /**
-         * Position (2, 1) in a 3x3 affine transformation matrix.
-         * @property ty
-         * @type Number
-         **/
-    }
-    var p = Matrix2D.prototype;
-
-    // constants:
-    /**
-     * Multiplier for converting degrees to radians. Used internally by Matrix2D.
-     * @property DEG_TO_RAD
-     * @static
-     * @final
-     * @type Number
-     * @readonly
-     **/
-    Matrix2D.DEG_TO_RAD = Math.PI / 180;
+(function() {
+	"use strict";
 
 
-    // static public properties:
-    /**
-     * An identity matrix, representing a null transformation.
-     * @property identity
-     * @static
-     * @type Matrix2D
-     * @readonly
-     **/
-    Matrix2D.identity = null; // set at bottom of class definition.
+// constructor:
+	/**
+	 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
+	 *
+	 * This matrix can be visualized as:
+	 *
+	 * 	[ a  c  tx
+	 * 	  b  d  ty
+	 * 	  0  0  1  ]
+	 *
+	 * Note the locations of b and c.
+	 *
+	 * @class Matrix2D
+	 * @param {Number} [a=1] Specifies the a property for the new matrix.
+	 * @param {Number} [b=0] Specifies the b property for the new matrix.
+	 * @param {Number} [c=0] Specifies the c property for the new matrix.
+	 * @param {Number} [d=1] Specifies the d property for the new matrix.
+	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+	 * @constructor
+	 **/
+	function Matrix2D(a, b, c, d, tx, ty) {
+		this.setValues(a,b,c,d,tx,ty);
+		
+	// public properties:
+		// assigned in the setValues method.
+		/**
+		 * Position (0, 0) in a 3x3 affine transformation matrix.
+		 * @property a
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (0, 1) in a 3x3 affine transformation matrix.
+		 * @property b
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (1, 0) in a 3x3 affine transformation matrix.
+		 * @property c
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (1, 1) in a 3x3 affine transformation matrix.
+		 * @property d
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (2, 0) in a 3x3 affine transformation matrix.
+		 * @property tx
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (2, 1) in a 3x3 affine transformation matrix.
+		 * @property ty
+		 * @type Number
+		 **/
+	}
+	var p = Matrix2D.prototype;
+
+// constants:
+	/**
+	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
+	 * @property DEG_TO_RAD
+	 * @static
+	 * @final
+	 * @type Number
+	 * @readonly
+	 **/
+	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 
-    // public methods:
-    /**
-     * Sets the specified values on this instance. 
-     * @method setValues
-     * @param {Number} [a=1] Specifies the a property for the new matrix.
-     * @param {Number} [b=0] Specifies the b property for the new matrix.
-     * @param {Number} [c=0] Specifies the c property for the new matrix.
-     * @param {Number} [d=1] Specifies the d property for the new matrix.
-     * @param {Number} [tx=0] Specifies the tx property for the new matrix.
-     * @param {Number} [ty=0] Specifies the ty property for the new matrix.
-     * @return {Matrix2D} This instance. Useful for chaining method calls.
-    */
-    p.setValues = function (a, b, c, d, tx, ty) {
-        // don't forget to update docs in the constructor if these change:
-        this.a = (a == null) ? 1 : a;
-        this.b = b || 0;
-        this.c = c || 0;
-        this.d = (d == null) ? 1 : d;
-        this.tx = tx || 0;
-        this.ty = ty || 0;
-        return this;
-    };
+// static public properties:
+	/**
+	 * An identity matrix, representing a null transformation.
+	 * @property identity
+	 * @static
+	 * @type Matrix2D
+	 * @readonly
+	 **/
+	Matrix2D.identity = null; // set at bottom of class definition.
+	
 
-    /**
-     * Appends the specified matrix properties to this matrix. All parameters are required.
-     * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
-     * @method append
-     * @param {Number} a
-     * @param {Number} b
-     * @param {Number} c
-     * @param {Number} d
-     * @param {Number} tx
-     * @param {Number} ty
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.append = function (a, b, c, d, tx, ty) {
-        var a1 = this.a;
-        var b1 = this.b;
-        var c1 = this.c;
-        var d1 = this.d;
-        if (a != 1 || b != 0 || c != 0 || d != 1) {
-            this.a = a1 * a + c1 * b;
-            this.b = b1 * a + d1 * b;
-            this.c = a1 * c + c1 * d;
-            this.d = b1 * c + d1 * d;
-        }
-        this.tx = a1 * tx + c1 * ty + this.tx;
-        this.ty = b1 * tx + d1 * ty + this.ty;
-        return this;
-    };
+// public methods:
+	/**
+	 * Sets the specified values on this instance. 
+	 * @method setValues
+	 * @param {Number} [a=1] Specifies the a property for the new matrix.
+	 * @param {Number} [b=0] Specifies the b property for the new matrix.
+	 * @param {Number} [c=0] Specifies the c property for the new matrix.
+	 * @param {Number} [d=1] Specifies the d property for the new matrix.
+	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+	 * @return {Matrix2D} This instance. Useful for chaining method calls.
+	*/
+	p.setValues = function(a, b, c, d, tx, ty) {
+		// don't forget to update docs in the constructor if these change:
+		this.a = (a == null) ? 1 : a;
+		this.b = b || 0;
+		this.c = c || 0;
+		this.d = (d == null) ? 1 : d;
+		this.tx = tx || 0;
+		this.ty = ty || 0;
+		return this;
+	};
 
-    /**
-     * Prepends the specified matrix properties to this matrix.
-     * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
-     * All parameters are required.
-     * @method prepend
-     * @param {Number} a
-     * @param {Number} b
-     * @param {Number} c
-     * @param {Number} d
-     * @param {Number} tx
-     * @param {Number} ty
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.prepend = function (a, b, c, d, tx, ty) {
-        var a1 = this.a;
-        var c1 = this.c;
-        var tx1 = this.tx;
+	/**
+	 * Appends the specified matrix properties to this matrix. All parameters are required.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
+	 * @method append
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @param {Number} c
+	 * @param {Number} d
+	 * @param {Number} tx
+	 * @param {Number} ty
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.append = function(a, b, c, d, tx, ty) {
+		var a1 = this.a;
+		var b1 = this.b;
+		var c1 = this.c;
+		var d1 = this.d;
+		if (a != 1 || b != 0 || c != 0 || d != 1) {
+			this.a  = a1*a+c1*b;
+			this.b  = b1*a+d1*b;
+			this.c  = a1*c+c1*d;
+			this.d  = b1*c+d1*d;
+		}
+		this.tx = a1*tx+c1*ty+this.tx;
+		this.ty = b1*tx+d1*ty+this.ty;
+		return this;
+	};
 
-        this.a = a * a1 + c * this.b;
-        this.b = b * a1 + d * this.b;
-        this.c = a * c1 + c * this.d;
-        this.d = b * c1 + d * this.d;
-        this.tx = a * tx1 + c * this.ty + tx;
-        this.ty = b * tx1 + d * this.ty + ty;
-        return this;
-    };
+	/**
+	 * Prepends the specified matrix properties to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * All parameters are required.
+	 * @method prepend
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @param {Number} c
+	 * @param {Number} d
+	 * @param {Number} tx
+	 * @param {Number} ty
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.prepend = function(a, b, c, d, tx, ty) {
+		var a1 = this.a;
+		var c1 = this.c;
+		var tx1 = this.tx;
 
-    /**
-     * Appends the specified matrix to this matrix.
-     * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
-     * @method appendMatrix
-     * @param {Matrix2D} matrix
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.appendMatrix = function (matrix) {
-        return this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-    };
+		this.a  = a*a1+c*this.b;
+		this.b  = b*a1+d*this.b;
+		this.c  = a*c1+c*this.d;
+		this.d  = b*c1+d*this.d;
+		this.tx = a*tx1+c*this.ty+tx;
+		this.ty = b*tx1+d*this.ty+ty;
+		return this;
+	};
 
-    /**
-     * Prepends the specified matrix to this matrix.
-     * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
-     * For example, you could calculate the combined transformation for a child object using:
-     * 
-     * 	var o = myDisplayObject;
-     * 	var mtx = o.getMatrix();
-     * 	while (o = o.parent) {
-     * 		// prepend each parent's transformation in turn:
-     * 		o.prependMatrix(o.getMatrix());
-     * 	}
-     * @method prependMatrix
-     * @param {Matrix2D} matrix
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.prependMatrix = function (matrix) {
-        return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-    };
+	/**
+	 * Appends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
+	 * @method appendMatrix
+	 * @param {Matrix2D} matrix
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.appendMatrix = function(matrix) {
+		return this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+	};
 
-    /**
-     * Generates matrix properties from the specified display object transform properties, and appends them to this matrix.
-     * For example, you can use this to generate a matrix representing the transformations of a display object:
-     * 
-     * 	var mtx = new createjs.Matrix2D();
-     * 	mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-     * @method appendTransform
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} scaleX
-     * @param {Number} scaleY
-     * @param {Number} rotation
-     * @param {Number} skewX
-     * @param {Number} skewY
-     * @param {Number} regX Optional.
-     * @param {Number} regY Optional.
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.appendTransform = function (x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-        if (rotation % 360) {
-            var r = rotation * Matrix2D.DEG_TO_RAD;
-            var cos = Math.cos(r);
-            var sin = Math.sin(r);
-        } else {
-            cos = 1;
-            sin = 0;
-        }
+	/**
+	 * Prepends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = o.getMatrix();
+	 * 	while (o = o.parent) {
+	 * 		// prepend each parent's transformation in turn:
+	 * 		o.prependMatrix(o.getMatrix());
+	 * 	}
+	 * @method prependMatrix
+	 * @param {Matrix2D} matrix
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.prependMatrix = function(matrix) {
+		return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+	};
 
-        if (skewX || skewY) {
-            // TODO: can this be combined into a single append operation?
-            skewX *= Matrix2D.DEG_TO_RAD;
-            skewY *= Matrix2D.DEG_TO_RAD;
-            this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
-            this.append(cos * scaleX, sin * scaleX, -sin * scaleY, cos * scaleY, 0, 0);
-        } else {
-            this.append(cos * scaleX, sin * scaleX, -sin * scaleY, cos * scaleY, x, y);
-        }
+	/**
+	 * Generates matrix properties from the specified display object transform properties, and appends them to this matrix.
+	 * For example, you can use this to generate a matrix representing the transformations of a display object:
+	 * 
+	 * 	var mtx = new createjs.Matrix2D();
+	 * 	mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * @method appendTransform
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} scaleX
+	 * @param {Number} scaleY
+	 * @param {Number} rotation
+	 * @param {Number} skewX
+	 * @param {Number} skewY
+	 * @param {Number} regX Optional.
+	 * @param {Number} regY Optional.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+		if (rotation%360) {
+			var r = rotation*Matrix2D.DEG_TO_RAD;
+			var cos = Math.cos(r);
+			var sin = Math.sin(r);
+		} else {
+			cos = 1;
+			sin = 0;
+		}
 
-        if (regX || regY) {
-            // append the registration offset:
-            this.tx -= regX * this.a + regY * this.c;
-            this.ty -= regX * this.b + regY * this.d;
-        }
-        return this;
-    };
+		if (skewX || skewY) {
+			// TODO: can this be combined into a single append operation?
+			skewX *= Matrix2D.DEG_TO_RAD;
+			skewY *= Matrix2D.DEG_TO_RAD;
+			this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+		} else {
+			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		}
+		
+		if (regX || regY) {
+			// append the registration offset:
+			this.tx -= regX*this.a+regY*this.c; 
+			this.ty -= regX*this.b+regY*this.d;
+		}
+		return this;
+	};
 
-    /**
-     * Generates matrix properties from the specified display object transform properties, and prepends them to this matrix.
-     * For example, you could calculate the combined transformation for a child object using:
-     * 
-     * 	var o = myDisplayObject;
-     * 	var mtx = new createjs.Matrix2D();
-     * 	do  {
-     * 		// prepend each parent's transformation in turn:
-     * 		mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
-     * 	} while (o = o.parent);
-     * 	
-     * 	Note that the above example would not account for {{#crossLink "DisplayObject/transformMatrix:property"}}{{/crossLink}}
-     * 	values. See {{#crossLink "Matrix2D/prependMatrix"}}{{/crossLink}} for an example that does.
-     * @method prependTransform
-     * @param {Number} x
-     * @param {Number} y
-     * @param {Number} scaleX
-     * @param {Number} scaleY
-     * @param {Number} rotation
-     * @param {Number} skewX
-     * @param {Number} skewY
-     * @param {Number} regX Optional.
-     * @param {Number} regY Optional.
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.prependTransform = function (x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-        if (rotation % 360) {
-            var r = rotation * Matrix2D.DEG_TO_RAD;
-            var cos = Math.cos(r);
-            var sin = Math.sin(r);
-        } else {
-            cos = 1;
-            sin = 0;
-        }
+	/**
+	 * Generates matrix properties from the specified display object transform properties, and prepends them to this matrix.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = new createjs.Matrix2D();
+	 * 	do  {
+	 * 		// prepend each parent's transformation in turn:
+	 * 		mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+	 * 	} while (o = o.parent);
+	 * 	
+	 * 	Note that the above example would not account for {{#crossLink "DisplayObject/transformMatrix:property"}}{{/crossLink}}
+	 * 	values. See {{#crossLink "Matrix2D/prependMatrix"}}{{/crossLink}} for an example that does.
+	 * @method prependTransform
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} scaleX
+	 * @param {Number} scaleY
+	 * @param {Number} rotation
+	 * @param {Number} skewX
+	 * @param {Number} skewY
+	 * @param {Number} regX Optional.
+	 * @param {Number} regY Optional.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+		if (rotation%360) {
+			var r = rotation*Matrix2D.DEG_TO_RAD;
+			var cos = Math.cos(r);
+			var sin = Math.sin(r);
+		} else {
+			cos = 1;
+			sin = 0;
+		}
 
-        if (regX || regY) {
-            // prepend the registration offset:
-            this.tx -= regX; this.ty -= regY;
-        }
-        if (skewX || skewY) {
-            // TODO: can this be combined into a single prepend operation?
-            skewX *= Matrix2D.DEG_TO_RAD;
-            skewY *= Matrix2D.DEG_TO_RAD;
-            this.prepend(cos * scaleX, sin * scaleX, -sin * scaleY, cos * scaleY, 0, 0);
-            this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
-        } else {
-            this.prepend(cos * scaleX, sin * scaleX, -sin * scaleY, cos * scaleY, x, y);
-        }
-        return this;
-    };
+		if (regX || regY) {
+			// prepend the registration offset:
+			this.tx -= regX; this.ty -= regY;
+		}
+		if (skewX || skewY) {
+			// TODO: can this be combined into a single prepend operation?
+			skewX *= Matrix2D.DEG_TO_RAD;
+			skewY *= Matrix2D.DEG_TO_RAD;
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+		} else {
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		}
+		return this;
+	};
 
-    /**
-     * Applies a clockwise rotation transformation to the matrix.
-     * @method rotate
-     * @param {Number} angle The angle to rotate by, in degrees. To use a value in radians, multiply it by `180/Math.PI`.
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.rotate = function (angle) {
-        angle = angle * Matrix2D.DEG_TO_RAD;
-        var cos = Math.cos(angle);
-        var sin = Math.sin(angle);
+	/**
+	 * Applies a clockwise rotation transformation to the matrix.
+	 * @method rotate
+	 * @param {Number} angle The angle to rotate by, in degrees. To use a value in radians, multiply it by `Math.PI/180`.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.rotate = function(angle) {
+		angle = angle*Matrix2D.DEG_TO_RAD;
+		var cos = Math.cos(angle);
+		var sin = Math.sin(angle);
 
-        var a1 = this.a;
-        var b1 = this.b;
+		var a1 = this.a;
+		var b1 = this.b;
 
-        this.a = a1 * cos + this.c * sin;
-        this.b = b1 * cos + this.d * sin;
-        this.c = -a1 * sin + this.c * cos;
-        this.d = -b1 * sin + this.d * cos;
-        return this;
-    };
+		this.a = a1*cos+this.c*sin;
+		this.b = b1*cos+this.d*sin;
+		this.c = -a1*sin+this.c*cos;
+		this.d = -b1*sin+this.d*cos;
+		return this;
+	};
 
-    /**
-     * Applies a skew transformation to the matrix.
-     * @method skew
-     * @param {Number} skewX The amount to skew horizontally in degrees. To use a value in radians, multiply it by `180/Math.PI`.
-     * @param {Number} skewY The amount to skew vertically in degrees.
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-    */
-    p.skew = function (skewX, skewY) {
-        skewX = skewX * Matrix2D.DEG_TO_RAD;
-        skewY = skewY * Matrix2D.DEG_TO_RAD;
-        this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
-        return this;
-    };
+	/**
+	 * Applies a skew transformation to the matrix.
+	 * @method skew
+	 * @param {Number} skewX The amount to skew horizontally in degrees. To use a value in radians, multiply it by `Math.PI/180`.
+	 * @param {Number} skewY The amount to skew vertically in degrees.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	*/
+	p.skew = function(skewX, skewY) {
+		skewX = skewX*Matrix2D.DEG_TO_RAD;
+		skewY = skewY*Matrix2D.DEG_TO_RAD;
+		this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), 0, 0);
+		return this;
+	};
 
-    /**
-     * Applies a scale transformation to the matrix.
-     * @method scale
-     * @param {Number} x The amount to scale horizontally. E.G. a value of 2 will double the size in the X direction, and 0.5 will halve it.
-     * @param {Number} y The amount to scale vertically.
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.scale = function (x, y) {
-        this.a *= x;
-        this.b *= x;
-        this.c *= y;
-        this.d *= y;
-        //this.tx *= x;
-        //this.ty *= y;
-        return this;
-    };
+	/**
+	 * Applies a scale transformation to the matrix.
+	 * @method scale
+	 * @param {Number} x The amount to scale horizontally. E.G. a value of 2 will double the size in the X direction, and 0.5 will halve it.
+	 * @param {Number} y The amount to scale vertically.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.scale = function(x, y) {
+		this.a *= x;
+		this.b *= x;
+		this.c *= y;
+		this.d *= y;
+		//this.tx *= x;
+		//this.ty *= y;
+		return this;
+	};
 
-    /**
-     * Translates the matrix on the x and y axes.
-     * @method translate
-     * @param {Number} x
-     * @param {Number} y
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.translate = function (x, y) {
-        this.tx += this.a * x + this.c * y;
-        this.ty += this.b * x + this.d * y;
-        return this;
-    };
+	/**
+	 * Translates the matrix on the x and y axes.
+	 * @method translate
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.translate = function(x, y) {
+		this.tx += this.a*x + this.c*y;
+		this.ty += this.b*x + this.d*y;
+		return this;
+	};
 
-    /**
-     * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
-     * @method identity
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.identity = function () {
-        this.a = this.d = 1;
-        this.b = this.c = this.tx = this.ty = 0;
-        return this;
-    };
+	/**
+	 * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
+	 * @method identity
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.identity = function() {
+		this.a = this.d = 1;
+		this.b = this.c = this.tx = this.ty = 0;
+		return this;
+	};
 
-    /**
-     * Inverts the matrix, causing it to perform the opposite transformation.
-     * @method invert
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-     **/
-    p.invert = function () {
-        var a1 = this.a;
-        var b1 = this.b;
-        var c1 = this.c;
-        var d1 = this.d;
-        var tx1 = this.tx;
-        var n = a1 * d1 - b1 * c1;
+	/**
+	 * Inverts the matrix, causing it to perform the opposite transformation.
+	 * @method invert
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.invert = function() {
+		var a1 = this.a;
+		var b1 = this.b;
+		var c1 = this.c;
+		var d1 = this.d;
+		var tx1 = this.tx;
+		var n = a1*d1-b1*c1;
 
-        this.a = d1 / n;
-        this.b = -b1 / n;
-        this.c = -c1 / n;
-        this.d = a1 / n;
-        this.tx = (c1 * this.ty - d1 * tx1) / n;
-        this.ty = -(a1 * this.ty - b1 * tx1) / n;
-        return this;
-    };
+		this.a = d1/n;
+		this.b = -b1/n;
+		this.c = -c1/n;
+		this.d = a1/n;
+		this.tx = (c1*this.ty-d1*tx1)/n;
+		this.ty = -(a1*this.ty-b1*tx1)/n;
+		return this;
+	};
 
-    /**
-     * Returns true if the matrix is an identity matrix.
-     * @method isIdentity
-     * @return {Boolean}
-     **/
-    p.isIdentity = function () {
-        return this.tx === 0 && this.ty === 0 && this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1;
-    };
+	/**
+	 * Returns true if the matrix is an identity matrix.
+	 * @method isIdentity
+	 * @return {Boolean}
+	 **/
+	p.isIdentity = function() {
+		return this.tx === 0 && this.ty === 0 && this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1;
+	};
+	
+	/**
+	 * Returns true if this matrix is equal to the specified matrix (all property values are equal).
+	 * @method equals
+	 * @param {Matrix2D} matrix The matrix to compare.
+	 * @return {Boolean}
+	 **/
+	p.equals = function(matrix) {
+		return this.tx === matrix.tx && this.ty === matrix.ty && this.a === matrix.a && this.b === matrix.b && this.c === matrix.c && this.d === matrix.d;
+	};
 
-    /**
-     * Returns true if this matrix is equal to the specified matrix (all property values are equal).
-     * @method equals
-     * @param {Matrix2D} matrix The matrix to compare.
-     * @return {Boolean}
-     **/
-    p.equals = function (matrix) {
-        return this.tx === matrix.tx && this.ty === matrix.ty && this.a === matrix.a && this.b === matrix.b && this.c === matrix.c && this.d === matrix.d;
-    };
+	/**
+	 * Transforms a point according to this matrix.
+	 * @method transformPoint
+	 * @param {Number} x The x component of the point to transform.
+	 * @param {Number} y The y component of the point to transform.
+	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	 * @return {Point} This matrix. Useful for chaining method calls.
+	 **/
+	p.transformPoint = function(x, y, pt) {
+		pt = pt||{};
+		pt.x = x*this.a+y*this.c+this.tx;
+		pt.y = x*this.b+y*this.d+this.ty;
+		return pt;
+	};
 
-    /**
-     * Transforms a point according to this matrix.
-     * @method transformPoint
-     * @param {Number} x The x component of the point to transform.
-     * @param {Number} y The y component of the point to transform.
-     * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
-     * @return {Point} This matrix. Useful for chaining method calls.
-     **/
-    p.transformPoint = function (x, y, pt) {
-        pt = pt || {};
-        pt.x = x * this.a + y * this.c + this.tx;
-        pt.y = x * this.b + y * this.d + this.ty;
-        return pt;
-    };
+	/**
+	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that these values
+	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
+	 * results.
+	 * @method decompose
+	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
+	 * @return {Object} The target, or a new generic object with the transform properties applied.
+	*/
+	p.decompose = function(target) {
+		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation even when scale is negative
+		if (target == null) { target = {}; }
+		target.x = this.tx;
+		target.y = this.ty;
+		target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b);
+		target.scaleY = Math.sqrt(this.c * this.c + this.d * this.d);
 
-    /**
-     * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that these values
-     * may not match the transform properties you used to generate the matrix, though they will produce the same visual
-     * results.
-     * @method decompose
-     * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
-     * @return {Object} The target, or a new generic object with the transform properties applied.
-    */
-    p.decompose = function (target) {
-        // TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation even when scale is negative
-        if (target == null) { target = {}; }
-        target.x = this.tx;
-        target.y = this.ty;
-        target.scaleX = Math.sqrt(this.a * this.a + this.b * this.b);
-        target.scaleY = Math.sqrt(this.c * this.c + this.d * this.d);
+		var skewX = Math.atan2(-this.c, this.d);
+		var skewY = Math.atan2(this.b, this.a);
 
-        var skewX = Math.atan2(-this.c, this.d);
-        var skewY = Math.atan2(this.b, this.a);
+		var delta = Math.abs(1-skewX/skewY);
+		if (delta < 0.00001) { // effectively identical, can use rotation:
+			target.rotation = skewY/Matrix2D.DEG_TO_RAD;
+			if (this.a < 0 && this.d >= 0) {
+				target.rotation += (target.rotation <= 0) ? 180 : -180;
+			}
+			target.skewX = target.skewY = 0;
+		} else {
+			target.skewX = skewX/Matrix2D.DEG_TO_RAD;
+			target.skewY = skewY/Matrix2D.DEG_TO_RAD;
+		}
+		return target;
+	};
+	
+	/**
+	 * Copies all properties from the specified matrix to this matrix.
+	 * @method copy
+	 * @param {Matrix2D} matrix The matrix to copy properties from.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	*/
+	p.copy = function(matrix) {
+		return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
+	};
 
-        var delta = Math.abs(1 - skewX / skewY);
-        if (delta < 0.00001) { // effectively identical, can use rotation:
-            target.rotation = skewY / Matrix2D.DEG_TO_RAD;
-            if (this.a < 0 && this.d >= 0) {
-                target.rotation += (target.rotation <= 0) ? 180 : -180;
-            }
-            target.skewX = target.skewY = 0;
-        } else {
-            target.skewX = skewX / Matrix2D.DEG_TO_RAD;
-            target.skewY = skewY / Matrix2D.DEG_TO_RAD;
-        }
-        return target;
-    };
+	/**
+	 * Returns a clone of the Matrix2D instance.
+	 * @method clone
+	 * @return {Matrix2D} a clone of the Matrix2D instance.
+	 **/
+	p.clone = function() {
+		return new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
+	};
 
-    /**
-     * Copies all properties from the specified matrix to this matrix.
-     * @method copy
-     * @param {Matrix2D} matrix The matrix to copy properties from.
-     * @return {Matrix2D} This matrix. Useful for chaining method calls.
-    */
-    p.copy = function (matrix) {
-        return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-    };
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function() {
+		return "[Matrix2D (a="+this.a+" b="+this.b+" c="+this.c+" d="+this.d+" tx="+this.tx+" ty="+this.ty+")]";
+	};
 
-    /**
-     * Returns a clone of the Matrix2D instance.
-     * @method clone
-     * @return {Matrix2D} a clone of the Matrix2D instance.
-     **/
-    p.clone = function () {
-        return new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
-    };
-
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     **/
-    p.toString = function () {
-        return "[Matrix2D (a=" + this.a + " b=" + this.b + " c=" + this.c + " d=" + this.d + " tx=" + this.tx + " ty=" + this.ty + ")]";
-    };
-
-    // this has to be populated after the class is defined:
-    Matrix2D.identity = new Matrix2D();
+	// this has to be populated after the class is defined:
+	Matrix2D.identity = new Matrix2D();
 
 
-    createjs.Matrix2D = Matrix2D;
+	createjs.Matrix2D = Matrix2D;
 }());
 
 //##############################################################################
@@ -3866,7 +3897,7 @@ this.createjs = this.createjs || {};
 
     // static properties:
     /**
-     * A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid
+     * A reusable instance of {{#crossLink "Graphics.BeginPath"}}{{/crossLink}} to avoid
      * unnecessary instantiation.
      * @property beginCmd
      * @type {Graphics.BeginPath}
@@ -3940,6 +3971,12 @@ this.createjs = this.createjs || {};
         this._updateInstructions();
         return this._instructions;
     };
+
+    /**
+     * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
+     * @method getInstructions
+     * @deprecated
+     */
     // Graphics.getInstructions is @deprecated. Remove for 1.1+
     p.getInstructions = createjs.deprecate(p._getInstructions, "Graphics.getInstructions");
 
@@ -5753,7 +5790,7 @@ this.createjs = this.createjs || {};
         this.radiusTL = radiusTL; this.radiusTR = radiusTR;
         this.radiusBR = radiusBR; this.radiusBL = radiusBL;
     }).prototype.exec = function (ctx) {
-        var max = (w < h ? w : h) / 2;
+        var max = (this.w < this.h ? this.w : this.h) / 2;
         var mTL = 0, mTR = 0, mBR = 0, mBL = 0;
         var x = this.x, y = this.y, w = this.w, h = this.h;
         var rTL = this.radiusTL, rTR = this.radiusTR, rBR = this.radiusBR, rBL = this.radiusBL;
@@ -5971,7 +6008,7 @@ this.createjs = this.createjs || {};
          * If a cache is active, this returns the canvas that holds the image of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
          * for more information. Use this to display the result of a cache. This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
          * @property cacheCanvas
-         * @type {HTMLCanvasElement | Object}
+         * @type {HTMLCanvasElement | WebGLTexture | Object}
          * @default null
          * @readonly
          **/
@@ -6114,7 +6151,7 @@ this.createjs = this.createjs || {};
 
         /**
          * Indicates whether this display object should be rendered to the canvas and included when running the Stage
-         * {{#crossLink "Stage/getObjectsUnderPoint"}}{{/crossLink}} method.
+         * {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} method.
          * @property visible
          * @type {Boolean}
          * @default true
@@ -6159,7 +6196,7 @@ this.createjs = this.createjs || {};
 
         /**
          * Indicates whether the display object should be drawn to a whole pixel when
-         * {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole
+         * {{#crossLink "Stage/snapToPixelEnabled:property"}}{{/crossLink}} is true. To enable/disable snapping on whole
          * categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
          * @property snapToPixel
          * @type {Boolean}
@@ -6275,6 +6312,15 @@ this.createjs = this.createjs || {};
          * @default 0
          */
         this._webGLRenderStyle = DisplayObject._StageGL_NONE;
+
+        /**
+         * Storage for the calculated position of an object in StageGL. If not using StageGL, you can null it to save memory.
+         * @property _glMtx
+         * @protected
+         * @type {Matrix2D}
+         * @default null
+         */
+        this._glMtx = new createjs.Matrix2D();
     }
     var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
 
@@ -6398,9 +6444,10 @@ this.createjs = this.createjs || {};
      * 
      * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
      * shapeA and then directly on to shapeB. With a listener for {{#crossLink "mouseover:event"}}{{/crossLink}} on
-     * myContainer, two events would be received, each targeting a child element:<OL>
-     * <LI>when the mouse enters shapeA (target=shapeA)</LI>
-     * <LI>when the mouse enters shapeB (target=shapeB)</LI>
+     * myContainer, two events would be received, each targeting a child element:
+     * <OL>
+     * 		<LI>when the mouse enters shapeA (target=shapeA)</LI>
+     * 		<LI>when the mouse enters shapeB (target=shapeB)</LI>
      * </OL>
      * However, with a listener for "rollover" instead, only a single event is received when the mouse first enters
      * the aggregate myContainer content (target=myContainer).
@@ -6418,9 +6465,10 @@ this.createjs = this.createjs || {};
      * 
      * For example, myContainer contains two overlapping children: shapeA and shapeB. The user moves their mouse over
      * shapeA, then directly on to shapeB, then off both. With a listener for {{#crossLink "mouseout:event"}}{{/crossLink}}
-     * on myContainer, two events would be received, each targeting a child element:<OL>
-     * <LI>when the mouse leaves shapeA (target=shapeA)</LI>
-     * <LI>when the mouse leaves shapeB (target=shapeB)</LI>
+     * on myContainer, two events would be received, each targeting a child element:
+     * <OL>
+     * 		<LI>when the mouse leaves shapeA (target=shapeA)</LI>
+     * 		<LI>when the mouse leaves shapeB (target=shapeB)</LI>
      * </OL>
      * However, with a listener for "rollout" instead, only a single event is received when the mouse leaves
      * the aggregate myContainer content (target=myContainer).
@@ -6500,6 +6548,12 @@ this.createjs = this.createjs || {};
         if (o instanceof _Stage) { return o; }
         return null;
     };
+
+    /**
+     * Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
+     * @method getStage
+     * @deprecated
+     */
     // DisplayObject.getStage is @deprecated. Remove for 1.1+
     p.getStage = createjs.deprecate(p._getStage, "DisplayObject.getStage");
 
@@ -6521,10 +6575,10 @@ this.createjs = this.createjs || {};
      */
 
     /**
-     * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY"}}{{/crossLink}}
+     * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY:property"}}{{/crossLink}}
      * property to the same value. Note that when you get the value, if the `scaleX` and `scaleY` are different values,
      * it will return only the `scaleX`.
-     * @property scaleX
+     * @property scale
      * @type {Number}
      * @default 1
      */
@@ -6537,7 +6591,7 @@ this.createjs = this.createjs || {};
             },
             scale: {
                 get: function () { return this.scaleX; },
-                set: function (scale) { this.scaleX = this.scaleY = scale; },
+                set: function (scale) { this.scaleX = this.scaleY = scale; }
             }
         });
     } catch (e) { }
@@ -6558,7 +6612,7 @@ this.createjs = this.createjs || {};
 
     /**
      * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns <code>true</code> if the draw was handled (useful for overriding functionality).
+     * Returns `true` if the draw was handled (useful for overriding functionality).
      *
      * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
      * @method draw
@@ -6612,8 +6666,8 @@ this.createjs = this.createjs || {};
      * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
      * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
      * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
-     * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
-     * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
+     * update the cache by calling `updateCache()` again. You must specify the cached area via the x, y, w, and h
+     * parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
      *
      * <h4>Example</h4>
      * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
@@ -6646,6 +6700,8 @@ this.createjs = this.createjs || {};
     p.cache = function (x, y, width, height, scale, options) {
         if (!this.bitmapCache) {
             this.bitmapCache = new createjs.BitmapCache();
+        } else {
+            this.bitmapCache._autoGenerated = false;
         }
         this.bitmapCache.define(this, x, y, width, height, scale, options);
     };
@@ -6696,8 +6752,8 @@ this.createjs = this.createjs || {};
      * @method getCacheDataURL
      * @return {String} The image data url for the cache.
      **/
-    p.getCacheDataURL = function () {
-        return this.bitmapCache ? this.bitmapCache.getCacheDataURL() : null;
+    p.getCacheDataURL = function (type, encoderOptions) {
+        return this.bitmapCache ? this.bitmapCache.getCacheDataURL(type, encoderOptions) : null;
     };
 
     /**
@@ -6814,8 +6870,9 @@ this.createjs = this.createjs || {};
      * @return {Matrix2D} A matrix representing this display object's transform.
      **/
     p.getMatrix = function (matrix) {
-        var o = this, mtx = matrix && matrix.identity() || new createjs.Matrix2D();
-        return o.transformMatrix ? mtx.copy(o.transformMatrix) : mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+        var o = this, mtx = matrix || new createjs.Matrix2D();
+        return o.transformMatrix ? mtx.copy(o.transformMatrix) :
+            (mtx.identity() && mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY));
     };
 
     /**
@@ -6878,7 +6935,8 @@ this.createjs = this.createjs || {};
     p.hitTest = function (x, y) {
         var ctx = DisplayObject._hitTestContext;
         ctx.setTransform(1, 0, 0, 1, -x, -y);
-        this.draw(ctx);
+        // hit tests occur in a 2D context, so don't attempt to draw a GL only Texture into a 2D context
+        this.draw(ctx, !(this.bitmapCache && !(this.bitmapCache._cacheCanvas instanceof WebGLTexture)));
 
         var hit = this._testHit(ctx);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -6919,21 +6977,22 @@ this.createjs = this.createjs || {};
      * 		the automatic calculations listed below.
      * 	</td></tr>
      * 	<tr><td><b>Bitmap</b></td><td>
-     * 		Returns the width and height of the sourceRect (if specified) or image, extending from (x=0,y=0).
+     * 		Returns the width and height of the {{#crossLink "Bitmap/sourceRect"}}{{/crossLink}} (if specified) or image,
+     * 		extending from (x=0,y=0).
      * 	</td></tr>
      * 	<tr><td><b>Sprite</b></td><td>
      * 		Returns the bounds of the current frame. May have non-zero x/y if a frame registration point was specified
      * 		in the spritesheet data. See also {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}}
      * 	</td></tr>
      * 	<tr><td><b>Container</b></td><td>
-     * 		Returns the aggregate (combined) bounds of all children that return a non-null value from getBounds().
+     * 		Returns the aggregate (combined) bounds of all children that return a non-null value from `getBounds()`.
      * 	</td></tr>
      * 	<tr><td><b>Shape</b></td><td>
-     * 		Does not currently support automatic bounds calculations. Use setBounds() to manually define bounds.
+     * 		Does not currently support automatic bounds calculations. Use `setBounds()` to manually define bounds.
      * 	</td></tr>
      * 	<tr><td><b>Text</b></td><td>
-     * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height) are
-     * 		not, especially when using textBaseline values other than "top".
+     * 		Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height)
+     * 		are not, especially when using {{#crossLink "Text/textBaseline:property"}}{{/crossLink}} values other than "top".
      * 	</td></tr>
      * 	<tr><td><b>BitmapText</b></td><td>
      * 		Returns approximate bounds. Values will be more accurate if spritesheet frame registration points are close
@@ -6962,10 +7021,9 @@ this.createjs = this.createjs || {};
      **/
     p.getBounds = function () {
         if (this._bounds) { return this._rectangle.copy(this._bounds); }
-        var cacheCanvas = this.cacheCanvas;
-        if (cacheCanvas) {
-            var scale = this._cacheScale;
-            return this._rectangle.setValues(this._cacheOffsetX, this._cacheOffsetY, cacheCanvas.width / scale, cacheCanvas.height / scale);
+        var cache = this.bitmapCache;
+        if (cache && this.cacheCanvas) {
+            return cache.getBounds();
         }
         return null;
     };
@@ -7038,6 +7096,7 @@ this.createjs = this.createjs || {};
      * present in a {{#crossLink "StageGL"}}{{/crossLink}} instance.
      *
      * @method _updateState
+     * @protected
      * @default null
      */
     p._updateState = null;
@@ -7073,6 +7132,7 @@ this.createjs = this.createjs || {};
         o.hitArea = this.hitArea;
         o.cursor = this.cursor;
         o._bounds = this._bounds;
+        o._webGLRenderStyle = this._webGLRenderStyle;
         return o;
     };
 
@@ -7872,3796 +7932,3803 @@ this.createjs = this.createjs || {};
 // Stage.js
 //##############################################################################
 
-this.createjs = this.createjs || {};
-
-(function () {
-    "use strict";
-
-
-    // constructor:
-    /**
-     * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
-     * method is called, it will render its display list to its target canvas.
-     *
-     * <h4>Example</h4>
-     * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
-     * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
-     *
-     *      var stage = new createjs.Stage("canvasElementId");
-     *      var image = new createjs.Bitmap("imagePath.png");
-     *      stage.addChild(image);
-     *      createjs.Ticker.addEventListener("tick", handleTick);
-     *      function handleTick(event) {
-     *          image.x += 10;
-     *          stage.update();
-     *      }
-     *
-     * @class Stage
-     * @extends Container
-     * @constructor
-     * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
-     * of a canvas object in the current document.
-     **/
-    function Stage(canvas) {
-        this.Container_constructor();
-
-
-        // public properties:
-        /**
-         * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
-         * to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for
-         * example).
-         *
-         * <h4>Example</h4>
-         *
-         *      var stage = new createjs.Stage("canvasId");
-         *      stage.autoClear = false;
-         *
-         * @property autoClear
-         * @type Boolean
-         * @default true
-         **/
-        this.autoClear = true;
-
-        /**
-         * The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
-         * first stage that will be ticked (or they will clear each other's render).
-         *
-         * When changing the canvas property you must disable the events on the old canvas, and enable events on the
-         * new canvas or mouse events will not work as expected. For example:
-         *
-         *      myStage.enableDOMEvents(false);
-         *      myStage.canvas = anotherCanvas;
-         *      myStage.enableDOMEvents(true);
-         *
-         * @property canvas
-         * @type HTMLCanvasElement | Object
-         **/
-        this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
-
-        /**
-         * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
-         * position over the canvas, and mouseInBounds will be set to false.
-         * @property mouseX
-         * @type Number
-         * @readonly
-         **/
-        this.mouseX = 0;
-
-        /**
-         * The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
-         * position over the canvas, and mouseInBounds will be set to false.
-         * @property mouseY
-         * @type Number
-         * @readonly
-         **/
-        this.mouseY = 0;
-
-        /**
-         * Specifies the area of the stage to affect when calling update. This can be use to selectively
-         * re-draw specific regions of the canvas. If null, the whole canvas area is drawn.
-         * @property drawRect
-         * @type {Rectangle}
-         */
-        this.drawRect = null;
-
-        /**
-         * Indicates whether display objects should be rendered on whole pixels. You can set the
-         * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
-         * display objects to false to enable/disable this behaviour on a per instance basis.
-         * @property snapToPixelEnabled
-         * @type Boolean
-         * @default false
-         **/
-        this.snapToPixelEnabled = false;
-
-        /**
-         * Indicates whether the mouse is currently within the bounds of the canvas.
-         * @property mouseInBounds
-         * @type Boolean
-         * @default false
-         **/
-        this.mouseInBounds = false;
-
-        /**
-         * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
-         * @property tickOnUpdate
-         * @type Boolean
-         * @default true
-         **/
-        this.tickOnUpdate = true;
-
-        /**
-         * If true, mouse move events will continue to be called when the mouse leaves the target canvas. See
-         * {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}}
-         * x/y/rawX/rawY.
-         * @property mouseMoveOutside
-         * @type Boolean
-         * @default false
-         **/
-        this.mouseMoveOutside = false;
-
-
-        /**
-         * Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas.
-         * This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
-         * @property preventSelection
-         * @type Boolean
-         * @default true
-         **/
-        this.preventSelection = true;
-
-        /**
-         * The hitArea property is not supported for Stage.
-         * @property hitArea
-         * @type {DisplayObject}
-         * @default null
-         */
-
-
-        // private properties:
-        /**
-         * Holds objects with data for each active pointer id. Each object has the following properties:
-         * x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
-         * @property _pointerData
-         * @type {Object}
-         * @private
-         */
-        this._pointerData = {};
-
-        /**
-         * Number of active pointers.
-         * @property _pointerCount
-         * @type {Object}
-         * @private
-         */
-        this._pointerCount = 0;
-
-        /**
-         * The ID of the primary pointer.
-         * @property _primaryPointerID
-         * @type {Object}
-         * @private
-         */
-        this._primaryPointerID = null;
-
-        /**
-         * @property _mouseOverIntervalID
-         * @protected
-         * @type Number
-         **/
-        this._mouseOverIntervalID = null;
-
-        /**
-         * @property _nextStage
-         * @protected
-         * @type Stage
-         **/
-        this._nextStage = null;
-
-        /**
-         * @property _prevStage
-         * @protected
-         * @type Stage
-         **/
-        this._prevStage = null;
-
-
-        // initialize:
-        this.enableDOMEvents(true);
-    }
-    var p = createjs.extend(Stage, createjs.Container);
-
-    // events:
-    /**
-     * Dispatched when the user moves the mouse over the canvas.
-     * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-     * @event stagemousemove
-     * @since 0.6.0
-     */
-
-    /**
-     * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
-     * class for a listing of event properties.
-     * @event stagemousedown
-     * @since 0.6.0
-     */
-
-    /**
-     * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
-     * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
-     * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
-     * @event stagemouseup
-     * @since 0.6.0
-     */
-
-    /**
-     * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
-     * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
-     * class for a listing of event properties.
-     * @event mouseleave
-     * @since 0.7.0
-     */
-
-    /**
-     * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
-     * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
-     * class for a listing of event properties.
-     * @event mouseenter
-     * @since 0.7.0
-     */
-
-    /**
-     * Dispatched each update immediately before the tick event is propagated through the display list.
-     * You can call preventDefault on the event object to cancel propagating the tick event.
-     * @event tickstart
-     * @since 0.7.0
-     */
-
-    /**
-     * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
-     * tickOnUpdate is false. Precedes the "drawstart" event.
-     * @event tickend
-     * @since 0.7.0
-     */
-
-    /**
-     * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
-     * You can call preventDefault on the event object to cancel the draw.
-     * @event drawstart
-     * @since 0.7.0
-     */
-
-    /**
-     * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
-     * @event drawend
-     * @since 0.7.0
-     */
-
-
-    // getter / setters:
-    /**
-     * Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them.
-     * This can be useful in cases where you have multiple layered canvases and want user interactions
-     * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
-     *
-     *      topStage.nextStage = bottomStage;
-     *
-     * To disable relaying, set nextStage to null.
-     * 
-     * MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings
-     * of the top-most stage, but are only processed if the target stage has mouse over interactions enabled.
-     * Considerations when using roll over in relay targets:<OL>
-     * <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI>
-     * <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI>
-     * <LI> All relay targets will share the frequency value of the top-most stage</LI>
-     * </OL>
-     * To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing
-     * 30 as it's desired frequency):
-     * 	topStage.nextStage = targetStage;
-     * 	topStage.enableMouseOver(10);
-     * 	targetStage.enableMouseOver(30);
-     * 
-     * If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its
-     * DOM events using:
-     * 
-     *	targetStage.enableDOMEvents(false);
-     * 
-     * @property nextStage
-     * @type {Stage}
-     **/
-    p._get_nextStage = function () {
-        return this._nextStage;
-    };
-    p._set_nextStage = function (value) {
-        if (this._nextStage) { this._nextStage._prevStage = null; }
-        if (value) { value._prevStage = this; }
-        this._nextStage = value;
-    };
-
-    try {
-        Object.defineProperties(p, {
-            nextStage: { get: p._get_nextStage, set: p._set_nextStage }
-        });
-    } catch (e) { } // TODO: use Log
-
-
-    // public methods:
-    /**
-     * Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
-     * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
-     * and then render the display list to the canvas.
-     *
-     * @method update
-     * @param {Object} [props] Props object to pass to `tick()`. Should usually be a {{#crossLink "Ticker"}}{{/crossLink}} event object, or similar object with a delta property.
-     **/
-    p.update = function (props) {
-        if (!this.canvas) { return; }
-        if (this.tickOnUpdate) { this.tick(props); }
-        if (this.dispatchEvent("drawstart", false, true) === false) { return; }
-        createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
-        var r = this.drawRect, ctx = this.canvas.getContext("2d");
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        if (this.autoClear) {
-            if (r) { ctx.clearRect(r.x, r.y, r.width, r.height); }
-            else { ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1); }
-        }
-        ctx.save();
-        if (this.drawRect) {
-            ctx.beginPath();
-            ctx.rect(r.x, r.y, r.width, r.height);
-            ctx.clip();
-        }
-        this.updateContext(ctx);
-        this.draw(ctx, false);
-        ctx.restore();
-        this.dispatchEvent("drawend");
-    };
-
-    /**
-     * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
-     * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
-     *
-     * If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
-     * propagated to listeners.
-     *
-     * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-     * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
-     * passed as the `props` parameter to `tick()`. For example:
-     *
-     * 	Ticker.on("tick", handleTick);
-     * 	function handleTick(evtObj) {
-     * 		// clone the event object from Ticker, and add some custom data to it:
-     * 		var evt = evtObj.clone().set({greeting:"hello", name:"world"});
-     * 		
-     * 		// pass it to stage.update():
-     * 		myStage.update(evt); // subsequently calls tick() with the same param
-     * 	}
-     * 	
-     * 	// ...
-     * 	myDisplayObject.on("tick", handleDisplayObjectTick);
-     * 	function handleDisplayObjectTick(evt) {
-     * 		console.log(evt.delta); // the delta property from the Ticker tick event object
-     * 		console.log(evt.greeting, evt.name); // custom data: "hello world"
-     * 	}
-     * 
-     * @method tick
-     * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
-     **/
-    p.tick = function (props) {
-        if (!this.tickEnabled || this.dispatchEvent("tickstart", false, true) === false) { return; }
-        var evtObj = new createjs.Event("tick");
-        if (props) {
-            for (var n in props) {
-                if (props.hasOwnProperty(n)) { evtObj[ n ] = props[ n ]; }
-            }
-        }
-        this._tick(evtObj);
-        this.dispatchEvent("tickend");
-    };
-
-    /**
-     * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
-     * event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
-     * directly, using:
-     *
-     *      Ticker.addEventListener("tick", myStage);
-     *
-     * Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to
-     * display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
-     * @property handleEvent
-     * @type Function
-     **/
-    p.handleEvent = function (evt) {
-        if (evt.type == "tick") { this.update(evt); }
-    };
-
-    /**
-     * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
-     * @method clear
-     **/
-    p.clear = function () {
-        if (!this.canvas) { return; }
-        var ctx = this.canvas.getContext("2d");
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
-    };
-
-    /**
-     * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
-     * be specified as the src value of an image element.
-     * @method toDataURL
-     * @param {String} [backgroundColor] The background color to be used for the generated image. Any valid CSS color
-     * value is allowed. The default value is a transparent background.
-     * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
-     * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
-     * @return {String} a Base64 encoded image.
-     **/
-    p.toDataURL = function (backgroundColor, mimeType) {
-        var data, ctx = this.canvas.getContext('2d'), w = this.canvas.width, h = this.canvas.height;
-
-        if (backgroundColor) {
-            data = ctx.getImageData(0, 0, w, h);
-            var compositeOperation = ctx.globalCompositeOperation;
-            ctx.globalCompositeOperation = "destination-over";
-
-            ctx.fillStyle = backgroundColor;
-            ctx.fillRect(0, 0, w, h);
-        }
-
-        var dataURL = this.canvas.toDataURL(mimeType || "image/png");
-
-        if (backgroundColor) {
-            ctx.putImageData(data, 0, 0);
-            ctx.globalCompositeOperation = compositeOperation;
-        }
-
-        return dataURL;
-    };
-
-    /**
-     * Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
-     * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) and roll over events ({{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}
-     * and {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}) for this stage's display list. These events can
-     * be expensive to generate, so they are disabled by default. The frequency of the events can be controlled
-     * independently of mouse move events via the optional `frequency` parameter.
-     *
-     * <h4>Example</h4>
-     *
-     *      var stage = new createjs.Stage("canvasId");
-     *      stage.enableMouseOver(10); // 10 updates per second
-     *
-     * @method enableMouseOver
-     * @param {Number} [frequency=20] Optional param specifying the maximum number of times per second to broadcast
-     * mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less
-     * responsive, but uses less CPU.
-     **/
-    p.enableMouseOver = function (frequency) {
-        if (this._mouseOverIntervalID) {
-            clearInterval(this._mouseOverIntervalID);
-            this._mouseOverIntervalID = null;
-            if (frequency == 0) {
-                this._testMouseOver(true);
-            }
-        }
-        if (frequency == null) { frequency = 20; }
-        else if (frequency <= 0) { return; }
-        var o = this;
-        this._mouseOverIntervalID = setInterval(function () { o._testMouseOver(); }, 1000 / Math.min(50, frequency));
-    };
-
-    /**
-     * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas). It is good
-     * practice to disable events when disposing of a Stage instance, otherwise the stage will continue to receive
-     * events from the page.
-     *
-     * When changing the canvas property you must disable the events on the old canvas, and enable events on the
-     * new canvas or mouse events will not work as expected. For example:
-     *
-     *      myStage.enableDOMEvents(false);
-     *      myStage.canvas = anotherCanvas;
-     *      myStage.enableDOMEvents(true);
-     *
-     * @method enableDOMEvents
-     * @param {Boolean} [enable=true] Indicates whether to enable or disable the events. Default is true.
-     **/
-    p.enableDOMEvents = function (enable) {
-        if (enable == null) { enable = true; }
-        var n, o, ls = this._eventListeners;
-        if (!enable && ls) {
-            for (n in ls) {
-                o = ls[ n ];
-                o.t.removeEventListener(n, o.f, false);
-            }
-            this._eventListeners = null;
-        } else if (enable && !ls && this.canvas) {
-            var t = window.addEventListener ? window : document;
-            var _this = this;
-            ls = this._eventListeners = {};
-            ls[ "mouseup" ] = { t: t, f: function (e) { _this._handleMouseUp(e) } };
-            ls[ "mousemove" ] = { t: t, f: function (e) { _this._handleMouseMove(e) } };
-            ls[ "dblclick" ] = { t: this.canvas, f: function (e) { _this._handleDoubleClick(e) } };
-            ls[ "mousedown" ] = { t: this.canvas, f: function (e) { _this._handleMouseDown(e) } };
-
-            for (n in ls) {
-                o = ls[ n ];
-                o.t.addEventListener(n, o.f, false);
-            }
-        }
-    };
-
-    /**
-     * Stage instances cannot be cloned.
-     * @method clone
-     **/
-    p.clone = function () {
-        throw ("Stage cannot be cloned.");
-    };
-
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     **/
-    p.toString = function () {
-        return "[Stage (name=" + this.name + ")]";
-    };
-
-
-    // private methods:
-    /**
-     * @method _getElementRect
-     * @protected
-     * @param {HTMLElement} e
-     **/
-    p._getElementRect = function (e) {
-        var bounds;
-        try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
-        catch (err) { bounds = { top: e.offsetTop, left: e.offsetLeft, width: e.offsetWidth, height: e.offsetHeight }; }
-
-        var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
-        var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop || document.body.clientTop || 0);
-
-        var styles = window.getComputedStyle ? getComputedStyle(e, null) : e.currentStyle; // IE <9 compatibility.
-        var padL = parseInt(styles.paddingLeft) + parseInt(styles.borderLeftWidth);
-        var padT = parseInt(styles.paddingTop) + parseInt(styles.borderTopWidth);
-        var padR = parseInt(styles.paddingRight) + parseInt(styles.borderRightWidth);
-        var padB = parseInt(styles.paddingBottom) + parseInt(styles.borderBottomWidth);
-
-        // note: in some browsers bounds properties are read only.
-        return {
-            left: bounds.left + offX + padL,
-            right: bounds.right + offX - padR,
-            top: bounds.top + offY + padT,
-            bottom: bounds.bottom + offY - padB
-        }
-    };
-
-    /**
-     * @method _getPointerData
-     * @protected
-     * @param {Number} id
-     **/
-    p._getPointerData = function (id) {
-        var data = this._pointerData[ id ];
-        if (!data) { data = this._pointerData[ id ] = { x: 0, y: 0 }; }
-        return data;
-    };
-
-    /**
-     * @method _handleMouseMove
-     * @protected
-     * @param {MouseEvent} e
-     **/
-    p._handleMouseMove = function (e) {
-        if (!e) { e = window.event; }
-        this._handlePointerMove(-1, e, e.pageX, e.pageY);
-    };
-
-    /**
-     * @method _handlePointerMove
-     * @protected
-     * @param {Number} id
-     * @param {Event} e
-     * @param {Number} pageX
-     * @param {Number} pageY
-     * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
-     **/
-    p._handlePointerMove = function (id, e, pageX, pageY, owner) {
-        if (this._prevStage && owner === undefined) { return; } // redundant listener.
-        if (!this.canvas) { return; }
-        var nextStage = this._nextStage, o = this._getPointerData(id);
-
-        var inBounds = o.inBounds;
-        this._updatePointerPosition(id, e, pageX, pageY);
-        if (inBounds || o.inBounds || this.mouseMoveOutside) {
-            if (id === -1 && o.inBounds == !inBounds) {
-                this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
-            }
-
-            this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
-            this._dispatchMouseEvent(o.target, "pressmove", true, id, o, e);
-        }
-
-        nextStage && nextStage._handlePointerMove(id, e, pageX, pageY, null);
-    };
-
-    /**
-     * @method _updatePointerPosition
-     * @protected
-     * @param {Number} id
-     * @param {Event} e
-     * @param {Number} pageX
-     * @param {Number} pageY
-     **/
-    p._updatePointerPosition = function (id, e, pageX, pageY) {
-        var rect = this._getElementRect(this.canvas);
-        pageX -= rect.left;
-        pageY -= rect.top;
-
-        var w = this.canvas.width;
-        var h = this.canvas.height;
-        pageX /= (rect.right - rect.left) / w;
-        pageY /= (rect.bottom - rect.top) / h;
-        var o = this._getPointerData(id);
-        if (o.inBounds = (pageX >= 0 && pageY >= 0 && pageX <= w - 1 && pageY <= h - 1)) {
-            o.x = pageX;
-            o.y = pageY;
-        } else if (this.mouseMoveOutside) {
-            o.x = pageX < 0 ? 0 : (pageX > w - 1 ? w - 1 : pageX);
-            o.y = pageY < 0 ? 0 : (pageY > h - 1 ? h - 1 : pageY);
-        }
-
-        o.posEvtObj = e;
-        o.rawX = pageX;
-        o.rawY = pageY;
-
-        if (id === this._primaryPointerID || id === -1) {
-            this.mouseX = o.x;
-            this.mouseY = o.y;
-            this.mouseInBounds = o.inBounds;
-        }
-    };
-
-    /**
-     * @method _handleMouseUp
-     * @protected
-     * @param {MouseEvent} e
-     **/
-    p._handleMouseUp = function (e) {
-        this._handlePointerUp(-1, e, false);
-    };
-
-    /**
-     * @method _handlePointerUp
-     * @protected
-     * @param {Number} id
-     * @param {Event} e
-     * @param {Boolean} clear
-     * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
-     **/
-    p._handlePointerUp = function (id, e, clear, owner) {
-        var nextStage = this._nextStage, o = this._getPointerData(id);
-        if (this._prevStage && owner === undefined) { return; } // redundant listener.
-
-        var target = null, oTarget = o.target;
-        if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
-
-        if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e, target); o.down = false; }
-
-        if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
-        this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
-
-        if (clear) {
-            if (id == this._primaryPointerID) { this._primaryPointerID = null; }
-            delete (this._pointerData[ id ]);
-        } else { o.target = null; }
-
-        nextStage && nextStage._handlePointerUp(id, e, clear, owner || target && this);
-    };
-
-    /**
-     * @method _handleMouseDown
-     * @protected
-     * @param {MouseEvent} e
-     **/
-    p._handleMouseDown = function (e) {
-        this._handlePointerDown(-1, e, e.pageX, e.pageY);
-    };
-
-    /**
-     * @method _handlePointerDown
-     * @protected
-     * @param {Number} id
-     * @param {Event} e
-     * @param {Number} pageX
-     * @param {Number} pageY
-     * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
-     **/
-    p._handlePointerDown = function (id, e, pageX, pageY, owner) {
-        if (this.preventSelection) { e.preventDefault(); }
-        if (this._primaryPointerID == null || id === -1) { this._primaryPointerID = id; } // mouse always takes over.
-
-        if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
-        var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
-        if (!owner) { target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
-
-        if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e, target); o.down = true; }
-        this._dispatchMouseEvent(target, "mousedown", true, id, o, e);
-
-        nextStage && nextStage._handlePointerDown(id, e, pageX, pageY, owner || target && this);
-    };
-
-    /**
-     * @method _testMouseOver
-     * @param {Boolean} clear If true, clears the mouseover / rollover (ie. no target)
-     * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
-     * @param {Stage} eventTarget The stage that the cursor is actively over.
-     * @protected
-     **/
-    p._testMouseOver = function (clear, owner, eventTarget) {
-        if (this._prevStage && owner === undefined) { return; } // redundant listener.
-
-        var nextStage = this._nextStage;
-        if (!this._mouseOverIntervalID) {
-            // not enabled for mouseover, but should still relay the event.
-            nextStage && nextStage._testMouseOver(clear, owner, eventTarget);
-            return;
-        }
-        var o = this._getPointerData(-1);
-        // only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-        if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
-
-        var e = o.posEvtObj;
-        var isEventTarget = eventTarget || e && (e.target == this.canvas);
-        var target = null, common = -1, cursor = "", t, i, l;
-
-        if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
-            target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
-            this._mouseOverX = this.mouseX;
-            this._mouseOverY = this.mouseY;
-        }
-
-        var oldList = this._mouseOverTarget || [];
-        var oldTarget = oldList[ oldList.length - 1 ];
-        var list = this._mouseOverTarget = [];
-
-        // generate ancestor list and check for cursor:
-        t = target;
-        while (t) {
-            list.unshift(t);
-            if (!cursor) { cursor = t.cursor; }
-            t = t.parent;
-        }
-        this.canvas.style.cursor = cursor;
-        if (!owner && eventTarget) { eventTarget.canvas.style.cursor = cursor; }
-
-        // find common ancestor:
-        for (i = 0, l = list.length; i < l; i++) {
-            if (list[ i ] != oldList[ i ]) { break; }
-            common = i;
-        }
-
-        if (oldTarget != target) {
-            this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e, target);
-        }
-
-        for (i = oldList.length - 1; i > common; i--) {
-            this._dispatchMouseEvent(oldList[ i ], "rollout", false, -1, o, e, target);
-        }
-
-        for (i = list.length - 1; i > common; i--) {
-            this._dispatchMouseEvent(list[ i ], "rollover", false, -1, o, e, oldTarget);
-        }
-
-        if (oldTarget != target) {
-            this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
-        }
-
-        nextStage && nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
-    };
-
-    /**
-     * @method _handleDoubleClick
-     * @protected
-     * @param {MouseEvent} e
-     * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
-     **/
-    p._handleDoubleClick = function (e, owner) {
-        var target = null, nextStage = this._nextStage, o = this._getPointerData(-1);
-        if (!owner) {
-            target = this._getObjectsUnderPoint(o.x, o.y, null, true);
-            this._dispatchMouseEvent(target, "dblclick", true, -1, o, e);
-        }
-        nextStage && nextStage._handleDoubleClick(e, owner || target && this);
-    };
-
-    /**
-     * @method _dispatchMouseEvent
-     * @protected
-     * @param {DisplayObject} target
-     * @param {String} type
-     * @param {Boolean} bubbles
-     * @param {Number} pointerId
-     * @param {Object} o
-     * @param {MouseEvent} [nativeEvent]
-     * @param {DisplayObject} [relatedTarget]
-     **/
-    p._dispatchMouseEvent = function (target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
-        // TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
-        if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
-        /*
-        // TODO: account for stage transformations?
-        this._mtx = this.getConcatenatedMatrix(this._mtx).invert();
-        var pt = this._mtx.transformPoint(o.x, o.y);
-        var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID || pointerId==-1, o.rawX, o.rawY);
-        */
-        var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY, relatedTarget);
-        target.dispatchEvent(evt);
-    };
-
-
-    createjs.Stage = createjs.promote(Stage, "Container");
+this.createjs = this.createjs||{};
+
+(function() {
+	"use strict";
+
+
+// constructor:
+	/**
+	 * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * method is called, it will render its display list to its target canvas.
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
+	 * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
+	 *
+	 *      var stage = new createjs.Stage("canvasElementId");
+	 *      var image = new createjs.Bitmap("imagePath.png");
+	 *      stage.addChild(image);
+	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      function handleTick(event) {
+	 *          image.x += 10;
+	 *          stage.update();
+	 *      }
+	 *
+	 * @class Stage
+	 * @extends Container
+	 * @constructor
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
+	 * of a canvas object in the current document.
+	 **/
+	function Stage(canvas) {
+		this.Container_constructor();
+	
+	
+	// public properties:
+		/**
+		 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
+		 * to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for
+		 * example).
+		 *
+		 * <h4>Example</h4>
+		 *
+		 *      var stage = new createjs.Stage("canvasId");
+		 *      stage.autoClear = false;
+		 *
+		 * @property autoClear
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.autoClear = true;
+	
+		/**
+		 * The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
+		 * first stage that will be ticked (or they will clear each other's render).
+		 *
+		 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
+		 * new canvas or mouse events will not work as expected. For example:
+		 *
+		 *      myStage.enableDOMEvents(false);
+		 *      myStage.canvas = anotherCanvas;
+		 *      myStage.enableDOMEvents(true);
+		 *
+		 * @property canvas
+		 * @type HTMLCanvasElement | Object
+		 **/
+		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+	
+		/**
+		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+		 * position over the canvas, and mouseInBounds will be set to false.
+		 * @property mouseX
+		 * @type Number
+		 * @readonly
+		 **/
+		this.mouseX = 0;
+	
+		/**
+		 * The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+		 * position over the canvas, and mouseInBounds will be set to false.
+		 * @property mouseY
+		 * @type Number
+		 * @readonly
+		 **/
+		this.mouseY = 0;
+	
+		/**
+		 * Specifies the area of the stage to affect when calling update. This can be use to selectively
+		 * re-draw specific regions of the canvas. If null, the whole canvas area is drawn.
+		 * @property drawRect
+		 * @type {Rectangle}
+		 */
+		this.drawRect = null;
+	
+		/**
+		 * Indicates whether display objects should be rendered on whole pixels. You can set the
+		 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
+		 * display objects to false to enable/disable this behaviour on a per instance basis.
+		 * @property snapToPixelEnabled
+		 * @type Boolean
+		 * @default false
+		 **/
+		this.snapToPixelEnabled = false;
+	
+		/**
+		 * Indicates whether the mouse is currently within the bounds of the canvas.
+		 * @property mouseInBounds
+		 * @type Boolean
+		 * @default false
+		 **/
+		this.mouseInBounds = false;
+	
+		/**
+		 * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
+		 * @property tickOnUpdate
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.tickOnUpdate = true;
+	
+		/**
+		 * If true, mouse move events will continue to be called when the mouse leaves the target canvas. See
+		 * {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}}
+		 * x/y/rawX/rawY.
+		 * @property mouseMoveOutside
+		 * @type Boolean
+		 * @default false
+		 **/
+		this.mouseMoveOutside = false;
+		
+		
+		/**
+		 * Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas.
+		 * This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
+		 * @property preventSelection
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.preventSelection = true;
+	
+		/**
+		 * The hitArea property is not supported for Stage.
+		 * @property hitArea
+		 * @type {DisplayObject}
+		 * @default null
+		 */
+		 
+		 
+	// private properties:
+		/**
+		 * Holds objects with data for each active pointer id. Each object has the following properties:
+		 * x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
+		 * @property _pointerData
+		 * @type {Object}
+		 * @private
+		 */
+		this._pointerData = {};
+	
+		/**
+		 * Number of active pointers.
+		 * @property _pointerCount
+		 * @type {Object}
+		 * @private
+		 */
+		this._pointerCount = 0;
+	
+		/**
+		 * The ID of the primary pointer.
+		 * @property _primaryPointerID
+		 * @type {Object}
+		 * @private
+		 */
+		this._primaryPointerID = null;
+	
+		/**
+		 * @property _mouseOverIntervalID
+		 * @protected
+		 * @type Number
+		 **/
+		this._mouseOverIntervalID = null;
+		
+		/**
+		 * @property _nextStage
+		 * @protected
+		 * @type Stage
+		 **/
+		this._nextStage = null;
+		
+		/**
+		 * @property _prevStage
+		 * @protected
+		 * @type Stage
+		 **/
+		this._prevStage = null;
+		
+		
+	// initialize:
+		this.enableDOMEvents(true);
+	}
+	var p = createjs.extend(Stage, createjs.Container);
+
+// events:
+	/**
+	 * Dispatched when the user moves the mouse over the canvas.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event stagemousemove
+	 * @since 0.6.0
+	 */
+
+	/**
+	 * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event stagemousedown
+	 * @since 0.6.0
+	 */
+
+	/**
+	 * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
+	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
+	 * @event stagemouseup
+	 * @since 0.6.0
+	 */
+
+	/**
+	 * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
+	 * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event mouseleave
+	 * @since 0.7.0
+	 */
+
+	/**
+	 * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
+	 * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
+	 * class for a listing of event properties.
+	 * @event mouseenter
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately before the tick event is propagated through the display list.
+	 * You can call preventDefault on the event object to cancel propagating the tick event.
+	 * @event tickstart
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
+	 * tickOnUpdate is false. Precedes the "drawstart" event.
+	 * @event tickend
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
+	 * You can call preventDefault on the event object to cancel the draw.
+	 * @event drawstart
+	 * @since 0.7.0
+	 */
+	 
+	/**
+	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
+	 * @event drawend
+	 * @since 0.7.0
+	 */
+
+	 
+// getter / setters:
+	/**
+	 * Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them.
+	 * This can be useful in cases where you have multiple layered canvases and want user interactions
+	 * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
+	 *
+	 *      topStage.nextStage = bottomStage;
+	 *
+	 * To disable relaying, set nextStage to null.
+	 * 
+	 * MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings
+	 * of the top-most stage, but are only processed if the target stage has mouse over interactions enabled.
+	 * Considerations when using roll over in relay targets:<OL>
+	 * <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI>
+	 * <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI>
+	 * <LI> All relay targets will share the frequency value of the top-most stage</LI>
+	 * </OL>
+	 * To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing
+	 * 30 as it's desired frequency):
+	 * 	topStage.nextStage = targetStage;
+	 * 	topStage.enableMouseOver(10);
+	 * 	targetStage.enableMouseOver(30);
+	 * 
+	 * If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its
+	 * DOM events using:
+	 * 
+	 *	targetStage.enableDOMEvents(false);
+	 * 
+	 * @property nextStage
+	 * @type {Stage}
+	 **/
+	p._get_nextStage = function() {
+		return this._nextStage;
+	};
+	p._set_nextStage = function(value) {
+		if (this._nextStage) { this._nextStage._prevStage = null; }
+		if (value) { value._prevStage = this; }
+		this._nextStage = value;
+	};
+	
+	try {
+		Object.defineProperties(p, {
+			nextStage: { get: p._get_nextStage, set: p._set_nextStage }
+		});
+	} catch (e) {} // TODO: use Log
+
+
+// public methods:
+	/**
+	 * Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
+	 * and then render the display list to the canvas.
+	 *
+	 * @method update
+	 * @param {Object} [props] Props object to pass to `tick()`. Should usually be a {{#crossLink "Ticker"}}{{/crossLink}} event object, or similar object with a delta property.
+	 **/
+	p.update = function(props) {
+		if (!this.canvas) { return; }
+		if (this.tickOnUpdate) { this.tick(props); }
+		if (this.dispatchEvent("drawstart", false, true) === false) { return; }
+		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
+		var r = this.drawRect, ctx = this.canvas.getContext("2d");
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		if (this.autoClear) {
+			if (r) { ctx.clearRect(r.x, r.y, r.width, r.height); }
+			else { ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1); }
+		}
+		ctx.save();
+		if (this.drawRect) {
+			ctx.beginPath();
+			ctx.rect(r.x, r.y, r.width, r.height);
+			ctx.clip();
+		}
+		this.updateContext(ctx);
+		this.draw(ctx, false);
+		ctx.restore();
+		this.dispatchEvent("drawend");
+	};
+
+	/**
+	 * Draws the stage into the specified context ignoring its visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
+	p.draw = function(ctx, ignoreCache) {
+		var result = this.Container_draw(ctx, ignoreCache);
+		this.canvas._invalid = true;
+		return result;
+	};
+
+	/**
+	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
+	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
+	 *
+	 * If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
+	 * propagated to listeners.
+	 *
+	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
+	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
+	 * passed as the `props` parameter to `tick()`. For example:
+	 *
+	 * 	Ticker.on("tick", handleTick);
+	 * 	function handleTick(evtObj) {
+	 * 		// clone the event object from Ticker, and add some custom data to it:
+	 * 		var evt = evtObj.clone().set({greeting:"hello", name:"world"});
+	 * 		
+	 * 		// pass it to stage.update():
+	 * 		myStage.update(evt); // subsequently calls tick() with the same param
+	 * 	}
+	 * 	
+	 * 	// ...
+	 * 	myDisplayObject.on("tick", handleDisplayObjectTick);
+	 * 	function handleDisplayObjectTick(evt) {
+	 * 		console.log(evt.delta); // the delta property from the Ticker tick event object
+	 * 		console.log(evt.greeting, evt.name); // custom data: "hello world"
+	 * 	}
+	 * 
+	 * @method tick
+	 * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
+	 **/
+	p.tick = function(props) {
+		if (!this.tickEnabled || this.dispatchEvent("tickstart", false, true) === false) { return; }
+		var evtObj = new createjs.Event("tick");
+		if (props) {
+			for (var n in props) {
+				if (props.hasOwnProperty(n)) { evtObj[n] = props[n]; }
+			}
+		}
+		this._tick(evtObj);
+		this.dispatchEvent("tickend");
+	};
+
+	/**
+	 * Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
+	 * event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}}
+	 * directly, using:
+	 *
+	 *      Ticker.addEventListener("tick", myStage);
+	 *
+	 * Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to
+	 * display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
+	 * @property handleEvent
+	 * @type Function
+	 **/
+	p.handleEvent = function(evt) {
+		if (evt.type == "tick") { this.update(evt); }
+	};
+
+	/**
+	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
+	 * @method clear
+	 **/
+	p.clear = function() {
+		if (!this.canvas) { return; }
+		var ctx = this.canvas.getContext("2d");
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
+	};
+
+	/**
+	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
+	 * be specified as the src value of an image element.
+	 * @method toDataURL
+	 * @param {String} [backgroundColor] The background color to be used for the generated image. Any valid CSS color
+	 * value is allowed. The default value is a transparent background.
+	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	 * @param {Number} [encoderOptions=0.92] A Number between 0 and 1 indicating the image quality to use for image
+	 * formats that use lossy  compression such as image/jpeg and image/webp.
+	 * @return {String} a Base64 encoded image.
+	 **/
+	p.toDataURL = function(backgroundColor, mimeType, encoderOptions) {
+		var data, ctx = this.canvas.getContext('2d'), w = this.canvas.width, h = this.canvas.height;
+
+		if (backgroundColor) {
+			data = ctx.getImageData(0, 0, w, h);
+			var compositeOperation = ctx.globalCompositeOperation;
+			ctx.globalCompositeOperation = "destination-over";
+			
+			ctx.fillStyle = backgroundColor;
+			ctx.fillRect(0, 0, w, h);
+		}
+
+		var dataURL = this.canvas.toDataURL(mimeType||"image/png", encoderOptions);
+
+		if(backgroundColor) {
+			ctx.putImageData(data, 0, 0);
+			ctx.globalCompositeOperation = compositeOperation;
+		}
+
+		return dataURL;
+	};
+
+	/**
+	 * Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
+	 * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) and roll over events ({{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}
+	 * and {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}) for this stage's display list. These events can
+	 * be expensive to generate, so they are disabled by default. The frequency of the events can be controlled
+	 * independently of mouse move events via the optional `frequency` parameter.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      var stage = new createjs.Stage("canvasId");
+	 *      stage.enableMouseOver(10); // 10 updates per second
+	 *
+	 * @method enableMouseOver
+	 * @param {Number} [frequency=20] Optional param specifying the maximum number of times per second to broadcast
+	 * mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less
+	 * responsive, but uses less CPU.
+	 **/
+	p.enableMouseOver = function(frequency) {
+		if (this._mouseOverIntervalID) {
+			clearInterval(this._mouseOverIntervalID);
+			this._mouseOverIntervalID = null;
+			if (frequency == 0) {
+				this._testMouseOver(true);
+			}
+		}
+		if (frequency == null) { frequency = 20; }
+		else if (frequency <= 0) { return; }
+		var o = this;
+		this._mouseOverIntervalID = setInterval(function(){ o._testMouseOver(); }, 1000/Math.min(50,frequency));
+	};
+
+	/**
+	 * Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas). It is good
+	 * practice to disable events when disposing of a Stage instance, otherwise the stage will continue to receive
+	 * events from the page.
+	 *
+	 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
+	 * new canvas or mouse events will not work as expected. For example:
+	 *
+	 *      myStage.enableDOMEvents(false);
+	 *      myStage.canvas = anotherCanvas;
+	 *      myStage.enableDOMEvents(true);
+	 *
+	 * @method enableDOMEvents
+	 * @param {Boolean} [enable=true] Indicates whether to enable or disable the events. Default is true.
+	 **/
+	p.enableDOMEvents = function(enable) {
+		if (enable == null) { enable = true; }
+		var n, o, ls = this._eventListeners;
+		if (!enable && ls) {
+			for (n in ls) {
+				o = ls[n];
+				o.t.removeEventListener(n, o.f, false);
+			}
+			this._eventListeners = null;
+		} else if (enable && !ls && this.canvas) {
+			var t = window.addEventListener ? window : document;
+			var _this = this;
+			ls = this._eventListeners = {};
+			ls["mouseup"] = {t:t, f:function(e) { _this._handleMouseUp(e)} };
+			ls["mousemove"] = {t:t, f:function(e) { _this._handleMouseMove(e)} };
+			ls["dblclick"] = {t:this.canvas, f:function(e) { _this._handleDoubleClick(e)} };
+			ls["mousedown"] = {t:this.canvas, f:function(e) { _this._handleMouseDown(e)} };
+
+			for (n in ls) {
+				o = ls[n];
+				o.t.addEventListener(n, o.f, false);
+			}
+		}
+	};
+
+	/**
+	 * Stage instances cannot be cloned.
+	 * @method clone
+	 **/
+	p.clone = function() {
+		throw("Stage cannot be cloned.");
+	};
+
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function() {
+		return "[Stage (name="+  this.name +")]";
+	};
+
+
+// private methods:
+	/**
+	 * @method _getElementRect
+	 * @protected
+	 * @param {HTMLElement} e
+	 **/
+	p._getElementRect = function(e) {
+		var bounds;
+		try { bounds = e.getBoundingClientRect(); } // this can fail on disconnected DOM elements in IE9
+		catch (err) { bounds = {top: e.offsetTop, left: e.offsetLeft, width:e.offsetWidth, height:e.offsetHeight}; }
+
+		var offX = (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || document.body.clientLeft || 0);
+		var offY = (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || document.body.clientTop  || 0);
+
+		var styles = window.getComputedStyle ? getComputedStyle(e,null) : e.currentStyle; // IE <9 compatibility.
+		var padL = parseInt(styles.paddingLeft)+parseInt(styles.borderLeftWidth);
+		var padT = parseInt(styles.paddingTop)+parseInt(styles.borderTopWidth);
+		var padR = parseInt(styles.paddingRight)+parseInt(styles.borderRightWidth);
+		var padB = parseInt(styles.paddingBottom)+parseInt(styles.borderBottomWidth);
+
+		// note: in some browsers bounds properties are read only.
+		return {
+			left: bounds.left+offX+padL,
+			right: bounds.right+offX-padR,
+			top: bounds.top+offY+padT,
+			bottom: bounds.bottom+offY-padB
+		}
+	};
+
+	/**
+	 * @method _getPointerData
+	 * @protected
+	 * @param {Number} id
+	 **/
+	p._getPointerData = function(id) {
+		var data = this._pointerData[id];
+		if (!data) { data = this._pointerData[id] = {x:0,y:0}; }
+		return data;
+	};
+
+	/**
+	 * @method _handleMouseMove
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
+	p._handleMouseMove = function(e) {
+		if(!e){ e = window.event; }
+		this._handlePointerMove(-1, e, e.pageX, e.pageY);
+	};
+
+	/**
+	 * @method _handlePointerMove
+	 * @protected
+	 * @param {Number} id
+	 * @param {Event} e
+	 * @param {Number} pageX
+	 * @param {Number} pageY
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 **/
+	p._handlePointerMove = function(id, e, pageX, pageY, owner) {
+		if (this._prevStage && owner === undefined) { return; } // redundant listener.
+		if (!this.canvas) { return; }
+		var nextStage=this._nextStage, o=this._getPointerData(id);
+
+		var inBounds = o.inBounds;
+		this._updatePointerPosition(id, e, pageX, pageY);
+		if (inBounds || o.inBounds || this.mouseMoveOutside) {
+			if (id === -1 && o.inBounds == !inBounds) {
+				this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
+			}
+			
+			this._dispatchMouseEvent(this, "stagemousemove", false, id, o, e);
+			this._dispatchMouseEvent(o.target, "pressmove", true, id, o, e);
+		}
+		
+		nextStage&&nextStage._handlePointerMove(id, e, pageX, pageY, null);
+	};
+
+	/**
+	 * @method _updatePointerPosition
+	 * @protected
+	 * @param {Number} id
+	 * @param {Event} e
+	 * @param {Number} pageX
+	 * @param {Number} pageY
+	 **/
+	p._updatePointerPosition = function(id, e, pageX, pageY) {
+		var rect = this._getElementRect(this.canvas);
+		pageX -= rect.left;
+		pageY -= rect.top;
+
+		var w = this.canvas.width;
+		var h = this.canvas.height;
+		pageX /= (rect.right-rect.left)/w;
+		pageY /= (rect.bottom-rect.top)/h;
+		var o = this._getPointerData(id);
+		if (o.inBounds = (pageX >= 0 && pageY >= 0 && pageX <= w-1 && pageY <= h-1)) {
+			o.x = pageX;
+			o.y = pageY;
+		} else if (this.mouseMoveOutside) {
+			o.x = pageX < 0 ? 0 : (pageX > w-1 ? w-1 : pageX);
+			o.y = pageY < 0 ? 0 : (pageY > h-1 ? h-1 : pageY);
+		}
+
+		o.posEvtObj = e;
+		o.rawX = pageX;
+		o.rawY = pageY;
+
+		if (id === this._primaryPointerID || id === -1) {
+			this.mouseX = o.x;
+			this.mouseY = o.y;
+			this.mouseInBounds = o.inBounds;
+		}
+	};
+
+	/**
+	 * @method _handleMouseUp
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
+	p._handleMouseUp = function(e) {
+		this._handlePointerUp(-1, e, false);
+	};
+
+	/**
+	 * @method _handlePointerUp
+	 * @protected
+	 * @param {Number} id
+	 * @param {Event} e
+	 * @param {Boolean} clear
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 **/
+	p._handlePointerUp = function(id, e, clear, owner) {
+		var nextStage = this._nextStage, o = this._getPointerData(id);
+		if (this._prevStage && owner === undefined) { return; } // redundant listener.
+		
+		var target=null, oTarget = o.target;
+		if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
+		
+		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e, target); o.down = false; }
+		
+		if (target == oTarget) { this._dispatchMouseEvent(oTarget, "click", true, id, o, e); }
+		this._dispatchMouseEvent(oTarget, "pressup", true, id, o, e);
+		
+		if (clear) {
+			if (id==this._primaryPointerID) { this._primaryPointerID = null; }
+			delete(this._pointerData[id]);
+		} else { o.target = null; }
+		
+		nextStage&&nextStage._handlePointerUp(id, e, clear, owner || target && this);
+	};
+
+	/**
+	 * @method _handleMouseDown
+	 * @protected
+	 * @param {MouseEvent} e
+	 **/
+	p._handleMouseDown = function(e) {
+		this._handlePointerDown(-1, e, e.pageX, e.pageY);
+	};
+
+	/**
+	 * @method _handlePointerDown
+	 * @protected
+	 * @param {Number} id
+	 * @param {Event} e
+	 * @param {Number} pageX
+	 * @param {Number} pageY
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 **/
+	p._handlePointerDown = function(id, e, pageX, pageY, owner) {
+		if (this.preventSelection) { e.preventDefault(); }
+		if (this._primaryPointerID == null || id === -1) { this._primaryPointerID = id; } // mouse always takes over.
+		
+		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
+		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
+		if (!owner) { target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
+
+		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e, target); o.down = true; }
+		this._dispatchMouseEvent(target, "mousedown", true, id, o, e);
+		
+		nextStage&&nextStage._handlePointerDown(id, e, pageX, pageY, owner || target && this);
+	};
+
+	/**
+	 * @method _testMouseOver
+	 * @param {Boolean} clear If true, clears the mouseover / rollover (ie. no target)
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 * @param {Stage} eventTarget The stage that the cursor is actively over.
+	 * @protected
+	 **/
+	p._testMouseOver = function(clear, owner, eventTarget) {
+		if (this._prevStage && owner === undefined) { return; } // redundant listener.
+		
+		var nextStage = this._nextStage;
+		if (!this._mouseOverIntervalID) {
+			// not enabled for mouseover, but should still relay the event.
+			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
+			return;
+		}
+		var o = this._getPointerData(-1);
+		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
+		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		
+		var e = o.posEvtObj;
+		var isEventTarget = eventTarget || e&&(e.target == this.canvas);
+		var target=null, common = -1, cursor="", t, i, l;
+		
+		if (!owner && (clear || this.mouseInBounds && isEventTarget)) {
+			target = this._getObjectsUnderPoint(this.mouseX, this.mouseY, null, true);
+			this._mouseOverX = this.mouseX;
+			this._mouseOverY = this.mouseY;
+		}
+
+		var oldList = this._mouseOverTarget||[];
+		var oldTarget = oldList[oldList.length-1];
+		var list = this._mouseOverTarget = [];
+
+		// generate ancestor list and check for cursor:
+		// Note: Internet Explorer won't update null or undefined cursor properties
+		t = target;
+		while (t) {
+			list.unshift(t);
+			if (!cursor && t.cursor) { cursor = t.cursor; }
+			t = t.parent;
+		}
+		this.canvas.style.cursor = cursor;
+		if (!owner && eventTarget) { eventTarget.canvas.style.cursor = cursor; }
+
+		// find common ancestor:
+		for (i=0,l=list.length; i<l; i++) {
+			if (list[i] != oldList[i]) { break; }
+			common = i;
+		}
+
+		if (oldTarget != target) {
+			this._dispatchMouseEvent(oldTarget, "mouseout", true, -1, o, e, target);
+		}
+
+		for (i=oldList.length-1; i>common; i--) {
+			this._dispatchMouseEvent(oldList[i], "rollout", false, -1, o, e, target);
+		}
+
+		for (i=list.length-1; i>common; i--) {
+			this._dispatchMouseEvent(list[i], "rollover", false, -1, o, e, oldTarget);
+		}
+
+		if (oldTarget != target) {
+			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
+		}
+		
+		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
+	};
+
+	/**
+	 * @method _handleDoubleClick
+	 * @protected
+	 * @param {MouseEvent} e
+	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
+	 **/
+	p._handleDoubleClick = function(e, owner) {
+		var target=null, nextStage=this._nextStage, o=this._getPointerData(-1);
+		if (!owner) {
+			target = this._getObjectsUnderPoint(o.x, o.y, null, true);
+			this._dispatchMouseEvent(target, "dblclick", true, -1, o, e);
+		}
+		nextStage&&nextStage._handleDoubleClick(e, owner || target && this);
+	};
+
+	/**
+	 * @method _dispatchMouseEvent
+	 * @protected
+	 * @param {DisplayObject} target
+	 * @param {String} type
+	 * @param {Boolean} bubbles
+	 * @param {Number} pointerId
+	 * @param {Object} o
+	 * @param {MouseEvent} [nativeEvent]
+	 * @param {DisplayObject} [relatedTarget]
+	 **/
+	p._dispatchMouseEvent = function(target, type, bubbles, pointerId, o, nativeEvent, relatedTarget) {
+		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
+		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
+		/*
+		// TODO: account for stage transformations?
+		this._mtx = this.getConcatenatedMatrix(this._mtx).invert();
+		var pt = this._mtx.transformPoint(o.x, o.y);
+		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID || pointerId==-1, o.rawX, o.rawY);
+		*/
+		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY, relatedTarget);
+		target.dispatchEvent(evt);
+	};
+
+
+	createjs.Stage = createjs.promote(Stage, "Container");
 }());
 
 //##############################################################################
 // StageGL.js
 //##############################################################################
 
-this.createjs = this.createjs || {};
+this.createjs = this.createjs||{};
 
 /*
-   * README IF EDITING:
-   *
-   * - Terminology for developers:
-   * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
-   * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
-   * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render
-   * 		modes do not use these)
-   * Card: a group of 2 triangles used to display a rectangular image
-   * UV: common names for the [0-1] texture co-ordinates on an image
-   * Batch: a single call to the renderer, best done as little as possible. Multiple cards are batched for this reason
-   * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When
-   * 		combined and paired these are a "shader program"
-   * Texture: WebGL representation of image data and associated extra information, separate from a DOM Image
-   * Slot: A space on the GPU into which textures can be loaded for use in a batch, i.e. using "ActiveTexture" switches texture slot.
-   * Render___: actual WebGL draw call
-   * Buffer: WebGL array data
-   * Cover: A card that covers the entire viewport
-   * Dst: The existing drawing surface in the shader
-   * Src: The new data being provided in the shader
-   *
-   * - Notes:
-   * WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
-   * 		numbers make sense to users and WebGL simultaneously. This extends to textures stored in memory too. If writing
-   * 		code that deals with x/y, be aware your y may be flipped.
-   * Older versions had distinct internal paths for filters and regular draws, these have been merged.
-   * Draws are slowly assembled out of found content. Overflowing things like shaders, object/texture count will cause
-   * 		an early draw before continuing. Lookout for the things that force a draw. Marked with <------------------------
-   */
+ * README IF EDITING:
+ *
+ * - Terminology for developers:
+ * Vertex: a point that help defines a shape, 3 per triangle. Usually has an x,y,z but can have more/less info.
+ * Vertex Property: a piece of information attached to the vertex like a vector3 containing x,y,z
+ * Index/Indices: used in groups of 3 to define a triangle, points to vertices by their index in an array (some render
+ * 		modes do not use these)
+ * Card: a group of 2 triangles used to display a rectangular image
+ * UV: common names for the [0-1] texture co-ordinates on an image
+ * Batch: a single call to the renderer, best done as little as possible. Multiple cards are batched for this reason
+ * Program/Shader: For every vertex we run the Vertex shader. The results are used per pixel by the Fragment shader. When
+ * 		combined and paired these are a "shader program"
+ * Texture: WebGL representation of image data and associated extra information, separate from a DOM Image
+ * Slot: A space on the GPU into which textures can be loaded for use in a batch, i.e. using "ActiveTexture" switches texture slot.
+ * Render___: actual WebGL draw call
+ * Buffer: WebGL array data
+ * Cover: A card that covers the entire viewport
+ * Dst: The existing drawing surface in the shader
+ * Src: The new data being provided in the shader
+ *
+ * - Notes:
+ * WebGL treats 0,0 as the bottom left, as such there's a lot of co-ordinate space flipping to make regular canvas
+ * 		numbers make sense to users and WebGL simultaneously. This extends to textures stored in memory too. If writing
+ * 		code that deals with x/y, be aware your y may be flipped.
+ * Older versions had distinct internal paths for filters and regular draws, these have been merged.
+ * Draws are slowly assembled out of found content. Overflowing things like shaders, object/texture count will cause
+ * 		an early draw before continuing. Lookout for the things that force a draw. Marked with <------------------------
+ */
 
 (function () {
-    "use strict";
-
-    /**
-       * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for a WebGL-optimized display list,
-       * which can be used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically
-       * to a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
-       *
-       * Each time the {{#crossLink "Stage/tick"}}{{/crossLink}} method is called, the display list is rendered to the
-       * target &lt;canvas/&gt; instance, ignoring non-WebGL-compatible display objects. On devices and browsers that don't
-       * support WebGL, content will automatically be rendered to canvas 2D context instead.
-       *
-       * <h4>Limitations</h4>
-       * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
-       * 	are not rendered when added to the display list.
-       * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
-       *	Caches can be rendered regardless of source.
-       * - Images are wrapped as a webGL "Texture". Each graphics card has a limit to its concurrent Textures, too many 
-       * Textures will noticeably slow performance.
-       * - Each cache counts as an individual Texture. As such {{#crossLink "SpriteSheet"}}{{/crossLink}} and 
-       * {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} are recommended practices to help keep texture counts low.
-       * - To use any image node (DOM Image/Canvas Element) between multiple StageGL instances it must be a 
-       * {{#crossLink "Bitmap/clone"}}{{/crossLink}}, otherwise the GPU texture loading and tracking will get confused.
-       * - to avoid an up/down scaled render you must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you
-       * resize your canvas after making a StageGL instance, this will properly size the WebGL context stored in memory.
-       * - Best performance in demanding scenarios will come from manual management of texture memory, but it is handled
-       * automatically by default. See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for details.
-       * - Disable `directDraw` to get access to cacheless filters and composite oeprations!
-       *
-       * <h4>Example</h4>
-       * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
-       * to update the child and redraw the stage.
-       *
-       *      var stage = new createjs.StageGL("canvasElementId");
-       *
-       *      var image = new createjs.Bitmap("imagePath.png");
-       *      stage.addChild(image);
-       *
-       *      createjs.Ticker.on("tick", handleTick);
-       *
-       *      function handleTick(event) {
-       *          image.x += 10;
-       *          stage.update();
-       *      }
-       *
-       * @class StageGL
-       * @extends Stage
-       * @constructor
-       * @param {HTMLCanvasElement | String | Object} canvas A canvas object that StageGL will render to, or the string id
-       * of a canvas object in the current DOM.
-       * @param {Object} options All the option parameters in a reference object, some are not supported by some browsers.
-       * @param {Boolean} [options.preserveBuffer=false] If `true`, the canvas is NOT auto-cleared by WebGL (the spec
-       * discourages setting this to `true`). This is useful if you want persistent draw effects and has also fixed device
-       * specific bugs due to mis-timed clear commands.
-       * @param {Boolean} [options.antialias=false] Specifies whether or not the browser's WebGL implementation should try
-       * to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
-       * @param {Boolean} [options.transparent=false] If `true`, the canvas is transparent. This is <strong>very</strong>
-       * expensive, and should be used with caution.
-       * @param {Boolean} [options.directDraw=true] If `true`, this will bypass intermediary render-textures when possible
-       * resulting in reduced memory and increased performance, this disables some features. Cache-less filters and some
-       * {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}} values rely on this being false.
-       * @param (Boolean} [options.premultiply] @deprecated Upgraded colour & transparency handling have fixed the issue
-       * this flag was trying to solve rendering it unnecessary.
-       * @param {int} [options.autoPurge=1200] How often the system should automatically dump unused textures. Calls
-       * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}}
-       * for more information on texture purging.
-       * @param {String|int} [options.clearColor=undefined] Automatically calls {{#crossLink "StageGL/setClearColor"}}{{/crossLink}}
-       * after init is complete, can be overridden and changed manually later.
-       * @param {String|int} [options.batchSize=DEFAULT_MAX_BATCH_SIZE] The size of the buffer used to retain a batch.
-       * Making it smaller reduces GPU load, but making it too small adds extra GPU calls. Figure out your maximum batch
-       * count and set it to a small buffer above that per-project. Check src/utils/WebGLInspector to track.
-       */
-    function StageGL(canvas, options) {
-        this.Stage_constructor(canvas);
-
-        var transparent, antialias, preserveBuffer, autoPurge, directDraw, batchSize;
-        if (options !== undefined) {
-            if (typeof options !== "object") { throw ("Invalid options object"); }
-            transparent = options.transparent;
-            antialias = options.antialias;
-            preserveBuffer = options.preserveBuffer;
-            autoPurge = options.autoPurge;
-            directDraw = options.directDraw;
-            batchSize = options.batchSize;
-        }
-
-        // public properties:
-        /**
-           * Console log potential issues and problems. This is designed to have <em>minimal</em> performance impact, so
-           * if extensive debugging information is required, this may be inadequate. See {{#crossLink "WebGLInspector"}}{{/crossLink}}
-           * @property vocalDebug
-           * @type {Boolean}
-           * @default false
-           */
-        this.vocalDebug = false;
-
-        /**
-           * Specifies whether this instance is slaved to a {{#crossLink "BitmapCache"}}{{/crossLink}} or draws independantly.
-           * Necessary to control texture outputs and behaviours when caching. StageGL cache outputs will only render
-           * properly for the StageGL that made them. See the {{#crossLink "cache"}}{{/crossLink}} function documentation
-           * for more information. Enabled by default when BitmapCache's `useGL` is true.
-           * NOTE: This property is mainly for internal use, though it may be useful for advanced uses.
-           * @property isCacheControlled
-           * @type {Boolean}
-           * @default false
-           */
-        this.isCacheControlled = false;
-
-        // private properties:
-        /**
-           * Specifies whether or not the canvas is auto-cleared by WebGL. The WebGL spec discourages `true`.
-           * If true, the canvas is NOT auto-cleared by WebGL. Used when the canvas context is created and requires
-           * context re-creation to update.
-           * @property _preserveBuffer
-           * @protected
-           * @type {Boolean}
-           * @default false
-           */
-        this._preserveBuffer = preserveBuffer || false;
-
-        /**
-           * Specifies whether or not the browser's WebGL implementation should try to perform anti-aliasing.
-           * @property _antialias
-           * @protected
-           * @type {Boolean}
-           * @default false
-           */
-        this._antialias = antialias || false;
-
-        /**
-           * Specifies whether or not the browser's WebGL implementation should be transparent.
-           * @property _transparent
-           * @protected
-           * @type {Boolean}
-           * @default false
-           */
-        this._transparent = transparent || false;
-
-        /**
-           * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
-           * @property _autoPurge
-           * @protected
-           * @type {int}
-           * @default null
-           */
-        this._autoPurge = undefined;
-        this.autoPurge = autoPurge;	//getter/setter handles setting the real value and validating and documentation
-
-        /**
-           * See directDraw
-           * @property _directDraw
-           * @protected
-           * @type {Boolean}
-           * @default false
-           */
-        this._directDraw = directDraw === undefined ? true : (!!directDraw);
-
-        /**
-           * The width in px of the drawing surface saved in memory.
-           * @property _viewportWidth
-           * @protected
-           * @type {Number}
-           * @default 0
-           */
-        this._viewportWidth = 0;
-
-        /**
-           * The height in px of the drawing surface saved in memory.
-           * @property _viewportHeight
-           * @protected
-           * @type {Number}
-           * @default 0
-           */
-        this._viewportHeight = 0;
-
-        /**
-           * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates. Regular canvas display
-           * uses Top-Left values of [0,0] where WebGL uses a Center [0,0] Top-Right [1,1] (euclidean) system.
-           * @property _projectionMatrix
-           * @protected
-           * @type {Float32Array}
-           * @default null
-           */
-        this._projectionMatrix = null;
-
-        /**
-           * The current WebGL canvas context. Often shorthanded to just "gl" in many parts of the code.
-           * @property _webGLContext
-           * @protected
-           * @type {WebGLRenderingContext}
-           * @default null
-           */
-        this._webGLContext = null;
-
-        /**
-           * Reduce API logic by allowing stage to behave as a renderTexture target, should always be null as null is canvas.
-           * @type {null}
-           * @protected
-           */
-        this._frameBuffer = null;
-
-        /**
-           * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
-           * @property _clearColor
-           * @protected
-           * @type {Object}
-           * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
-           */
-        this._clearColor = { r: 0.50, g: 0.50, b: 0.50, a: 0.00 };
-
-        /**
-           * The maximum number of verticies (6 make a single sprite) that can be drawn in one draw call. Use constructor props
-           * to modify otherwise internal buffers may be invalid sizes.
-           * @property _maxBatchVertexCount
-           * @protected
-           * @type {Number}
-           * @default StageGL.DEFAULT_MAX_BATCH_SIZE * StageGL.INDICIES_PER_CARD
-           */
-        this._maxBatchVertexCount = Math.max(
-            Math.min(
-                Number(batchSize) || StageGL.DEFAULT_MAX_BATCH_SIZE,
-                StageGL.DEFAULT_MAX_BATCH_SIZE)
-            , StageGL.DEFAULT_MIN_BATCH_SIZE) * StageGL.INDICIES_PER_CARD;
-
-        /**
-           * The shader program used to draw the current batch.
-           * @property _activeShader
-           * @protected
-           * @type {WebGLProgram}
-           * @default null
-           */
-        this._activeShader = null;
-
-        /**
-           * The non cover, per object shader used for most rendering actions.
-           * @type {WebGLProgram}
-           * @protected
-           */
-        this._mainShader = null;
-
-        /**
-           * All the different vertex attribute sets that can be used with the render buffer. Currently only internal,
-           * if/when alternate main shaders are possible, they'll register themselves here.
-           * @property _attributeConfig
-           * @protected
-           * @type {Object}
-           */
-        this._attributeConfig = {};
-
-        /**
-           * Which of the configs in {{#crossLink "StageGL/_attributeConfig:property"}}{{/crossLink}} is currently active.
-           * @property _activeConfig
-           * @protected
-           * @type {Object}
-           */
-        this._activeConfig = null;
-
-        /**
-           * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
-           * "What you're drawing to", object occasionally swaps with concat.
-           * @property _bufferTextureOutput
-           * @protected
-           * @type {WebGLTexture}
-           */
-        this._bufferTextureOutput = null;
-
-        /**
-           * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
-           * "What you've draw before now", object occasionally swaps with output.
-           * @property _bufferTextureConcat
-           * @protected
-           * @type {WebGLTexture}
-           */
-        this._bufferTextureConcat = null;
-
-        /**
-           * One of the major render buffers used in composite blending drawing.
-           * "Temporary mixing surface"
-           * @property _bufferTextureTemp
-           * @protected
-           * @type {WebGLTexture}
-           */
-        this._bufferTextureTemp = null;
-
-        /**
-           * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
-           * @property _batchTextureOutput
-           * @protected
-           * @type {WebGLTexture | StageGL}
-           */
-        this._batchTextureOutput = this;
-
-        /**
-           * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
-           * @property _batchTextureConcat
-           * @protected
-           * @type {WebGLTexture}
-           */
-        this._batchTextureConcat = null;
-
-        /**
-           * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
-           * @property _batchTextureTemp
-           * @protected
-           * @type {WebGLTexture}
-           */
-        this._batchTextureTemp = null;
-
-        /**
-           * Internal library of the shaders that have been compiled and created along with their parameters. Should contain
-           * compiled `gl.ShaderProgram` and settings for `gl.blendFunc` and `gl.blendEquation`. Populated as requested.
-           *
-           * See {{#crossLink "StageGL/_updateRenderMode:method"}}{{/crossLink}} for exact details.
-           * @type {Object}
-           * @private
-           */
-        this._builtShaders = {};
-
-        /**
-           * An index based lookup of every WebGL Texture currently in use.
-           * @property _drawTexture
-           * @protected
-           * @type {Array}
-           */
-        this._textureDictionary = [];
-
-        /**
-           * A string based lookup hash of which index a texture is stored at in the dictionary. The lookup string is
-           * often the src url.
-           * @property _textureIDs
-           * @protected
-           * @type {Object}
-           */
-        this._textureIDs = {};
-
-        /**
-           * An array of all the textures currently loaded into the GPU. The index in the array matches the GPU index.
-           * @property _batchTextures
-           * @protected
-           * @type {Array}
-           */
-        this._batchTextures = [];
-
-        /**
-           * An array of all the simple filler textures used to prevent issues with missing textures in a batch.
-           * @property _baseTextures
-           * @protected
-           * @type {Array}
-           */
-        this._baseTextures = [];
-
-        /**
-           * Texture slots for a draw
-           * @property _gpuTextureCount
-           * @protected
-           * @type {uint}
-           */
-        this._gpuTextureCount = 8;
-
-        /**
-           * Texture slots on the hardware
-           * @property _gpuTextureMax
-           * @protected
-           * @type {uint}
-           */
-        this._gpuTextureMax = 8;
-
-        /**
-           * Texture slots in a batch for User textures
-           * @property _batchTextureCount
-           * @protected
-           * @type {uint}
-           */
-        this._batchTextureCount = 0;
-
-        /**
-           * The location at which the last texture was inserted into a GPU slot
-           */
-        this._lastTextureInsert = -1;
-
-        /**
-           * The current string name of the render mode being employed per Context2D spec.
-           * Must start invalid to trigger default shader into being built during init.
-           * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
-           * @type {string}
-           * @private
-           */
-        this._renderMode = "";
-
-        /**
-           * Flag indicating that the content being batched in `appendToBatch` must be drawn now and not follow batch logic.
-           * Used for effects that are compounding in nature and cannot be applied in a single pass.
-           * Should be enabled with extreme care due to massive performance implications.
-           * @type {boolean}
-           * @private
-           */
-        this._immediateRender = false;
-
-        /**
-           * Vertices drawn into the batch so far.
-           * @type {number}
-           * @private
-           */
-        this._batchVertexCount = 0;
-
-        /**
-           * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
-           * can occur per draw.
-           * @property _batchId
-           * @protected
-           * @type {Number}
-           * @default 0
-           */
-        this._batchID = 0;
-
-        /**
-           * The current draw being performed, may contain multiple batches. Comparing to {{#crossLink "StageGL/_batchID:property"}}{{/crossLink}}
-           * can reveal batching efficiency.
-           * @property _drawID
-           * @protected
-           * @type {Number}
-           * @default 0
-           */
-        this._drawID = 0;
-
-        /**
-           * Tracks how many renders have occurred this draw, used for performance monitoring and empty draw avoidance.
-           * @property _renderPerDraw
-           * @protected
-           * @type {Number}
-           * @default 0
-           */
-        this._renderPerDraw = 0;
-
-        /**
-           * Used to prevent textures in certain GPU slots from being replaced by an insert.
-           * @property _slotBlackList
-           * @protected
-           * @type {Array}
-           */
-        this._slotBlacklist = [];
-
-        /**
-           * Used to ensure every canvas used as a texture source has a unique ID.
-           * @property _lastTrackedCanvas
-           * @protected
-           * @type {Number}
-           * @default 0
-           */
-        this._lastTrackedCanvas = -1;
-
-        /**
-           * Used to counter-position the object being cached so it aligns with the cache surface. Additionally ensures
-           * that all rendering starts with a top level container.
-           * @property _cacheContainer
-           * @protected
-           * @type {Container}
-           * @default An instance of an EaselJS Container.
-           */
-        this._cacheContainer = new createjs.Container();
-
-        // and begin
-        this._initializeWebGL();
-
-        // these settings require everything to be ready
-        if (options !== undefined) {
-            options.clearColor !== undefined && this.setClearColor(options.clearColor);
-            options.premultiply !== undefined && (createjs.deprecate(null, "options.premultiply")());
-        }
-    }
-    var p = createjs.extend(StageGL, createjs.Stage);
-
-    // static methods:
-    /**
-       * Calculate the UV co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space. Also includes
-       * the ability to get info back for a specific frame, or only calculate that one frame.
-       *
-       *     //generate UV rects for all entries
-       *     StageGL.buildUVRects( spriteSheetA );
-       *     //generate all, fetch the first
-       *     var firstFrame = StageGL.buildUVRects( spriteSheetB, 0 );
-       *     //generate the rect for just a single frame for performance's sake
-       *     var newFrame = StageGL.buildUVRects( dynamicSpriteSheet, newFrameIndex, true );
-       *
-       * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-       * @method buildUVRects
-       * @param  {SpriteSheet} spritesheet The spritesheet to find the frames on
-       * @param  {int} [target=-1] The index of the frame to return
-       * @param  {Boolean} [onlyTarget=false] Whether "target" is the only frame that gets calculated
-       * @static
-       * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
-       */
-    StageGL.buildUVRects = function (spritesheet, target, onlyTarget) {
-        if (!spritesheet || !spritesheet._frames) { return null; }
-        if (target === undefined) { target = -1; }
-        if (onlyTarget === undefined) { onlyTarget = false; }
-
-        var start = (target !== -1 && onlyTarget) ? (target) : (0);
-        var end = (target !== -1 && onlyTarget) ? (target + 1) : (spritesheet._frames.length);
-        for (var i = start; i < end; i++) {
-            var f = spritesheet._frames[ i ];
-            if (f.uvRect || f.image.width <= 0 || f.image.height <= 0) { continue; }
-
-            var r = f.rect;
-            f.uvRect = {
-                t: 1 - (r.y / f.image.height),
-                l: r.x / f.image.width,
-                b: 1 - ((r.y + r.height) / f.image.height),
-                r: (r.x + r.width) / f.image.width
-            };
-        }
-
-        return spritesheet._frames[ (target !== -1) ? target : 0 ].uvRect || { t: 0, l: 0, b: 1, r: 1 };
-    };
-
-    /**
-       * Test a context to see if it has WebGL enabled on it.
-       * @method isWebGLActive
-       * @param {CanvasRenderingContext2D | WebGLRenderingContext} ctx The context to test
-       * @static
-       * @return {Boolean} Whether WebGL is enabled
-       */
-    StageGL.isWebGLActive = function (ctx) {
-        return ctx &&
-            ctx instanceof WebGLRenderingContext &&
-            typeof WebGLRenderingContext !== 'undefined';
-    };
-
-    /**
-       * Utility used to convert the colour values the Context2D API accepts into WebGL color values.
-       * @param {String | Number} color
-       * @static
-       * @return {Object} Object with r, g, b, a in 0-1 values of the color.
-       */
-    StageGL.colorToObj = function (color) {
-        var r, g, b, a;
-
-        if (typeof color === "string") {
-            if (color.indexOf("#") === 0) {
-                if (color.length === 4) {
-                    color = "#" + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2) + color.charAt(3) + color.charAt(3)
-                }
-                r = Number("0x" + color.slice(1, 3)) / 255;
-                g = Number("0x" + color.slice(3, 5)) / 255;
-                b = Number("0x" + color.slice(5, 7)) / 255;
-                a = color.length > 7 ? Number("0x" + color.slice(7, 9)) / 255 : 1;
-            } else if (color.indexOf("rgba(") === 0) {
-                var output = color.slice(5, -1).split(",");
-                r = Number(output[ 0 ]) / 255;
-                g = Number(output[ 1 ]) / 255;
-                b = Number(output[ 2 ]) / 255;
-                a = Number(output[ 3 ]);
-            }
-        } else {	// >>> is an unsigned shift which is what we want as 0x80000000 and up are negative values
-            r = ((color & 0xFF000000) >>> 24) / 255;
-            g = ((color & 0x00FF0000) >>> 16) / 255;
-            b = ((color & 0x0000FF00) >>> 8) / 255;
-            a = (color & 0x000000FF) / 255;
-        }
-
-        return {
-            r: Math.min(Math.max(0, r), 1),
-            g: Math.min(Math.max(0, g), 1),
-            b: Math.min(Math.max(0, b), 1),
-            a: Math.min(Math.max(0, a), 1)
-        }
-    };
-
-    // static properties:
-    /**
-       * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
-       * @property VERTEX_PROPERTY_COUNT
-       * @protected
-       * @static
-       * @final
-       * @type {Number}
-       * @default 6
-       * @readonly
-       */
-    StageGL.VERTEX_PROPERTY_COUNT = 6;
-
-    /**
-       * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
-       * @property INDICIES_PER_CARD
-       * @protected
-       * @static
-       * @final
-       * @type {Number}
-       * @default 6
-       * @readonly
-       */
-    StageGL.INDICIES_PER_CARD = 6;
-
-    /**
-       * The default value for the maximum number of cards we want to process in a batch. See
-       * {{#crossLink "StageGL/WEBGL_MAX_INDEX_NUM:property"}}{{/crossLink}} for a hard limit.
-       * this value comes is designed to sneak under that limit.
-       * @property DEFAULT_MAX_BATCH_SIZE
-       * @static
-       * @final
-       * @type {Number}
-       * @default 10920
-       * @readonly
-       */
-    StageGL.DEFAULT_MAX_BATCH_SIZE = 10920;
-
-    /**
-       * The default value for the minimum number of cards we want to process in a batch. Less
-       * max cards can mean better performance, but anything below this is probably not worth it.
-       * @property DEFAULT_MIN_BATCH_SIZE
-       * @static
-       * @final
-       * @type {Number}
-       * @default 170
-       * @readonly
-       */
-    StageGL.DEFAULT_MIN_BATCH_SIZE = 170;
-
-    /**
-       * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
-       * make a unique card.
-       * @property WEBGL_MAX_INDEX_NUM
-       * @static
-       * @final
-       * @type {Number}
-       * @default 65536
-       * @readonly
-       */
-    StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
-
-    /**
-       * Default UV rect for dealing with full coverage from an image source.
-       * @property UV_RECT
-       * @protected
-       * @static
-       * @final
-       * @type {Object}
-       * @default {t:0, l:0, b:1, r:1}
-       * @readonly
-       */
-    StageGL.UV_RECT = { t: 1, l: 0, b: 0, r: 1 };
-
-    try {
-        /**
-           * Vertex positions for a card that covers the entire render. Used with render targets primarily.
-           * @property COVER_VERT
-           * @static
-           * @final
-           * @type {Float32Array}
-           * @readonly
-           */
-        StageGL.COVER_VERT = new Float32Array([
-            -1, 1,		//TL
-            1, 1,		//TR
-            -1, -1,		//BL
-            1, 1,		//TR
-            1, -1,		//BR
-            -1, -1		//BL
-        ]);
-
-        /**
-           * UV for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
-           * @property COVER_UV
-           * @static
-           * @final
-           * @type {Float32Array}
-           * @readonly
-           */
-        StageGL.COVER_UV = new Float32Array([
-            0, 1,		//TL
-            1, 1,		//TR
-            0, 0,		//BL
-            1, 1,		//TR
-            1, 0,		//BR
-            0, 0		//BL
-        ]);
-    } catch (e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
-
-    /**
-       * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
-       * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
-       * pre-compile.
-       * @property REGULAR_VARYING_HEADER
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.REGULAR_VARYING_HEADER = (
-        "#ifdef GL_FRAGMENT_PRECISION_HIGH \n" +
-        "precision highp float; \n" +
-        "#else \n" +
-        "precision mediump float; \n" +
-        "#endif \n" +
-
-        "varying vec2 vTextureCoord;" +
-        "varying lowp float indexPicker;" +
-        "varying lowp float alphaValue;"
-    );
-
-    /**
-       * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
-       * all expected objects. Shader code may contain templates that are replaced pre-compile.
-       * @property REGULAR_VERTEX_HEADER
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.REGULAR_VERTEX_HEADER = (
-        StageGL.REGULAR_VARYING_HEADER +
-        "attribute vec2 vertexPosition;" +
-        "attribute vec2 uvPosition;" +
-        "attribute lowp float textureIndex;" +
-        "attribute lowp float objectAlpha;" +
-        "uniform mat4 pMatrix;"
-    );
-
-    /**
-       * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
-       * all expected objects. Shader code may contain templates that are replaced pre-compile.
-       * @property REGULAR_FRAGMENT_HEADER
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.REGULAR_FRAGMENT_HEADER = (
-        StageGL.REGULAR_VARYING_HEADER +
-        "uniform sampler2D uSampler[{{count}}];"
-    );
-
-    /**
-       * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
-       * templates that are replaced pre-compile.
-       * @property REGULAR_VERTEX_BODY
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.REGULAR_VERTEX_BODY = (
-        "void main(void) {" +
-        "gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-        "alphaValue = objectAlpha;" +
-        "indexPicker = textureIndex;" +
-        "vTextureCoord = uvPosition;" +
-        "}"
-    );
-
-    /**
-       * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
-       * contain templates that are replaced pre-compile.
-       * @property REGULAR_FRAGMENT_BODY
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.REGULAR_FRAGMENT_BODY = (
-        "void main(void) {" +
-        "vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
-
-        "if (indexPicker <= 0.5) {" +
-        "color = texture2D(uSampler[0], vTextureCoord);" +
-        "{{alternates}}" +
-        "}" +
-
-        "gl_FragColor = vec4(color.rgb * alphaValue, color.a * alphaValue);" +
-        "}"
-    );
-
-    /**
-       * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
-       * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
-       * code may contain templates that are replaced pre-compile.
-       * @property COVER_VARYING_HEADER
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.COVER_VARYING_HEADER = (
-        "#ifdef GL_FRAGMENT_PRECISION_HIGH \n" +
-        "precision highp float; \n" +
-        "#else \n" +
-        "precision mediump float; \n" +
-        "#endif \n" +
-
-        "varying vec2 vTextureCoord;"
-    );
-
-    /**
-       * Actual full header for the vertex shader. Includes the varying header. The cover shader is designed to be a
-       * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
-       * replaced pre-compile.
-       * @property COVER_VERTEX_HEADER
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.COVER_VERTEX_HEADER = (
-        StageGL.COVER_VARYING_HEADER +
-        "attribute vec2 vertexPosition;" +
-        "attribute vec2 uvPosition;"
-    );
-
-    /**
-       * Actual full header for the fragment shader. Includes the varying header. The cover shader is designed to be a
-       * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
-       * replaced pre-compile.
-       * @property COVER_FRAGMENT_HEADER
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.COVER_FRAGMENT_HEADER = (
-        StageGL.COVER_VARYING_HEADER +
-        "uniform sampler2D uSampler;"
-    );
-
-    /**
-       * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
-       * the render surface. Shader code may contain templates that are replaced pre-compile.
-       * @property COVER_VERTEX_BODY
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.COVER_VERTEX_BODY = (
-        "void main(void) {" +
-        "gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
-        "vTextureCoord = uvPosition;" +
-        "}"
-    );
-
-    /**
-       * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
-       * covers the render surface. Shader code may contain templates that are replaced pre-compile.
-       * @property COVER_FRAGMENT_BODY
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.COVER_FRAGMENT_BODY = (
-        "void main(void) {" +
-        "gl_FragColor = texture2D(uSampler, vTextureCoord);" +
-        "}"
-    );
-
-    /**
-       * The starting template of a cover fragment shader with simple blending equations
-       * @property BLEND_FRAGMENT_SIMPLE
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.BLEND_FRAGMENT_SIMPLE = (
-        "uniform sampler2D uMixSampler;" +
-        "void main(void) {" +
-        "vec4 src = texture2D(uMixSampler, vTextureCoord);" +
-        "vec4 dst = texture2D(uSampler, vTextureCoord);"
-        // note this is an open bracket on main!
-    );
-
-    /**
-       * The starting template of a cover fragment shader which has complex blending equations
-       * @property BLEND_FRAGMENT_COMPLEX
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.BLEND_FRAGMENT_COMPLEX = (
-        StageGL.BLEND_FRAGMENT_SIMPLE +
-        "vec3 srcClr = min(src.rgb/src.a, 1.0);" +
-        "vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
-
-        "float totalAlpha = min(1.0 - (1.0-dst.a) * (1.0-src.a), 1.0);" +
-        "float srcFactor = min(max(src.a - dst.a, 0.0) / totalAlpha, 1.0);" +
-        "float dstFactor = min(max(dst.a - src.a, 0.0) / totalAlpha, 1.0);" +
-        "float mixFactor = max(max(1.0 - srcFactor, 0.0) - dstFactor, 0.0);" +
-
-        "gl_FragColor = vec4(" +
-        "(" +
-        "srcFactor * srcClr +" +
-        "dstFactor * dstClr +" +
-        "mixFactor * vec3("
-        // this should be closed with the cap!
-    );
-
-    /**
-       * The closing portion of a template for a cover fragment shader which has complex blending equations
-       * @property BLEND_FRAGMENT_COMPLEX_CAP
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.BLEND_FRAGMENT_COMPLEX_CAP = (
-        ")" +
-        ") * totalAlpha, totalAlpha" +
-        ");" +
-        "}"
-    );
-
-    /**
-       * A shader utility function, used to calculate the "overlay" blend of two elements
-       * @property BLEND_FRAGMENT_OVERLAY_UTIL
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.BLEND_FRAGMENT_OVERLAY_UTIL = (
-        "float overlay(float a, float b) {" +
-        "if(a < 0.5) { return 2.0 * a * b; }" +
-        "return 1.0 - 2.0 * (1.0-a) * (1.0-b);" +
-        "}"
-    );
-
-    /**
-       * A collection of shader utility functions, used to calculate HSL math. Taken from W3C spec
-       * https://www.w3.org/TR/compositing-1/#blendingnonseparable
-       * @property BLEND_FRAGMENT_HSL_UTIL
-       * @protected
-       * @static
-       * @final
-       * @type {String}
-       * @readonly
-       */
-    StageGL.BLEND_FRAGMENT_HSL_UTIL = (
-        "float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
-        "float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
-        "vec3 clipHSL(vec3 c) {" +
-        "float lum = getLum(c);" +
-        "float n = min(min(c.r, c.g), c.b);" +
-        "float x = max(max(c.r, c.g), c.b);" +
-        "if(n < 0.0){ c = lum + (((c - lum) * lum) / (lum - n)); }" +
-        "if(x > 1.0){ c = lum + (((c - lum) * (1.0 - lum)) / (x - lum)); }" +
-        "return clamp(c, 0.0, 1.0);" +
-        "}" +
-        "vec3 setLum(vec3 c, float lum) {" +
-        "return clipHSL(c + (lum - getLum(c)));" +
-        "}" +
-        "vec3 setSat(vec3 c, float val) {" +
-        "vec3 result = vec3(0.0);" +
-        "float minVal = min(min(c.r, c.g), c.b);" +
-        "float maxVal = max(max(c.r, c.g), c.b);" +
-        "vec3 minMask = vec3(c.r == minVal, c.g == minVal, c.b == minVal);" +
-        "vec3 maxMask = vec3(c.r == maxVal, c.g == maxVal, c.b == maxVal);" +
-        "vec3 midMask = 1.0 - min(minMask+maxMask, 1.0);" +
-        "float midVal = (c*midMask).r + (c*midMask).g + (c*midMask).b;" +
-        "if(maxVal > minVal) {" +
-        "result = midMask * min( ((midVal - minVal) * val) / (maxVal - minVal), 1.0);" +
-        "result += maxMask * val;" +
-        "}" +
-        "return result;" +
-        "}"
-    );
-
-    /**
-       * The hash of supported blend modes and their properties
-       * @property BLEND_SOURCES
-       * @static
-       * @final
-       * @type {Object}
-       * @readonly
-       */
-    StageGL.BLEND_SOURCES = {
-        "source-over": { // empty object verifies it as a blend mode, but default values handle actual settings
-            //eqRGB: "FUNC_ADD",						eqA: "FUNC_ADD"
-            //srcRGB: "ONE",							srcA: "ONE"
-            //dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE_MINUS_SRC_ALPHA"
-        },
-        "source-in": {
-            shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-                "gl_FragColor = vec4(src.rgb * dst.a, src.a * dst.a);" +
-                "}")
-        },
-        "source-in_cheap": {
-            srcRGB: "DST_ALPHA", srcA: "ZERO",
-            dstRGB: "ZERO", dstA: "SRC_ALPHA"
-        },
-        "source-out": {
-            shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-                "gl_FragColor = vec4(src.rgb * (1.0 - dst.a), src.a - dst.a);" +
-                "}")
-        },
-        "source-out_cheap": {
-            eqA: "FUNC_SUBTRACT",
-            srcRGB: "ONE_MINUS_DST_ALPHA", srcA: "ONE",
-            dstRGB: "ZERO", dstA: "SRC_ALPHA"
-        },
-        "source-atop": {
-            srcRGB: "DST_ALPHA", srcA: "ZERO",
-            dstRGB: "ONE_MINUS_SRC_ALPHA", dstA: "ONE"
-        },
-        "destination-over": {
-            srcRGB: "ONE_MINUS_DST_ALPHA", srcA: "ONE_MINUS_DST_ALPHA",
-            dstRGB: "ONE", dstA: "ONE"
-        },
-        "destination-in": {
-            shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-                "gl_FragColor = vec4(dst.rgb * src.a, src.a * dst.a);" +
-                "}")
-        },
-        "destination-in_cheap": {
-            srcRGB: "ZERO", srcA: "DST_ALPHA",
-            dstRGB: "SRC_ALPHA", dstA: "ZERO"
-        },
-        "destination-out": {
-            eqA: "FUNC_REVERSE_SUBTRACT",
-            srcRGB: "ZERO", srcA: "DST_ALPHA",
-            dstRGB: "ONE_MINUS_SRC_ALPHA", dstA: "ONE"
-        },
-        "destination-atop": {
-            shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-                "gl_FragColor = vec4(dst.rgb * src.a + src.rgb * (1.0 - dst.a), src.a);" +
-                "}")
-        },
-        "destination-atop_cheap": {
-            srcRGB: "ONE_MINUS_DST_ALPHA", srcA: "ONE",
-            dstRGB: "SRC_ALPHA", dstA: "ZERO"
-        },
-        "copy": {
-            shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-                "gl_FragColor = vec4(src.rgb, src.a);" +
-                "}")
-        },
-        "copy_cheap": {
-            dstRGB: "ZERO", dstA: "ZERO"
-        },
-        "xor": {
-            shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
-                "float omSRC = (1.0 - src.a);" +
-                "float omDST = (1.0 - dst.a);" +
-                "gl_FragColor = vec4(src.rgb * omDST + dst.rgb * omSRC, src.a * omDST + dst.a * omSRC);"
-                + "}")
-        },
-
-        "multiply": { // this has to be complex to handle retention of both dst and src in non mixed scenarios
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "srcClr * dstClr"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "multiply_cheap": { // NEW, handles retention of src data incorrectly when no dst data present
-            srcRGB: "ONE_MINUS_DST_ALPHA", srcA: "ONE",
-            dstRGB: "SRC_COLOR", dstA: "ONE"
-        },
-        "screen": {
-            srcRGB: "ONE", srcA: "ONE",
-            dstRGB: "ONE_MINUS_SRC_COLOR", dstA: "ONE_MINUS_SRC_ALPHA"
-        },
-        "lighter": {
-            dstRGB: "ONE", dstA: "ONE"
-        },
-        "lighten": { //WebGL 2.0 can optimize this
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "max(srcClr, dstClr)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "darken": { //WebGL 2.0 can optimize this
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "min(srcClr, dstClr)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-
-        "overlay": {
-            shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "overlay(dstClr.r,srcClr.r), overlay(dstClr.g,srcClr.g), overlay(dstClr.b,srcClr.b)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "hard-light": {
-            shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "overlay(srcClr.r,dstClr.r), overlay(srcClr.g,dstClr.g), overlay(srcClr.b,dstClr.b)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "soft-light": {
-            shader: (
-                "float softcurve(float a) {" +
-                "if(a > 0.25) { return sqrt(a); }" +
-                "return ((16.0 * a - 12.0) * a + 4.0) * a;" +
-                "}" +
-                "float softmix(float a, float b) {" +
-                "if(b <= 0.5) { return a - (1.0 - 2.0*b) * a * (1.0 - a); }" +
-                "return a + (2.0 * b - 1.0) * (softcurve(a) - a);" +
-                "}" + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "softmix(dstClr.r,srcClr.r), softmix(dstClr.g,srcClr.g), softmix(dstClr.b,srcClr.b)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "color-dodge": {
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "clamp(dstClr / (1.0 - srcClr), 0.0, 1.0)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "color-burn": {
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "1.0 - clamp((1.0 - smoothstep(0.0035, 0.9955, dstClr)) / smoothstep(0.0035, 0.9955, srcClr), 0.0, 1.0)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "difference": { // do this to match visible results in browsers
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "abs(src.rgb - dstClr)"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "exclusion": { // do this to match visible results in browsers
-            shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
-                "dstClr + src.rgb - 2.0 * src.rgb * dstClr"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-
-        "hue": {
-            shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "saturation": {
-            shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "setLum(setSat(dstClr, getSat(srcClr)), getLum(dstClr))"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "color": {
-            shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "setLum(srcClr, getLum(dstClr))"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        },
-        "luminosity": {
-            shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
-                "setLum(dstClr, getLum(srcClr))"
-                + StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
-        }
-    };
-
-    // events:
-    /**
-       * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it. You can call
-       * {{#crossLink "Event/preventDefault"}}{{/crossLink}} on the event to cancel the draw.
-       * @event drawstart
-       */
-
-    /**
-       * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
-       * @event drawend
-       */
-
-    // getter / setters:
-    p._get_isWebGL = function () {
-        return !!this._webGLContext;
-    };
-
-    p._set_autoPurge = function (value) {
-        value = isNaN(value) ? 1200 : value;
-        if (value !== -1) {
-            value = value < 10 ? 10 : value;
-        }
-        this._autoPurge = value;
-    };
-    p._get_autoPurge = function () {
-        return Number(this._autoPurge);
-    };
-
-    try {
-        Object.defineProperties(p, {
-            /**
-               * Indicates whether WebGL is being used for rendering. For example, this would be `false` if WebGL is not
-               * supported in the browser.
-               * @property isWebGL
-               * @type {Boolean}
-               * @readonly
-               */
-            isWebGL: { get: p._get_isWebGL },
-
-            /**
-               * Specifies whether or not StageGL is automatically purging unused textures. Higher numbers purge less
-               * often. Values below 10 are upgraded to 10, and -1 disables this feature. If you are not dynamically adding
-               * and removing new images this can be se9000t to -1, and should be for performance reasons. If you only add images,
-               * or add and remove the same images for the entire application, it is safe to turn off this feature. Alternately,
-               * manually manage removing textures yourself with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}}
-               * @property autoPurge
-               * @type {int}
-               * @default 1000
-               */
-            autoPurge: { get: p._get_autoPurge, set: p._set_autoPurge }
-        });
-    } catch (e) { } // TODO: use Log
-
-
-    // constructor methods:
-    /**
-       * Create and properly initialize the WebGL instance.
-       * @method _initializeWebGL
-       * @protected
-       * @return {WebGLRenderingContext}
-       */
-    p._initializeWebGL = function () {
-        if (this.canvas) {
-            if (!this._webGLContext || this._webGLContext.canvas !== this.canvas) {
-                // A context hasn't been defined yet,
-                // OR the defined context belongs to a different canvas, so reinitialize.
-
-                // defaults and options
-                var options = {
-                    depth: false, // nothing has depth
-                    stencil: false, // while there's uses for this, we're not using any yet
-                    premultipliedAlpha: this._transparent, // this is complicated, trust it
-
-                    alpha: this._transparent,
-                    antialias: this._antialias,
-                    preserveDrawingBuffer: this._preserveBuffer
-                };
-
-                var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
-                if (!gl) { return null; }
-
-                gl.disable(gl.DEPTH_TEST);
-                gl.depthMask(false);
-                gl.enable(gl.BLEND);
-                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-                gl.clearColor(0.0, 0.0, 0.0, 0);
-                gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-                gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-                this._createBuffers();
-                this._initMaterials();
-                this._updateRenderMode("source-over");
-
-                this.updateViewport(this.canvas.width, this.canvas.height);
-                if (!this._directDraw) {
-                    this._bufferTextureOutput = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
-                }
-
-                this.canvas._invalid = true;
-            }
-        } else {
-            this._webGLContext = null;
-        }
-        return this._webGLContext;
-    };
-
-    // public methods:
-    // Docced in superclass
-    p.update = function (props) {
-        if (!this.canvas) { return; }
-        if (this.tickOnUpdate) { this.tick(props); }
-        this.dispatchEvent("drawstart");
-
-        if (this._webGLContext) {
-            this.draw(this._webGLContext, false);
-        } else {
-            // Use 2D.
-            if (this.autoClear) { this.clear(); }
-            var ctx = this.canvas.getContext("2d");
-            ctx.save();
-            this.updateContext(ctx);
-            this.draw(ctx, false);
-            ctx.restore();
-        }
-        this.dispatchEvent("drawend");
-    };
-
-    // Docced in superclass
-    p.clear = function () {
-        if (!this.canvas) { return; }
-
-        var gl = this._webGLContext;
-        if (!StageGL.isWebGLActive(gl)) { // Use 2D.
-            this.Stage_clear();
-            return;
-        }
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        this._clearFrameBuffer(this._transparent ? this._clearColor.a : 1);
-    };
-
-    /**
-       * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context. As such
-       * you cannot share contexts among many StageGLs and each context requires a unique StageGL instance. Contexts that
-       * don't match the context managed by this StageGL will be treated as a 2D context.
-       *
-       * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-       * @method draw
-       * @param {CanvasRenderingContext2D | WebGLRenderingContext} context The context object to draw into.
-       * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For
-       *  example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-       * @return {Boolean} If the draw was handled by this function
-       */
-    p.draw = function (context, ignoreCache) {
-        var gl = this._webGLContext;
-        // 2D context fallback
-        if (!(context === this._webGLContext && StageGL.isWebGLActive(gl))) {
-            return this.Stage_draw(context, ignoreCache);
-        }
-
-        var storeBatchOutput = this._batchTextureOutput;
-        var storeBatchConcat = this._batchTextureConcat;
-        var storeBatchTemp = this._batchTextureTemp;
-
-        // Use WebGL
-        this._renderPerDraw = 0;
-        this._batchVertexCount = 0;
-        this._drawID++;
-
-        if (this._directDraw) {
-            this._batchTextureOutput = this;
-            if (this.autoClear) { this.clear(); }
-        } else {
-            this._batchTextureOutput = this._bufferTextureOutput;
-            this._batchTextureConcat = this._bufferTextureConcat;
-            this._batchTextureTemp = this._bufferTextureTemp;
-        }
-
-        this._updateRenderMode("source-over");
-        this._drawContent(this, ignoreCache);
-
-        if (!this._directDraw) {
-            if (this.autoClear) { this.clear(); }
-            this.batchReason = "finalOutput";
-            if (this._renderPerDraw) {
-                this._drawCover(null, this._batchTextureOutput);
-            }
-        }
-
-        // batches may generate or swap around textures. To be sure we capture them, store them back into buffer
-        this._bufferTextureOutput = this._batchTextureOutput;
-        this._bufferTextureConcat = this._batchTextureConcat;
-        this._bufferTextureTemp = this._batchTextureTemp;
-
-        this._batchTextureOutput = storeBatchOutput;
-        this._batchTextureConcat = storeBatchConcat;
-        this._batchTextureTemp = storeBatchTemp;
-
-        if (this._autoPurge !== -1 && !(this._drawID % ((this._autoPurge / 2) | 0))) {
-            this.purgeTextures(this._autoPurge);
-        }
-
-        return true;
-    };
-
-    /**
-       * Draws the target into the correct context, be it a canvas or Render Texture using WebGL.
-       *
-       * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-       * @method cacheDraw
-       * @param {DisplayObject} target The object we're drawing into cache.
-       * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
-       * @param {BitmapCache} manager The BitmapCache instance looking after the cache
-       * @return {Boolean} If the draw was handled by this function
-       */
-    p.cacheDraw = function (target, manager) {
-        // 2D context fallback
-        if (!StageGL.isWebGLActive(this._webGLContext)) {
-            return false;
-        }
-
-        for (var i = 0; i < this._gpuTextureCount; i++) {
-            if (this._batchTextures[ i ]._frameBuffer) {
-                this._batchTextures[ i ] = this._baseTextures[ i ];
-            }
-        }
-
-        var storeBatchOutput = this._batchTextureOutput;
-        var storeBatchConcat = this._batchTextureConcat;
-        var storeBatchTemp = this._batchTextureTemp;
-
-        var filterCount = manager._filterCount, filtersLeft = filterCount;
-        var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
-        this._updateDrawingSurface(manager._drawWidth, manager._drawHeight);
-
-        this._batchTextureOutput = (manager._filterCount % 2) ? manager._bufferTextureConcat : manager._bufferTextureOutput;
-        this._batchTextureConcat = (manager._filterCount % 2) ? manager._bufferTextureOutput : manager._bufferTextureConcat;
-        this._batchTextureTemp = manager._bufferTextureTemp;
-
-        var container = this._cacheContainer;
-        container.children = [ target ];
-        container.transformMatrix = this._alignTargetToCache(target, manager);
-
-        this._updateRenderMode("source-over");
-        this._drawContent(container, true);
-
-        // re-align buffers with fake filter passes to solve certain error cases
-        if (this.isCacheControlled) {
-            // post filter pass to place content into output buffer
-            //TODO: add in directDraw support for cache controlled StageGLs
-            filterCount++;
-            filtersLeft++;
-        } else if (manager._cacheCanvas !== ((manager._filterCount % 2) ? this._batchTextureConcat : this._batchTextureOutput)) {
-            // pre filter pass to align output, may of become misaligned due to composite operations
-            filtersLeft++;
-        }
-
-        while (filtersLeft) { //warning: pay attention to where filtersLeft is modified, this is a micro-optimization
-            var filter = manager._getGLFilter(filterCount - (filtersLeft--));
-            var swap = this._batchTextureConcat;
-            this._batchTextureConcat = this._batchTextureOutput;
-            this._batchTextureOutput = (this.isCacheControlled && filtersLeft === 0) ? this : swap;
-            this.batchReason = "filterPass";
-            this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, filter);
-        }
-
-        manager._bufferTextureOutput = this._batchTextureOutput;
-        manager._bufferTextureConcat = this._batchTextureConcat;
-        manager._bufferTextureTemp = this._batchTextureTemp;
-
-        this._batchTextureOutput = storeBatchOutput;
-        this._batchTextureConcat = storeBatchConcat;
-        this._batchTextureTemp = storeBatchTemp;
-
-        this._updateDrawingSurface(backupWidth, backupHeight);
-        return true;
-    };
-
-    /**
-       * For every image encountered StageGL registers and tracks it automatically. This tracking can cause memory leaks 
-       * if not purged. StageGL, by default, automatically purges them. This does have a cost and may unfortunately find
-       * false positives. This function is for manual management of this memory instead of the automatic system controlled
-       * by the {{#crossLink "StageGL/autoPurge:property"}}{{/crossLink}} property.
-       *
-       * This function will recursively remove all textures found on the object, its children, cache, etc. It will uncache 
-       * objects and remove any texture it finds REGARDLESS of whether it is currently in use elsewhere. It is up to the
-       * developer to ensure that a texture in use is not removed.
-       *
-       * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
-       * Removing a texture in use will cause the texture to end up being re-uploaded slowing rendering.
-       * @method releaseTexture
-       * @param {DisplayObject | WebGLTexture | Image | Canvas} item An object that used the texture to be discarded.
-       * @param {Boolean} [safe=false] Should the release attempt to be "safe" and only delete this usage.
-       */
-    p.releaseTexture = function (item, safe) {
-        var i, l;
-        if (!item) { return; }
-
-        // this is a container object
-        if (item.children) {
-            for (i = 0, l = item.children.length; i < l; i++) {
-                this.releaseTexture(item.children[ i ], safe);
-            }
-        }
-
-        // this has a cache canvas
-        if (item.cacheCanvas) {
-            item.uncache();
-        }
-
-        var foundImage = undefined;
-        if (item._storeID !== undefined) {
-            // this is a texture itself
-            if (item === this._textureDictionary[ item._storeID ]) {
-                this._killTextureObject(item);
-                item._storeID = undefined;
-                return;
-            }
-
-            // this is an image or canvas
-            foundImage = item;
-        } else if (item._webGLRenderStyle === 2) {
-            // this is a Bitmap class
-            foundImage = item.image;
-            if (foundImage.getImage) { foundImage = foundImage.getImage(); }
-        } else if (item._webGLRenderStyle === 1) {
-            // this is a SpriteSheet, we can't tell which image we used from the list easily so remove them all!
-            for (i = 0, l = item.spriteSheet._images.length; i < l; i++) {
-                this.releaseTexture(item.spriteSheet._images[ i ], safe);
-            }
-            return;
-        }
-
-        // did we find anything
-        if (foundImage === undefined) {
-            if (this.vocalDebug) {
-                console.log("No associated texture found on release");
-            }
-            return;
-        }
-
-        // remove it
-        var texture = this._textureDictionary[ foundImage._storeID ];
-        if (safe) {
-            var data = texture._imageData;
-            var index = data.indexOf(foundImage);
-            if (index >= 0) { data.splice(index, 1); }
-            foundImage._storeID = undefined;
-            if (data.length === 0) { this._killTextureObject(texture); }
-        } else {
-            this._killTextureObject(texture);
-        }
-    };
-
-    /**
-       * Similar to {{#crossLink "releaseTexture"}}{{/crossLink}}, but this function differs by searching for textures to
-       * release. It works by assuming that it can purge any texture which was last used more than "count" draw calls ago.
-       * Because this process is unaware of the objects and whether they may be used later on your stage, false positives can
-       * occur. It is recommended to manually manage your memory with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}},
-       * however, there are many use cases where this is simpler and error-free. This process is also run by default under
-       * the hood to prevent leaks. To disable it see the {{#crossLink "StageGL/autoPurge:property"}}{{/crossLink}} property.
-       * @method purgeTextures
-       * @param {Number} [count=100] How many renders ago the texture was last used
-       */
-    p.purgeTextures = function (count) {
-        if (!(count >= 0)) { count = 100; }
-
-        var dict = this._textureDictionary;
-        var l = dict.length;
-        for (var i = 0; i < l; i++) {
-            var data, texture = dict[ i ];
-            if (!texture || !(data = texture._imageData)) { continue; }
-
-            for (var j = 0; j < data.length; j++) {
-                var item = data[ j ];
-                if (item._drawID + count <= this._drawID) {
-                    item._storeID = undefined;
-                    data.splice(j, 1);
-                    j--;
-                }
-            }
-
-            if (!data.length) { this._killTextureObject(texture); }
-        }
-    };
-
-    /**
-       * Update the WebGL viewport. Note that this does <strong>not</strong> update the canvas element's width/height, but
-       * the render surface's instead. This is necessary after manually resizing the canvas element on the DOM to avoid a
-       * up/down scaled render.
-       * @method updateViewport
-       * @param {int} width The width of the render surface in pixels.
-       * @param {int} height The height of the render surface in pixels.
-       */
-    p.updateViewport = function (width, height) {
-        width = Math.abs(width | 0) || 1;
-        height = Math.abs(height | 0) || 1;
-
-        this._updateDrawingSurface(width, height);
-
-        if (this._bufferTextureOutput !== this && this._bufferTextureOutput !== null) {
-            this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
-        }
-        if (this._bufferTextureConcat !== null) {
-            this.resizeTexture(this._bufferTextureConcat, this._viewportWidth, this._viewportHeight);
-        }
-        if (this._bufferTextureTemp !== null) {
-            this.resizeTexture(this._bufferTextureTemp, this._viewportWidth, this._viewportHeight);
-        }
-    };
-
-    /**
-       * Fetches the shader compiled and set up to work with the provided filter/object. The shader is compiled on first
-       * use and returned on subsequent calls.
-       * @method getFilterShader
-       * @param  {Filter|Object} filter The object which will provide the information needed to construct the filter shader.
-       * @return {WebGLProgram}
-       */
-    p.getFilterShader = function (filter) {
-        if (!filter) { filter = this; }
-
-        var gl = this._webGLContext;
-        var targetShader = this._activeShader;
-
-        if (filter._builtShader) {
-            targetShader = filter._builtShader;
-            if (filter.shaderParamSetup) {
-                gl.useProgram(targetShader);
-                filter.shaderParamSetup(gl, this, targetShader);
-            }
-        } else {
-            try {
-                targetShader = this._fetchShaderProgram(
-                    true, filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
-                    filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
-                );
-                filter._builtShader = targetShader;
-                targetShader._name = filter.toString();
-            } catch (e) {
-                console && console.log("SHADER SWITCH FAILURE", e);
-            }
-        }
-        return targetShader;
-    };
-
-    /**
-       * Returns a base texture that has no image or data loaded. Not intended for loading images. It may return `null`
-       * in some error cases, and trying to use a "null" texture can cause renders to fail.
-       * @method getBaseTexture
-       * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
-       * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
-       */
-    p.getBaseTexture = function (w, h) {
-        var width = Math.ceil(w > 0 ? w : 1) || 1;
-        var height = Math.ceil(h > 0 ? h : 1) || 1;
-
-        var gl = this._webGLContext;
-        var texture = gl.createTexture();
-        this.resizeTexture(texture, width, height);
-        this.setTextureParams(gl, false);
-
-        return texture;
-    };
-
-    /**
-       * Resizes a supplied texture element. May generate invalid textures in some error cases such as; when the texture
-       * is too large, when an out of texture memory error occurs, or other error scenarios. Trying to use an invalid texture
-       * can cause renders to hard stop on some devices. Check the WebGL bound texture after running this function.
-       *
-       * NOTE: The supplied texture must have been made with the WebGL "texImage2D" function, all default APIs in StageGL
-       * use this, so this note only matters for library developers and plugins.
-       *
-       * @protected
-       * @method resizeTexture
-       * @param  {WebGLTexture} texture The GL Texture to be modified.
-       * @param  {uint} width The width of the texture in pixels
-       * @param  {uint} height The height of the texture in pixels
-       */
-    p.resizeTexture = function (texture, width, height) {
-        if (texture.width === width && texture.height === height) { return; }
-
-        var gl = this._webGLContext;
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(
-            gl.TEXTURE_2D,				// target
-            0,							// level of detail
-            gl.RGBA,					// internal format
-            width, height, 0,			// width, height, border (only for array/null sourced textures)
-            gl.RGBA,					// format (match internal format)
-            gl.UNSIGNED_BYTE,			// type of texture(pixel color depth)
-            null						// image data, we can do null because we're doing array data
-        );
-
-        // set its width and height for spoofing as an image and tracking
-        texture.width = width;
-        texture.height = height;
-    };
-
-    /**
-       * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) for details. Also includes an
-       * attached and linked render buffer in `texture._frameBuffer`. RenderTextures can be thought of as an internal
-       * canvas on the GPU that can be drawn to. Being internal to the GPU they are much faster than "offscreen canvases".
-       * @method getRenderBufferTexture
-       * @param  {Number} w The width of the texture in pixels.
-       * @param  {Number} h The height of the texture in pixels.
-       * @return {WebGLTexture} the basic texture instance with a render buffer property.
-       */
-    p.getRenderBufferTexture = function (w, h) {
-        var gl = this._webGLContext;
-
-        var renderTexture = this.getBaseTexture(w, h);
-        if (!renderTexture) { return null; }
-
-        var frameBuffer = gl.createFramebuffer();
-        if (!frameBuffer) { return null; }
-
-        // set its width and height for spoofing as an image and tracking
-        renderTexture.width = w;
-        renderTexture.height = h;
-
-        // attach frame buffer to texture and provide cross links to look up each other
-        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTexture, 0);
-        frameBuffer._renderTexture = renderTexture;
-        renderTexture._frameBuffer = frameBuffer;
-
-        // these keep track of themselves simply to reduce complexity of some lookup code
-        renderTexture._storeID = this._textureDictionary.length;
-        this._textureDictionary[ renderTexture._storeID ] = renderTexture;
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        return renderTexture;
-    };
-
-    /**
-       * Common utility function used to apply the correct texture processing parameters for the bound texture.
-       * @method setTextureParams
-       * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-       * @param  {Boolean} [isPOT=false] Marks whether the texture is "Power of Two", this may allow better quality AA.
-       */
-    p.setTextureParams = function (gl, isPOT) {
-        if (isPOT && this._antialias) {
-            //non POT linear works in some devices, but performance is NOT good, investigate
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        } else {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    };
-
-    /**
-       * Changes the webGL clear, aka "background" color to the provided value. A transparent clear is recommended, as
-       * non-transparent colours may create undesired boxes around some visuals.
-       *
-       * The clear color will also be used for filters and other "render textures". The stage background will ignore the
-       * transparency value and display a solid color normally. For the stage to recognize and use transparency it must be
-       * created with the transparent flag set to `true` (see {{#crossLink "StageGL/constructor"}}{{/crossLink}})).
-       *
-       * Using "transparent white" to demonstrate, the valid data formats are as follows:
-       * <ul>
-       *     <li>"#FFF"</li>
-       *     <li>"#FFFFFF"</li>
-       *     <li>"#FFFFFF00"</li>
-       *     <li>"rgba(255,255,255,0.0)"</li>
-       * </ul>
-       * @method setClearColor
-       * @param {String|int} [color=0x00000000] The new color to use as the background
-       */
-    p.setClearColor = function (color) {
-        this._clearColor = StageGL.colorToObj(color);
-    };
-
-    /**
-       * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
-       * be specified as the src value of an image element. StageGL renders differently than Context2D and the information
-       * of the last render is harder to get. For best results turn directDraw to false, or preserveBuffer to true and no
-       * backgorund color.
-       * @method toDataURL
-       * @param {String} [backgroundColor=undefined] The background color to be used for the generated image. See setClearColor
-       * for valid values. A value of undefined will make no adjustments to the existing background which may be significantly faster.
-       * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
-       * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
-       * @param {Number} [encoderOptions=0.92] A Number between 0 and 1 indicating the image quality to use for image
-       * formats that use lossy  compression such as image/jpeg and image/webp.
-       * @return {String} a Base64 encoded image.
-       **/
-    p.toDataURL = function (backgroundColor, mimeType, encoderOptions) {
-        var dataURL, gl = this._webGLContext;
-        this.batchReason = "dataURL";
-        var clearBackup = this._clearColor;
-
-        if (!this.canvas) { return; }
-        if (!StageGL.isWebGLActive(gl)) {
-            return this.Stage_toDataURL(backgroundColor, mimeType, encoderOptions);
-        }
-
-        // if the buffer is preserved and we don't want a background we can just output what we have, otherwise we'll have to render it
-        if (!this._preserveBuffer || backgroundColor !== undefined) {
-            // render it onto the right background
-            if (backgroundColor !== undefined) {
-                this._clearColor = StageGL.colorToObj(backgroundColor);
-            }
-            this.clear();
-            // if we're not using directDraw then we can just trust the last buffer content
-            if (!this._directDraw) {
-                this._drawCover(null, this._bufferTextureOutput);
-            } else {
-                console.log("No stored/useable gl render info, result may be incorrect if content was changed since render");
-                this.draw(gl);
-            }
-        }
-
-        // create the dataurl
-        dataURL = this.canvas.toDataURL(mimeType || "image/png", encoderOptions);
-
-        // reset the picture in the canvas
-        if (!this._preserveBuffer || backgroundColor !== undefined) {
-            if (backgroundColor !== undefined) {
-                this._clearColor = clearBackup;
-            }
-            this.clear();
-            if (!this._directDraw) {
-                this._drawCover(null, this._bufferTextureOutput);
-            } else {
-                this.draw(gl);
-            }
-        }
-
-        return dataURL;
-    };
-
-    // Docced in subclass
-    p.toString = function () {
-        return "[StageGL (name=" + this.name + ")]";
-    };
-
-    // private methods:
-    /**
-       * Changes the active drawing surface and view matrix to the correct parameters without polluting the concept
-       * of the current stage size
-       * @param  {uint} w The width of the surface in pixels, defaults to _viewportWidth
-       * @param  {uint} h The height of the surface in pixels, defaults to _viewportHeight
-       */
-    p._updateDrawingSurface = function (w, h) {
-        this._viewportWidth = w;
-        this._viewportHeight = h;
-
-        this._webGLContext.viewport(0, 0, this._viewportWidth, this._viewportHeight);
-
-        // WebGL works with a -1,1 space on its screen. It also follows Y-Up
-        // we need to flip the y, scale and then translate the co-ordinates to match this
-        // additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
-        this._projectionMatrix = new Float32Array([
-            2 / w, 0, 0, 0,
-            0, -2 / h, 0, 0,
-            0, 0, 1, 0,
-            -1, 1, 0, 1
-        ]);
-    };
-
-    /**
-       * Returns a base texture that has no image or data loaded. Not intended for loading images. In some error cases,
-       * the texture creation will fail. This function differs from {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}
-       * in that the failed textures will be replaced with a safe to render "nothing" texture.
-       * @method _getSafeTexture
-       * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
-       * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
-       * @protected
-       */
-    p._getSafeTexture = function (w, h) {
-        var texture = this.getBaseTexture(w, h);
-
-        if (!texture) {
-            var msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
-            (console.error && console.error(msg)) || console.log(msg);
-
-            texture = this._baseTextures[ 0 ];
-        }
-
-        return texture;
-    };
-
-    /**
-       * Visually clear out the currently active FrameBuffer, does not rebind or adjust the frameBuffer in use.
-       * @method _getSafeTexture
-       * @param alpha
-       * @protected
-       */
-    p._clearFrameBuffer = function (alpha) {
-        var gl = this._webGLContext;
-        var cc = this._clearColor;
-
-        if (alpha > 0) { alpha = 1; }
-        if (alpha < 0) { alpha = 0; }
-
-        // Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
-        gl.clearColor(cc.r * alpha, cc.g * alpha, cc.b * alpha, alpha);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.clearColor(0, 0, 0, 0);
-    };
-
-    /**
-       * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include 
-       * situations where the canvas element already has a context, 2D or GL.
-       * @param  {Canvas} canvas The DOM canvas element to attach to
-       * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
-       * @method _fetchWebGLContext
-       * @protected
-       * @return {WebGLRenderingContext} The WebGL context, may return undefined in error scenarios
-       */
-    p._fetchWebGLContext = function (canvas, options) {
-        var gl;
-
-        try {
-            gl = canvas.getContext("webgl", options) || canvas.getContext("experimental-webgl", options);
-        } catch (e) {
-            // don't do anything in catch, null check will handle it
-        }
-
-        if (!gl) {
-            var msg = "Could not initialize WebGL";
-            console.error ? console.error(msg) : console.log(msg);
-        } else {
-            gl.viewportWidth = canvas.width;
-            gl.viewportHeight = canvas.height;
-        }
-
-        return gl;
-    };
-
-    /**
-       * Create the completed Shader Program from the vertex and fragment shaders. Allows building of custom shaders for
-       * filters. Once compiled, shaders are saved so. If the Shader code requires dynamic alterations re-run this function
-       * to generate a new shader.
-       * @method _fetchShaderProgram
-       * @param  {Boolean} coverShader Is this a per object shader or a cover shader
-       * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
-       * @param  {String | undefined} [customVTX=undefined] Extra vertex shader information to replace a regular draw, see
-       * {{#crossLink "StageGL/COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-       * @param  {String | undefined} [customFRAG=undefined] Extra fragment shader information to replace a regular draw, see
-       * {{#crossLink "StageGL/COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
-       * @param  {Function | undefined} [shaderParamSetup=undefined] Function to run so custom shader parameters can get applied for the render.
-       * @protected
-       * @return {WebGLProgram} The compiled and linked shader
-       */
-    p._fetchShaderProgram = function (coverShader, customVTX, customFRAG, shaderParamSetup) {
-        var gl = this._webGLContext;
-
-        gl.useProgram(null);		// safety to avoid collisions
-
-        // build the correct shader string out of the right headers and bodies
-        var targetFrag, targetVtx;
-        if (coverShader) {
-            targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
-            targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
-        } else {
-            targetVtx = StageGL.REGULAR_VERTEX_HEADER + (customVTX || StageGL.REGULAR_VERTEX_BODY);
-            targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + (customFRAG || StageGL.REGULAR_FRAGMENT_BODY);
-        }
-
-        // create the separate vars
-        var vertexShader = this._createShader(gl, gl.VERTEX_SHADER, targetVtx);
-        var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
-
-        // link them together
-        var shaderProgram = gl.createProgram();
-        gl.attachShader(shaderProgram, vertexShader);
-        gl.attachShader(shaderProgram, fragmentShader);
-        gl.linkProgram(shaderProgram);
-
-        // check compile status
-        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-            gl.useProgram(this._activeShader);
-            throw gl.getProgramInfoLog(shaderProgram);
-        }
-
-        // set up the parameters on the shader
-        gl.useProgram(shaderProgram);
-
-        // get the places in memory the shader is stored so we can feed information into them
-        // then save it off on the shader because it's so tied to the shader itself
-        shaderProgram.positionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-        gl.enableVertexAttribArray(shaderProgram.positionAttribute);
-
-        shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
-        gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
-
-        if (coverShader) {
-            shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-            gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-            // if there's some custom attributes be sure to hook them up
-            if (shaderParamSetup) {
-                shaderParamSetup(gl, this, shaderProgram);
-            }
-        } else {
-            shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
-            gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
-
-            shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
-            gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
-
-            var samplers = [];
-            for (var i = 0; i < this._gpuTextureCount; i++) {
-                samplers[ i ] = i;
-            }
-            shaderProgram.samplerData = samplers;
-
-            shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-            gl.uniform1iv(shaderProgram.samplerUniform, shaderProgram.samplerData);
-
-            shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
-        }
-
-        shaderProgram._type = coverShader ? "cover" : "batch";
-
-        gl.useProgram(this._activeShader);
-        return shaderProgram;
-    };
-
-    /**
-       * Creates a shader from the specified string replacing templates. Template items are defined via `{{` `key` `}}``.
-       * @method _createShader
-       * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-       * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
-       * @param  {String} str The definition for the shader.
-       * @return {WebGLShader}
-       * @protected
-       */
-    p._createShader = function (gl, type, str) {
-        var textureCount = this._batchTextureCount;
-
-        // inject the static number
-        str = str.replace(/\{\{count}}/g, textureCount);
-
-        if (type === gl.FRAGMENT_SHADER) {
-            // resolve issue with no dynamic samplers by creating correct samplers in if else chain
-            // TODO: WebGL 2.0 does not need this support
-            var insert = "";
-            for (var i = 1; i < textureCount; i++) {
-                insert += "} else if (indexPicker <= " + i + ".5) { color = texture2D(uSampler[" + i + "], vTextureCoord);";
-            }
-            str = str.replace(/\{\{alternates}}/g, insert);
-        }
-
-        // actually compile the shader
-        var shader = gl.createShader(type);
-        gl.shaderSource(shader, str);
-        gl.compileShader(shader);
-
-        // check compile status
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            throw gl.getShaderInfoLog(shader);
-        }
-
-        return shader;
-    };
-
-    /**
-       * Sets up the necessary vertex property buffers, including position and UV.
-       * @method _createBuffers
-       * @protected
-       */
-    p._createBuffers = function () {
-        var gl = this._webGLContext;
-        var groupCount = this._maxBatchVertexCount;
-        var groupSize, i, l, config, atrBuffer;
-
-        // TODO benchmark and test using unified main buffer
-
-        // regular
-        config = this._attributeConfig[ "default" ] = {};
-
-        groupSize = 2;
-        var vertices = new Float32Array(groupCount * groupSize);
-        for (i = 0, l = vertices.length; i < l; i += groupSize) { vertices[ i ] = vertices[ i + 1 ] = 0.0; }
-        atrBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-        config[ "position" ] = {
-            array: vertices,
-            buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
-        };
-
-        groupSize = 2;
-        var uvs = new Float32Array(groupCount * groupSize);
-        for (i = 0, l = uvs.length; i < l; i += groupSize) { uvs[ i ] = uvs[ i + 1 ] = 0.0; }
-        atrBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
-        config[ "uv" ] = {
-            array: uvs,
-            buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
-        };
-
-        groupSize = 1;
-        var indices = new Float32Array(groupCount * groupSize);
-        for (i = 0, l = indices.length; i < l; i++) { indices[ i ] = 0.0; }
-        atrBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
-        config[ "texture" ] = {
-            array: indices,
-            buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
-        };
-
-        groupSize = 1;
-        var alphas = new Float32Array(groupCount * groupSize);
-        for (i = 0, l = alphas.length; i < l; i++) { alphas[ i ] = 1.0; }
-        atrBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
-        config[ "alpha" ] = {
-            array: alphas,
-            buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
-        };
-
-        // micro
-        config = this._attributeConfig[ "micro" ] = {};
-        groupCount = 5; // we probably do not need this much space, but it's safer and barely more expensive
-        groupSize = 2 + 2 + 1 + 1;
-        var stride = groupSize * 4; // they're all floats, so 4 bytes each
-
-        var microArray = new Float32Array(groupCount * groupSize);
-        for (i = 0, l = microArray.length; i < l; i += groupSize) {
-            microArray[ i ] = microArray[ i + 1 ] = 0.0; // vertex
-            microArray[ i + 1 ] = microArray[ i + 2 ] = 0.0; // uv
-            microArray[ i + 3 ] = 0.0;                   // texture
-            microArray[ i + 4 ] = 1.0;                   // alpha
-        }
-        atrBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, microArray, gl.DYNAMIC_DRAW);
-
-        config[ "position" ] = {
-            array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
-            offset: 0, offB: 0, size: 2
-        };
-        config[ "uv" ] = {
-            array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
-            offset: 2, offB: 2 * 4, size: 2
-        };
-        config[ "texture" ] = {
-            array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
-            offset: 4, offB: 4 * 4, size: 1
-        };
-        config[ "alpha" ] = {
-            array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
-            offset: 5, offB: 5 * 4, size: 1
-        };
-
-        // defaults
-        this._activeConfig = this._attributeConfig[ "default" ];
-    };
-
-    /**
-       * Do all the setup steps for standard textures & shaders.
-       * @method _initMaterials
-       * @protected
-       */
-    p._initMaterials = function () {
-        var gl = this._webGLContext;
-
-        // reset counters
-        this._lastTextureInsert = -1;
-
-        // clear containers
-        this._textureDictionary = [];
-        this._textureIDs = {};
-        this._baseTextures = [];
-        this._batchTextures = [];
-
-        this._gpuTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS); // this is what we can draw with
-        this._gpuTextureMax = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS); // this could be higher
-
-        this._batchTextureCount = this._gpuTextureCount;
-        var success = false;
-        while (!success) {
-            try {
-                this._activeShader = this._fetchShaderProgram(false);
-                success = true;
-            } catch (e) {
-                if (this._batchTextureCount <= 1) { throw "Cannot compile shader " + e; }
-                this._batchTextureCount = (this._batchTextureCount / 2) | 0;
-
-                if (this.vocalDebug) {
-                    console.log("Reducing possible texture count due to errors: " + this._batchTextureCount);
-                }
-            }
-        }
-
-        this._mainShader = this._activeShader;
-        this._mainShader._name = "main";
-
-        // fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
-        var texture = this.getBaseTexture();
-        if (!texture) {
-            throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
-        } else {
-            texture._storeID = -1;
-        }
-        for (var i = 0; i < this._batchTextureCount; i++) {
-            this._baseTextures[ i ] = this._batchTextures[ i ] = texture;
-        }
-    };
-
-    /**
-       * Load a specific texture, accounting for potential delay, as it might not be preloaded.
-       * @method _loadTextureImage
-       * @param {WebGLRenderingContext} gl
-       * @param {Image | Canvas} image Actual image to be loaded
-       * @return {WebGLTexture} The resulting Texture object
-       * @protected
-       */
-    p._loadTextureImage = function (gl, image) {
-        var srcPath, texture, msg;
-        if ((image instanceof Image || image instanceof HTMLImageElement) && image.src) {
-            srcPath = image.src;
-        } else if (image instanceof HTMLCanvasElement) {
-            image._isCanvas = true; //canvases are already loaded and assumed unique so note that
-            srcPath = "canvas_" + (++this._lastTrackedCanvas);
-        } else {
-            msg = "Invalid image provided as source. Please ensure source is a correct DOM element.";
-            (console.error && console.error(msg, image)) || console.log(msg, image);
-            return;
-        }
-
-        // create the texture lookup and texture
-        var storeID = this._textureIDs[ srcPath ];
-        if (storeID === undefined) {
-            this._textureIDs[ srcPath ] = storeID = this._textureDictionary.length;
-            image._storeID = storeID;
-            image._invalid = true;
-            texture = this._getSafeTexture();
-            this._textureDictionary[ storeID ] = texture;
-        } else {
-            image._storeID = storeID;
-            texture = this._textureDictionary[ storeID ];
-        }
-
-        // allow the texture to track its references for cleanup, if it's not an error ref
-        if (texture._storeID !== -1) {
-            texture._storeID = storeID;
-            if (texture._imageData) {
-                texture._imageData.push(image);
-            } else {
-                texture._imageData = [ image ];
-            }
-        }
-
-        // insert texture into batch
-        this._insertTextureInBatch(gl, texture);
-
-        return texture;
-    };
-
-    /**
-       * Necessary to upload the actual image data to the GPU. Without this the texture will be blank. Called automatically
-       * in most cases due to loading and caching APIs. Flagging an image source with `_invalid = true` will trigger this
-       * next time the image is rendered.
-       * @method _updateTextureImageData
-       * @param {WebGLRenderingContext} gl
-       * @param {Image | Canvas} image The image data to be uploaded
-       * @protected
-       */
-    p._updateTextureImageData = function (gl, image) {
-        // the image isn't loaded and isn't ready to be updated, because we don't set the invalid flag we should try again later
-        if (!(image.complete || image._isCanvas || image.naturalWidth)) {
-            return;
-        }
-
-        // the bitwise & is intentional, cheap exponent 2 check
-        var isNPOT = (image.width & image.width - 1) || (image.height & image.height - 1);
-        var texture = this._textureDictionary[ image._storeID ];
-
-        gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-
-        texture.isPOT = !isNPOT;
-        this.setTextureParams(gl, texture.isPOT);
-
-        try {
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-        } catch (e) {
-            var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
-            if (console.error) {
-                //TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
-                console.error(errString);
-                console.error(e);
-            } else if (console) {
-                console.log(errString);
-                console.log(e);
-            }
-        }
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-
-        if (image._invalid !== undefined) { image._invalid = false; } // only adjust what is tracking this data
-
-        texture.width = image.width;
-        texture.height = image.height;
-
-        if (this.vocalDebug) {
-            if (isNPOT && this._antialias) {
-                console.warn("NPOT(Non Power of Two) Texture with context.antialias true: " + image.src);
-            }
-            if (image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE) {
-                console && console.error("Oversized Texture: " + image.width + "x" + image.height + " vs " + gl.MAX_TEXTURE_SIZE + "max");
-            }
-        }
-    };
-
-    /**
-       * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
-       * @method _insertTextureInBatch
-       * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
-       * @param {WebGLTexture} texture The texture to be inserted.
-       * @protected
-       */
-    p._insertTextureInBatch = function (gl, texture) {
-        var image;
-        if (this._batchTextures[ texture._activeIndex ] !== texture) {	// if it wasn't used last batch
-            // we've got to find it a a spot.
-            var found = -1;
-            var start = (this._lastTextureInsert + 1) % this._batchTextureCount;
-            var look = start;
-            do {
-                if (this._batchTextures[ look ]._batchID !== this._batchID && !this._slotBlacklist[ look ]) {
-                    found = look;
-                    break;
-                }
-                look = (look + 1) % this._batchTextureCount;
-            } while (look !== start);
-
-            // we couldn't find anywhere for it go, meaning we're maxed out
-            if (found === -1) {
-                this.batchReason = "textureOverflow";
-                this._renderBatch();		// <------------------------------------------------------------------------
-                found = start; //TODO: how do we optimize this to be smarter?
-            }
-
-            // lets put it into that spot
-            this._batchTextures[ found ] = texture;
-            texture._activeIndex = found;
-            image = texture._imageData && texture._imageData[ 0 ]; // first come first served, potentially problematic
-            if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
-                this._updateTextureImageData(gl, image);
-            } else {
-                // probably redundant, confirm functionality then remove from codebase
-                //gl.activeTexture(gl.TEXTURE0 + found);
-                //gl.bindTexture(gl.TEXTURE_2D, texture);
-                //this.setTextureParams(gl);
-            }
-            this._lastTextureInsert = found;
-
-        } else if (texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
-            image = texture._imageData && texture._imageData[ 0 ];
-            if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
-                this._updateTextureImageData(gl, image);
-            }
-        }
-
-        texture._drawID = this._drawID;
-        texture._batchID = this._batchID;
-    };
-
-    /**
-       * Remove and clean the texture, expects a texture and is inflexible. Mostly for internal use, recommended to call 
-       * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
-       * Note: Testing shows this may not happen immediately, have to wait frames for WebGL to have actually adjust memory.
-       * @method _killTextureObject
-       * @param {WebGLTexture} texture The texture to be cleaned out
-       * @protected
-       */
-    p._killTextureObject = function (texture) {
-        if (!texture) { return; }
-        var gl = this._webGLContext;
-
-        // remove linkage
-        if (texture._storeID !== undefined && texture._storeID >= 0) {
-            this._textureDictionary[ texture._storeID ] = undefined;
-            for (var n in this._textureIDs) {
-                if (this._textureIDs[ n ] === texture._storeID) { delete this._textureIDs[ n ]; }
-            }
-            var data = texture._imageData;
-            if (data) {
-                for (var i = data.length - 1; i >= 0; i--) { data[ i ]._storeID = undefined; }
-            }
-            texture._imageData = texture._storeID = undefined;
-        }
-
-        // make sure to drop it out of an active slot
-        if (texture._activeIndex !== undefined && this._batchTextures[ texture._activeIndex ] === texture) {
-            this._batchTextures[ texture._activeIndex ] = this._baseTextures[ texture._activeIndex ];
-        }
-
-        // remove buffers if present
-        try {
-            if (texture._frameBuffer) { gl.deleteFramebuffer(texture._frameBuffer); }
-            texture._frameBuffer = undefined;
-        } catch (e) {
-            /* suppress delete errors because it's already gone or didn't need deleting probably */
-            if (this.vocalDebug) { console.log(e); }
-        }
-
-        // remove entry
-        try {
-            gl.deleteTexture(texture);
-        } catch (e) {
-            /* suppress delete errors because it's already gone or didn't need deleting probably */
-            if (this.vocalDebug) { console.log(e); }
-        }
-    };
-
-    /**
-       * Small utility function to keep internal API consistent and set the uniforms for a dual texture cover render
-       * @method _setCoverMixShaderParams
-       * @param {WebGLRenderingContext} gl The context where the drawing takes place
-       * @param stage unused
-       * @param shaderProgram unused
-       * @protected
-       */
-    p._setCoverMixShaderParams = function (gl, stage, shaderProgram) {
-        gl.uniform1i(
-            gl.getUniformLocation(shaderProgram, "uMixSampler"),
-            1
-        );
-    };
-
-    /**
-       * Change the respective render settings and filters to the correct settings. Will build the shader on first use.
-       * @method _updateRenderMode
-       * @param {String} newMode Composite operation name
-       * @protected
-       */
-    p._updateRenderMode = function (newMode) {
-        if (newMode === null || newMode === undefined) { newMode = "source-over"; }
-
-        var blendSrc = StageGL.BLEND_SOURCES[ newMode ];
-        if (blendSrc === undefined) {
-            if (this.vocalDebug) { console.log("Unknown compositeOperation [" + newMode + "], reverting to default"); }
-            blendSrc = StageGL.BLEND_SOURCES[ newMode = "source-over" ];
-        }
-
-        if (this._renderMode === newMode) { return; }
-
-        var gl = this._webGLContext;
-        var shaderData = this._builtShaders[ newMode ];
-        if (shaderData === undefined) {
-            try {
-                shaderData = this._builtShaders[ newMode ] = {
-                    eqRGB: gl[ blendSrc.eqRGB || "FUNC_ADD" ],
-                    srcRGB: gl[ blendSrc.srcRGB || "ONE" ],
-                    dstRGB: gl[ blendSrc.dstRGB || "ONE_MINUS_SRC_ALPHA" ],
-                    eqA: gl[ blendSrc.eqA || "FUNC_ADD" ],
-                    srcA: gl[ blendSrc.srcA || "ONE" ],
-                    dstA: gl[ blendSrc.dstA || "ONE_MINUS_SRC_ALPHA" ],
-                    immediate: blendSrc.shader !== undefined,
-                    shader: (blendSrc.shader || this._builtShaders[ "source-over" ] === undefined) ?
-                        this._fetchShaderProgram(
-                            true, undefined, blendSrc.shader,
-                            this._setCoverMixShaderParams
-                        ) : this._builtShaders[ "source-over" ].shader // re-use source-over when we don't need a new shader
-                };
-                if (blendSrc.shader) { shaderData.shader._name = newMode; }
-            } catch (e) {
-                this._builtShaders[ newMode ] = undefined;
-                console && console.log("SHADER SWITCH FAILURE", e);
-                return;
-            }
-        }
-
-        if (shaderData.immediate) {
-            if (this._directDraw) {
-                if (this.vocalDebug) { console.log("Illegal compositeOperation [" + newMode + "] due to StageGL.directDraw = true, reverting to default"); }
-                return;
-            }
-            this._activeConfig = this._attributeConfig[ "micro" ];
-        }
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
-
-        this.batchReason = "shaderSwap";
-        this._renderBatch();		// <--------------------------------------------------------------------------------
-
-        this._renderMode = newMode;
-        this._immediateRender = shaderData.immediate;
-        gl.blendEquationSeparate(shaderData.eqRGB, shaderData.eqA);
-        gl.blendFuncSeparate(shaderData.srcRGB, shaderData.dstRGB, shaderData.srcA, shaderData.dstA);
-    };
-
-    /**
-       * Helper function for the standard content draw
-       * @method _drawContent
-       * @param {Stage | Container} content
-       * @param {Boolean} ignoreCache
-       * @protected
-       */
-    p._drawContent = function (content, ignoreCache) {
-        var gl = this._webGLContext;
-
-        this._activeShader = this._mainShader;
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
-        if (this._batchTextureOutput._frameBuffer !== null) { gl.clear(gl.COLOR_BUFFER_BIT); }
-
-        this._appendToBatch(content, new createjs.Matrix2D(), this.alpha, ignoreCache);
-
-        this.batchReason = "contentEnd";
-        this._renderBatch();
-    };
-
-    /**
-       * Used to draw one or more textures potentially using a filter into the supplied buffer.
-       * Mostly used for caches, filters, and outputting final render frames.
-       * Draws `dst` into `out` after applying `srcFilter` depending on its current value.
-       * @method _drawCover
-       * @param {WebGLFramebuffer} out Buffer to draw the results into (null is the canvas element)
-       * @param {WebGLTexture} dst Base texture layer aka "destination" in image blending terminology
-       * @param {WebGLTexture | Filter} [srcFilter = undefined] Modification parameter for the draw. If a texture, the
-       * current _renderMode applies it as a "source" image. If a Filter, the filter is applied to the dst with its params.
-       * @protected
-       */
-    p._drawCover = function (out, dst, srcFilter) {
-        var gl = this._webGLContext;
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, out);
-        if (out !== null) { gl.clear(gl.COLOR_BUFFER_BIT); }
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, dst);
-        this.setTextureParams(gl);
-
-        if (srcFilter instanceof createjs.Filter) {
-            this._activeShader = this.getFilterShader(srcFilter);
-        } else {
-            if (srcFilter instanceof WebGLTexture) {
-                gl.activeTexture(gl.TEXTURE1);
-                gl.bindTexture(gl.TEXTURE_2D, srcFilter);
-                this.setTextureParams(gl);
-            } else if (srcFilter !== undefined && this.vocalDebug) {
-                console.log("Unknown data handed to function: ", srcFilter);
-            }
-            this._activeShader = this._builtShaders[ this._renderMode ].shader;
-        }
-
-        this._renderCover();
-    };
-
-    /**
-       * Returns a matrix that can be used to counter position the `target` so that it fits and scales to the `manager`
-       * @param {DisplayObject} target The object to be counter positioned
-       * @param {BitmapCache} manager The cache manager to be aligned to
-       * @returns {Matrix2D} The matrix that can be used used to counter position the container
-       * @method _alignTargetToCache
-       * @private
-       */
-    p._alignTargetToCache = function (target, manager) {
-        if (manager._counterMatrix === null) {
-            manager._counterMatrix = target.getMatrix();
-        } else {
-            target.getMatrix(manager._counterMatrix)
-        }
-
-        var mtx = manager._counterMatrix;
-        mtx.scale(1 / manager.scale, 1 / manager.scale);
-        mtx = mtx.invert();
-        mtx.translate(-manager.offX / manager.scale * target.scaleX, -manager.offY / manager.scale * target.scaleY);
-
-        return mtx;
-    };
-
-    /**
-       * Add all the contents of a container to the pending buffers, called recursively on each container. This may
-       * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
-       * @method _appendToBatch
-       * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
-       * @param {Matrix2D} concatMtx The effective (concatenated) transformation matrix when beginning this container
-       * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
-       * @param {Boolean} [ignoreCache=false] Don't use an element's cache during this draw
-       * @protected
-       */
-    p._appendToBatch = function (container, concatMtx, concatAlpha, ignoreCache) {
-        var gl = this._webGLContext;
-
-        // sort out shared properties
-        var cMtx = container._glMtx;
-        cMtx.copy(concatMtx);
-        if (container.transformMatrix !== null) {
-            cMtx.appendMatrix(container.transformMatrix);
-        } else {
-            cMtx.appendTransform(
-                container.x, container.y,
-                container.scaleX, container.scaleY,
-                container.rotation, container.skewX, container.skewY,
-                container.regX, container.regY
-            );
-        }
-
-        var previousRenderMode = this._renderMode;
-        if (container.compositeOperation) {
-            this._updateRenderMode(container.compositeOperation);
-        }
-
-        // sub components of figuring out the position an object holds
-        var subL, subT, subR, subB;
-
-        // actually apply its data to the buffers
-        var l = container.children.length;
-        for (var i = 0; i < l; i++) {
-            var item = container.children[ i ];
-            var useCache = (!ignoreCache && item.cacheCanvas) || false;
-
-            if (!(item.visible && concatAlpha > 0.0035)) { continue; }
-            var itemAlpha = item.alpha;
-
-            if (useCache === false) {
-                if (item._updateState) {
-                    item._updateState();
-                }
-
-                if (!this._directDraw && (!ignoreCache && item.cacheCanvas === null && item.filters !== null && item.filters.length)) {
-                    var bounds;
-                    if (item.bitmapCache === null) {
-                        bounds = item.getBounds();
-                        item.bitmapCache = new createjs.BitmapCache();
-                        item.bitmapCache._autoGenerated = true;
-                    }
-                    if (item.bitmapCache._autoGenerated) {
-                        this.batchReason = "cachelessFilterInterupt";
-                        this._renderBatch();					// <----------------------------------------------------
-
-                        item.alpha = 1;
-                        var shaderBackup = this._activeShader;
-                        bounds = bounds || item.getBounds();
-                        item.bitmapCache.define(item, bounds.x, bounds.y, bounds.width, bounds.height, 1, { useGL: this });
-                        useCache = item.bitmapCache._cacheCanvas;
-
-                        item.alpha = itemAlpha;
-                        this._activeShader = shaderBackup;
-                        gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
-                    }
-                }
-            }
-
-            if (useCache === false && item.children) {
-                this._appendToBatch(item, cMtx, itemAlpha * concatAlpha);
-                continue;
-            }
-
-            var containerRenderMode = this._renderMode;
-            if (item.compositeOperation) {
-                this._updateRenderMode(item.compositeOperation);
-            }
-
-            // check for overflowing batch, if yes then force a render
-            if (this._batchVertexCount + StageGL.INDICIES_PER_CARD > this._maxBatchVertexCount) {
-                this.batchReason = "vertexOverflow";
-                this._renderBatch();					// <------------------------------------------------------------
-            }
-
-            // keep track of concatenated position
-            var iMtx = item._glMtx;
-            iMtx.copy(cMtx);
-            if (item.transformMatrix) {
-                iMtx.appendMatrix(item.transformMatrix);
-            } else {
-                iMtx.appendTransform(
-                    item.x, item.y,
-                    item.scaleX, item.scaleY,
-                    item.rotation, item.skewX, item.skewY,
-                    item.regX, item.regY
-                );
-            }
-
-            var uvRect, texIndex, image, frame, texture, src;
-
-            // get the image data, or abort if not present
-            // BITMAP / Cached Canvas
-            if (item._webGLRenderStyle === 2 || useCache !== false) {
-                image = useCache === false ? item.image : useCache;
-
-                // SPRITE
-            } else if (item._webGLRenderStyle === 1) {
-                frame = item.spriteSheet.getFrame(item.currentFrame);
-                if (frame === null) { continue; }
-                image = frame.image;
-
-                // MISC (DOM objects render themselves later)
-            } else {
-                continue;
-            }
-            if (!image) { continue; }
-
-            // calculate texture
-            if (image._storeID === undefined) {
-                // this texture is new to us so load it and add it to the batch
-                texture = this._loadTextureImage(gl, image);
-            } else {
-                // fetch the texture (render textures know how to look themselves up to simplify this logic)
-                texture = this._textureDictionary[ image._storeID ];
-
-                if (!texture) { //TODO: this should really not occur but has due to bugs, hopefully this can be removed eventually
-                    if (this.vocalDebug) { console.log("Image source should not be lookup a non existent texture, please report a bug."); }
-                    continue;
-                }
-
-                // put it in the batch if needed
-                if (texture._batchID !== this._batchID) {
-                    this._insertTextureInBatch(gl, texture);
-                }
-            }
-            texIndex = texture._activeIndex;
-            image._drawID = this._drawID;
-
-            // BITMAP / Cached Canvas
-            if (item._webGLRenderStyle === 2 || useCache !== false) {
-                if (useCache === false && item.sourceRect) {
-                    // calculate uvs
-                    if (!item._uvRect) { item._uvRect = {}; }
-                    src = item.sourceRect;
-                    uvRect = item._uvRect;
-                    uvRect.t = 1 - ((src.y) / image.height);
-                    uvRect.l = (src.x) / image.width;
-                    uvRect.b = 1 - ((src.y + src.height) / image.height);
-                    uvRect.r = (src.x + src.width) / image.width;
-
-                    // calculate vertices
-                    subL = 0; subT = 0;
-                    subR = src.width + subL; subB = src.height + subT;
-                } else {
-                    // calculate uvs
-                    uvRect = StageGL.UV_RECT;
-                    // calculate vertices
-                    if (useCache === false) {
-                        subL = 0; subT = 0;
-                        subR = image.width + subL; subB = image.height + subT;
-                    } else {
-                        src = item.bitmapCache;
-                        subL = src.x + (src._filterOffX / src.scale); subT = src.y + (src._filterOffY / src.scale);
-                        subR = (src._drawWidth / src.scale) + subL; subB = (src._drawHeight / src.scale) + subT;
-                    }
-                }
-
-                // SPRITE
-            } else if (item._webGLRenderStyle === 1) {
-                var rect = frame.rect;
-
-                // calculate uvs
-                uvRect = frame.uvRect;
-                if (!uvRect) {
-                    uvRect = StageGL.buildUVRects(item.spriteSheet, item.currentFrame, false);
-                }
-
-                // calculate vertices
-                subL = -frame.regX; subT = -frame.regY;
-                subR = rect.width - frame.regX; subB = rect.height - frame.regY;
-            }
-
-            var spacing = 0;
-            var cfg = this._activeConfig;
-            var vpos = cfg.position.array;
-            var uvs = cfg.uv.array;
-            var texI = cfg.texture.array;
-            var alphas = cfg.alpha.array;
-
-            // apply vertices
-            spacing = cfg.position.spacing;
-            var vtxOff = this._batchVertexCount * spacing + cfg.position.offset;
-            vpos[ vtxOff ] = subL * iMtx.a + subT * iMtx.c + iMtx.tx; vpos[ vtxOff + 1 ] = subL * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vtxOff += spacing;
-            vpos[ vtxOff ] = subL * iMtx.a + subB * iMtx.c + iMtx.tx; vpos[ vtxOff + 1 ] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
-            vtxOff += spacing;
-            vpos[ vtxOff ] = subR * iMtx.a + subT * iMtx.c + iMtx.tx; vpos[ vtxOff + 1 ] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vtxOff += spacing;
-            vpos[ vtxOff ] = subL * iMtx.a + subB * iMtx.c + iMtx.tx; vpos[ vtxOff + 1 ] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
-            vtxOff += spacing;
-            vpos[ vtxOff ] = subR * iMtx.a + subT * iMtx.c + iMtx.tx; vpos[ vtxOff + 1 ] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vtxOff += spacing;
-            vpos[ vtxOff ] = subR * iMtx.a + subB * iMtx.c + iMtx.tx; vpos[ vtxOff + 1 ] = subR * iMtx.b + subB * iMtx.d + iMtx.ty;
-
-            // apply uvs
-            spacing = cfg.uv.spacing;
-            var uvOff = this._batchVertexCount * spacing + cfg.uv.offset;
-            uvs[ uvOff ] = uvRect.l; uvs[ uvOff + 1 ] = uvRect.t;
-            uvOff += spacing;
-            uvs[ uvOff ] = uvRect.l; uvs[ uvOff + 1 ] = uvRect.b;
-            uvOff += spacing;
-            uvs[ uvOff ] = uvRect.r; uvs[ uvOff + 1 ] = uvRect.t;
-            uvOff += spacing;
-            uvs[ uvOff ] = uvRect.l; uvs[ uvOff + 1 ] = uvRect.b;
-            uvOff += spacing;
-            uvs[ uvOff ] = uvRect.r; uvs[ uvOff + 1 ] = uvRect.t;
-            uvOff += spacing;
-            uvs[ uvOff ] = uvRect.r; uvs[ uvOff + 1 ] = uvRect.b;
-
-            // apply texture
-            spacing = cfg.texture.spacing;
-            var texOff = this._batchVertexCount * spacing + cfg.texture.offset;
-            texI[ texOff ] = texIndex;
-            texOff += spacing;
-            texI[ texOff ] = texIndex;
-            texOff += spacing;
-            texI[ texOff ] = texIndex;
-            texOff += spacing;
-            texI[ texOff ] = texIndex;
-            texOff += spacing;
-            texI[ texOff ] = texIndex;
-            texOff += spacing;
-            texI[ texOff ] = texIndex;
-
-            // apply alpha
-            spacing = cfg.alpha.spacing;
-            var aOff = this._batchVertexCount * spacing + cfg.alpha.offset;
-            alphas[ aOff ] = itemAlpha * concatAlpha;
-            aOff += spacing;
-            alphas[ aOff ] = itemAlpha * concatAlpha;
-            aOff += spacing;
-            alphas[ aOff ] = itemAlpha * concatAlpha;
-            aOff += spacing;
-            alphas[ aOff ] = itemAlpha * concatAlpha;
-            aOff += spacing;
-            alphas[ aOff ] = itemAlpha * concatAlpha;
-            aOff += spacing;
-            alphas[ aOff ] = itemAlpha * concatAlpha;
-
-            this._batchVertexCount += StageGL.INDICIES_PER_CARD;
-
-            if (this._immediateRender) {
-                this._activeConfig = this._attributeConfig[ "default" ];
-                this._immediateBatchRender();
-            }
-
-            if (this._renderMode !== containerRenderMode) {
-                this._updateRenderMode(containerRenderMode);
-            }
-        }
-
-        if (this._renderMode !== previousRenderMode) {
-            this._updateRenderMode(previousRenderMode);
-        }
-    };
-
-    /**
-       * The shader or effect needs to be drawn immediately, sub function of `_appendToBatch`
-       * @method _immediateBatchRender
-       * @protected
-       */
-    p._immediateBatchRender = function () {
-        var gl = this._webGLContext;
-
-        if (this._batchTextureConcat === null) {
-            this._batchTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
-        } else {
-            this.resizeTexture(this._batchTextureConcat, this._viewportWidth, this._viewportHeight);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureConcat._frameBuffer);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        }
-        if (this._batchTextureTemp === null) {
-            this._batchTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
-        } else {
-            this.resizeTexture(this._batchTextureTemp, this._viewportWidth, this._viewportHeight);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        }
-
-        var swap = this._batchTextureOutput;
-        this._batchTextureOutput = this._batchTextureConcat;
-        this._batchTextureConcat = swap;
-
-        this._activeShader = this._mainShader;
-        this.batchReason = "immediatePrep";
-        this._renderBatch();//<-----------------------------------------------------------------------------------------
-
-        this.batchReason = "immediateResults";
-        this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, this._batchTextureTemp);
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
-    };
-
-    /**
-       * Draws all the currently defined cards in the buffer to the render surface.
-       * @method _renderBatch
-       * @protected
-       */
-    p._renderBatch = function () {
-        if (this._batchVertexCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
-        var gl = this._webGLContext;
-        this._renderPerDraw++;
-
-        if (this.vocalDebug) {
-            console.log("Batch[" + this._drawID + ":" + this._batchID + "] : " + this.batchReason);
-        }
-        var shaderProgram = this._activeShader;
-        var pc, config = this._activeConfig;
-
-        gl.useProgram(shaderProgram);
-
-        pc = config.position;
-        gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-        gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
-
-        pc = config.texture;
-        gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-        gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
-
-        pc = config.uv;
-        gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-        gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
-
-        pc = config.alpha;
-        gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-        gl.vertexAttribPointer(shaderProgram.alphaAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
-
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
-
-        for (var i = 0; i < this._batchTextureCount; i++) {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[ i ]);
-        }
-
-        gl.drawArrays(gl.TRIANGLES, 0, this._batchVertexCount);
-
-        this._batchVertexCount = 0;
-        this._batchID++;
-    };
-
-    /**
-       * Draws a card that covers the entire render surface. Mainly used for filters and composite operations.
-       * @method _renderCover
-       * @protected
-       */
-    p._renderCover = function () {
-        var gl = this._webGLContext;
-        this._renderPerDraw++;
-
-        if (this.vocalDebug) {
-            console.log("Cover[" + this._drawID + ":" + this._batchID + "] : " + this.batchReason);
-        }
-        var shaderProgram = this._activeShader;
-        var pc, config = this._attributeConfig.default;
-
-        gl.useProgram(shaderProgram);
-
-        pc = config.position;
-        gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-        gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
-
-        pc = config.uv;
-        gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
-        gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_UV);
-
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
-        this._batchID++; // while this isn't a batch, this fixes issues with expected textures in expected places
-    };
-
-    createjs.StageGL = createjs.promote(StageGL, "Stage");
+	"use strict";
+
+	/**
+	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for a WebGL-optimized display list,
+	 * which can be used in place of the usual {{#crossLink "Stage"}}{{/crossLink}}. This class should behave identically
+	 * to a {{#crossLink "Stage"}}{{/crossLink}} except for WebGL-specific functionality.
+	 *
+	 * Each time the {{#crossLink "Stage/tick"}}{{/crossLink}} method is called, the display list is rendered to the
+	 * target &lt;canvas/&gt; instance, ignoring non-WebGL-compatible display objects. On devices and browsers that don't
+	 * support WebGL, content will automatically be rendered to canvas 2D context instead.
+	 *
+	 * <h4>Limitations</h4>
+	 * - {{#crossLink "Shape"}}{{/crossLink}}, {{#crossLink "Shadow"}}{{/crossLink}}, and {{#crossLink "Text"}}{{/crossLink}}
+	 * 	are not rendered when added to the display list.
+	 * - To display something StageGL cannot render, {{#crossLink "displayObject/cache"}}{{/crossLink}} the object.
+	 *	Caches can be rendered regardless of source.
+	 * - Images are wrapped as a webGL "Texture". Each graphics card has a limit to its concurrent Textures, too many 
+	 * Textures will noticeably slow performance.
+	 * - Each cache counts as an individual Texture. As such {{#crossLink "SpriteSheet"}}{{/crossLink}} and 
+	 * {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}} are recommended practices to help keep texture counts low.
+	 * - To use any image node (DOM Image/Canvas Element) between multiple StageGL instances it must be a 
+	 * {{#crossLink "Bitmap/clone"}}{{/crossLink}}, otherwise the GPU texture loading and tracking will get confused.
+	 * - to avoid an up/down scaled render you must call {{#crossLink "StageGL/updateViewport"}}{{/crossLink}} if you
+	 * resize your canvas after making a StageGL instance, this will properly size the WebGL context stored in memory.
+	 * - Best performance in demanding scenarios will come from manual management of texture memory, but it is handled
+	 * automatically by default. See {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} for details.
+	 * - Disable `directDraw` to get access to cacheless filters and composite oeprations!
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a StageGL instance, adds a child to it, then uses the EaselJS {{#crossLink "Ticker"}}{{/crossLink}}
+	 * to update the child and redraw the stage.
+	 *
+	 *      var stage = new createjs.StageGL("canvasElementId");
+	 *
+	 *      var image = new createjs.Bitmap("imagePath.png");
+	 *      stage.addChild(image);
+	 *
+	 *      createjs.Ticker.on("tick", handleTick);
+	 *
+	 *      function handleTick(event) {
+	 *          image.x += 10;
+	 *          stage.update();
+	 *      }
+	 *
+	 * @class StageGL
+	 * @extends Stage
+	 * @constructor
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that StageGL will render to, or the string id
+	 * of a canvas object in the current DOM.
+	 * @param {Object} options All the option parameters in a reference object, some are not supported by some browsers.
+	 * @param {Boolean} [options.preserveBuffer=false] If `true`, the canvas is NOT auto-cleared by WebGL (the spec
+	 * discourages setting this to `true`). This is useful if you want persistent draw effects and has also fixed device
+	 * specific bugs due to mis-timed clear commands.
+	 * @param {Boolean} [options.antialias=false] Specifies whether or not the browser's WebGL implementation should try
+	 * to perform anti-aliasing. This will also enable linear pixel sampling on power-of-two textures (smoother images).
+	 * @param {Boolean} [options.transparent=false] If `true`, the canvas is transparent. This is <strong>very</strong>
+	 * expensive, and should be used with caution.
+	 * @param {Boolean} [options.directDraw=true] If `true`, this will bypass intermediary render-textures when possible
+	 * resulting in reduced memory and increased performance, this disables some features. Cache-less filters and some
+	 * {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}} values rely on this being false.
+	 * @param (Boolean} [options.premultiply] @deprecated Upgraded colour & transparency handling have fixed the issue
+	 * this flag was trying to solve rendering it unnecessary.
+	 * @param {int} [options.autoPurge=1200] How often the system should automatically dump unused textures. Calls
+	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}}
+	 * for more information on texture purging.
+	 * @param {String|int} [options.clearColor=undefined] Automatically calls {{#crossLink "StageGL/setClearColor"}}{{/crossLink}}
+	 * after init is complete, can be overridden and changed manually later.
+	 * @param {String|int} [options.batchSize=DEFAULT_MAX_BATCH_SIZE] The size of the buffer used to retain a batch.
+	 * Making it smaller reduces GPU load, but making it too small adds extra GPU calls. Figure out your maximum batch
+	 * count and set it to a small buffer above that per-project. Check src/utils/WebGLInspector to track.
+	 */
+	function StageGL(canvas, options) {
+		this.Stage_constructor(canvas);
+
+		var transparent, antialias, preserveBuffer, autoPurge, directDraw, batchSize;
+		if (options !== undefined) {
+			if (typeof options !== "object"){ throw("Invalid options object"); }
+			transparent = options.transparent;
+			antialias = options.antialias;
+			preserveBuffer = options.preserveBuffer;
+			autoPurge = options.autoPurge;
+			directDraw = options.directDraw;
+			batchSize = options.batchSize;
+		}
+
+// public properties:
+		/**
+		 * Console log potential issues and problems. This is designed to have <em>minimal</em> performance impact, so
+		 * if extensive debugging information is required, this may be inadequate. See {{#crossLink "WebGLInspector"}}{{/crossLink}}
+		 * @property vocalDebug
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.vocalDebug = false;
+
+		/**
+		 * Specifies whether this instance is slaved to a {{#crossLink "BitmapCache"}}{{/crossLink}} or draws independantly.
+		 * Necessary to control texture outputs and behaviours when caching. StageGL cache outputs will only render
+		 * properly for the StageGL that made them. See the {{#crossLink "cache"}}{{/crossLink}} function documentation
+		 * for more information. Enabled by default when BitmapCache's `useGL` is true.
+		 * NOTE: This property is mainly for internal use, though it may be useful for advanced uses.
+		 * @property isCacheControlled
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this.isCacheControlled = false;
+
+// private properties:
+		/**
+		 * Specifies whether or not the canvas is auto-cleared by WebGL. The WebGL spec discourages `true`.
+		 * If true, the canvas is NOT auto-cleared by WebGL. Used when the canvas context is created and requires
+		 * context re-creation to update.
+		 * @property _preserveBuffer
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this._preserveBuffer = preserveBuffer||false;
+
+		/**
+		 * Specifies whether or not the browser's WebGL implementation should try to perform anti-aliasing.
+		 * @property _antialias
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this._antialias = antialias||false;
+
+		/**
+		 * Specifies whether or not the browser's WebGL implementation should be transparent.
+		 * @property _transparent
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this._transparent = transparent||false;
+
+		/**
+		 * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
+		 * @property _autoPurge
+		 * @protected
+		 * @type {int}
+		 * @default null
+		 */
+		this._autoPurge = undefined;
+		this.autoPurge = autoPurge;	//getter/setter handles setting the real value and validating and documentation
+
+		/**
+		 * See directDraw
+		 * @property _directDraw
+		 * @protected
+		 * @type {Boolean}
+		 * @default false
+		 */
+		this._directDraw = directDraw === undefined ? true : (!!directDraw);
+
+		/**
+		 * The width in px of the drawing surface saved in memory.
+		 * @property _viewportWidth
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._viewportWidth = 0;
+
+		/**
+		 * The height in px of the drawing surface saved in memory.
+		 * @property _viewportHeight
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._viewportHeight = 0;
+
+		/**
+		 * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates. Regular canvas display
+		 * uses Top-Left values of [0,0] where WebGL uses a Center [0,0] Top-Right [1,1] (euclidean) system.
+		 * @property _projectionMatrix
+		 * @protected
+		 * @type {Float32Array}
+		 * @default null
+		 */
+		this._projectionMatrix = null;
+
+		/**
+		 * The current WebGL canvas context. Often shorthanded to just "gl" in many parts of the code.
+		 * @property _webGLContext
+		 * @protected
+		 * @type {WebGLRenderingContext}
+		 * @default null
+		 */
+		this._webGLContext = null;
+
+		/**
+		 * Reduce API logic by allowing stage to behave as a renderTexture target, should always be null as null is canvas.
+		 * @type {null}
+		 * @protected
+		 */
+		this._frameBuffer = null;
+
+		/**
+		 * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
+		 * @property _clearColor
+		 * @protected
+		 * @type {Object}
+		 * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
+		 */
+		this._clearColor = {r: 0.50, g: 0.50, b: 0.50, a: 0.00};
+
+		/**
+		 * The maximum number of verticies (6 make a single sprite) that can be drawn in one draw call. Use constructor props
+		 * to modify otherwise internal buffers may be invalid sizes.
+		 * @property _maxBatchVertexCount
+		 * @protected
+		 * @type {Number}
+		 * @default StageGL.DEFAULT_MAX_BATCH_SIZE * StageGL.INDICIES_PER_CARD
+		 */
+		this._maxBatchVertexCount = Math.max(
+			Math.min(
+				Number(batchSize) || StageGL.DEFAULT_MAX_BATCH_SIZE,
+				StageGL.DEFAULT_MAX_BATCH_SIZE)
+			, StageGL.DEFAULT_MIN_BATCH_SIZE) * StageGL.INDICIES_PER_CARD;
+
+		/**
+		 * The shader program used to draw the current batch.
+		 * @property _activeShader
+		 * @protected
+		 * @type {WebGLProgram}
+		 * @default null
+		 */
+		this._activeShader = null;
+
+		/**
+		 * The non cover, per object shader used for most rendering actions.
+		 * @type {WebGLProgram}
+		 * @protected
+		 */
+		this._mainShader = null;
+
+		/**
+		 * All the different vertex attribute sets that can be used with the render buffer. Currently only internal,
+		 * if/when alternate main shaders are possible, they'll register themselves here.
+		 * @property _attributeConfig
+		 * @protected
+		 * @type {Object}
+		 */
+		this._attributeConfig = {};
+
+		/**
+		 * Which of the configs in {{#crossLink "StageGL/_attributeConfig:property"}}{{/crossLink}} is currently active.
+		 * @property _activeConfig
+		 * @protected
+		 * @type {Object}
+		 */
+		this._activeConfig = null;
+
+		/**
+		 * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
+		 * "What you're drawing to", object occasionally swaps with concat.
+		 * @property _bufferTextureOutput
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureOutput = null;
+
+		/**
+		 * One of the major render buffers used in composite blending drawing. Do not expect this to always be the same object.
+		 * "What you've draw before now", object occasionally swaps with output.
+		 * @property _bufferTextureConcat
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureConcat = null;
+
+		/**
+		 * One of the major render buffers used in composite blending drawing.
+		 * "Temporary mixing surface"
+		 * @property _bufferTextureTemp
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureTemp = null;
+
+		/**
+		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
+		 * @property _batchTextureOutput
+		 * @protected
+		 * @type {WebGLTexture | StageGL}
+		 */
+		this._batchTextureOutput = this;
+
+		/**
+		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
+		 * @property _batchTextureConcat
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._batchTextureConcat = null;
+
+		/**
+		 * The current render buffer being targeted, usually targets internal buffers, but may be set to cache's buffer during a cache render.
+		 * @property _batchTextureTemp
+		 * @protected
+		 * @type {WebGLTexture}
+		 */
+		this._batchTextureTemp = null;
+
+		/**
+		 * Internal library of the shaders that have been compiled and created along with their parameters. Should contain
+		 * compiled `gl.ShaderProgram` and settings for `gl.blendFunc` and `gl.blendEquation`. Populated as requested.
+		 *
+		 * See {{#crossLink "StageGL/_updateRenderMode:method"}}{{/crossLink}} for exact details.
+		 * @type {Object}
+		 * @private
+		 */
+		this._builtShaders = {};
+
+		/**
+		 * An index based lookup of every WebGL Texture currently in use.
+		 * @property _drawTexture
+		 * @protected
+		 * @type {Array}
+		 */
+		this._textureDictionary = [];
+
+		/**
+		 * A string based lookup hash of which index a texture is stored at in the dictionary. The lookup string is
+		 * often the src url.
+		 * @property _textureIDs
+		 * @protected
+		 * @type {Object}
+		 */
+		this._textureIDs = {};
+
+		/**
+		 * An array of all the textures currently loaded into the GPU. The index in the array matches the GPU index.
+		 * @property _batchTextures
+		 * @protected
+		 * @type {Array}
+		 */
+		this._batchTextures = [];
+
+		/**
+		 * An array of all the simple filler textures used to prevent issues with missing textures in a batch.
+		 * @property _baseTextures
+		 * @protected
+		 * @type {Array}
+		 */
+		this._baseTextures = [];
+
+		/**
+		 * Texture slots for a draw
+		 * @property _gpuTextureCount
+		 * @protected
+		 * @type {uint}
+		 */
+		this._gpuTextureCount = 8;
+
+		/**
+		 * Texture slots on the hardware
+		 * @property _gpuTextureMax
+		 * @protected
+		 * @type {uint}
+		 */
+		this._gpuTextureMax = 8;
+
+		/**
+		 * Texture slots in a batch for User textures
+		 * @property _batchTextureCount
+		 * @protected
+		 * @type {uint}
+		 */
+		this._batchTextureCount = 0;
+
+		/**
+		 * The location at which the last texture was inserted into a GPU slot
+		 */
+		this._lastTextureInsert = -1;
+
+		/**
+		 * The current string name of the render mode being employed per Context2D spec.
+		 * Must start invalid to trigger default shader into being built during init.
+		 * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+		 * @type {string}
+		 * @private
+		 */
+		this._renderMode = "";
+
+		/**
+		 * Flag indicating that the content being batched in `appendToBatch` must be drawn now and not follow batch logic.
+		 * Used for effects that are compounding in nature and cannot be applied in a single pass.
+		 * Should be enabled with extreme care due to massive performance implications.
+		 * @type {boolean}
+		 * @private
+		 */
+		this._immediateRender = false;
+
+		/**
+		 * Vertices drawn into the batch so far.
+		 * @type {number}
+		 * @private
+		 */
+		this._batchVertexCount = 0;
+
+		/**
+		 * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
+		 * can occur per draw.
+		 * @property _batchId
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._batchID = 0;
+
+		/**
+		 * The current draw being performed, may contain multiple batches. Comparing to {{#crossLink "StageGL/_batchID:property"}}{{/crossLink}}
+		 * can reveal batching efficiency.
+		 * @property _drawID
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._drawID = 0;
+
+		/**
+		 * Tracks how many renders have occurred this draw, used for performance monitoring and empty draw avoidance.
+		 * @property _renderPerDraw
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._renderPerDraw = 0;
+
+		/**
+		 * Used to prevent textures in certain GPU slots from being replaced by an insert.
+		 * @property _slotBlackList
+		 * @protected
+		 * @type {Array}
+		 */
+		this._slotBlacklist = [];
+
+		/**
+		 * Used to ensure every canvas used as a texture source has a unique ID.
+		 * @property _lastTrackedCanvas
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 */
+		this._lastTrackedCanvas = -1;
+
+		/**
+		 * Used to counter-position the object being cached so it aligns with the cache surface. Additionally ensures
+		 * that all rendering starts with a top level container.
+		 * @property _cacheContainer
+		 * @protected
+		 * @type {Container}
+		 * @default An instance of an EaselJS Container.
+		 */
+		this._cacheContainer = new createjs.Container();
+
+		// and begin
+		this._initializeWebGL();
+
+		// these settings require everything to be ready
+		if (options !== undefined) {
+			options.clearColor !== undefined && this.setClearColor(options.clearColor);
+			options.premultiply !== undefined && (createjs.deprecate(null, "options.premultiply")());
+		}
+	}
+	var p = createjs.extend(StageGL, createjs.Stage);
+
+// static methods:
+	/**
+	 * Calculate the UV co-ordinate based info for sprite frames. Instead of pixel count it uses a 0-1 space. Also includes
+	 * the ability to get info back for a specific frame, or only calculate that one frame.
+	 *
+	 *     //generate UV rects for all entries
+	 *     StageGL.buildUVRects( spriteSheetA );
+	 *     //generate all, fetch the first
+	 *     var firstFrame = StageGL.buildUVRects( spriteSheetB, 0 );
+	 *     //generate the rect for just a single frame for performance's sake
+	 *     var newFrame = StageGL.buildUVRects( dynamicSpriteSheet, newFrameIndex, true );
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method buildUVRects
+	 * @param  {SpriteSheet} spritesheet The spritesheet to find the frames on
+	 * @param  {int} [target=-1] The index of the frame to return
+	 * @param  {Boolean} [onlyTarget=false] Whether "target" is the only frame that gets calculated
+	 * @static
+	 * @return {Object} the target frame if supplied and present or a generic frame {t, l, b, r}
+	 */
+	StageGL.buildUVRects = function (spritesheet, target, onlyTarget) {
+		if (!spritesheet || !spritesheet._frames) { return null; }
+		if (target === undefined) { target = -1; }
+		if (onlyTarget === undefined) { onlyTarget = false; }
+
+		var start = (target !== -1 && onlyTarget)?(target):(0);
+		var end = (target !== -1 && onlyTarget)?(target+1):(spritesheet._frames.length);
+		for (var i=start; i<end; i++) {
+			var f = spritesheet._frames[i];
+			if (f.uvRect || f.image.width <= 0 || f.image.height <= 0) { continue; }
+
+			var r = f.rect;
+			f.uvRect = {
+				t: 1 - (r.y / f.image.height),
+				l: r.x / f.image.width,
+				b: 1 - ((r.y + r.height) / f.image.height),
+				r: (r.x + r.width) / f.image.width
+			};
+		}
+
+		return spritesheet._frames[(target !== -1) ? target : 0].uvRect || {t:0, l:0, b:1, r:1};
+	};
+
+	/**
+	 * Test a context to see if it has WebGL enabled on it.
+	 * @method isWebGLActive
+	 * @param {CanvasRenderingContext2D | WebGLRenderingContext} ctx The context to test
+	 * @static
+	 * @return {Boolean} Whether WebGL is enabled
+	 */
+	StageGL.isWebGLActive = function (ctx) {
+		return ctx &&
+			ctx instanceof WebGLRenderingContext &&
+			typeof WebGLRenderingContext !== 'undefined';
+	};
+
+	/**
+	 * Utility used to convert the colour values the Context2D API accepts into WebGL color values.
+	 * @param {String | Number} color
+	 * @static
+	 * @return {Object} Object with r, g, b, a in 0-1 values of the color.
+	 */
+	StageGL.colorToObj = function (color) {
+		var r, g, b, a;
+
+		if (typeof color === "string") {
+			if (color.indexOf("#") === 0) {
+				if (color.length === 4) {
+					color = "#" + color.charAt(1)+color.charAt(1) + color.charAt(2)+color.charAt(2) + color.charAt(3)+color.charAt(3)
+				}
+				r = Number("0x"+color.slice(1, 3))/255;
+				g = Number("0x"+color.slice(3, 5))/255;
+				b = Number("0x"+color.slice(5, 7))/255;
+				a = color.length > 7 ? Number("0x"+color.slice(7, 9))/255 : 1;
+			} else if (color.indexOf("rgba(") === 0) {
+				var output = color.slice(5, -1).split(",");
+				r = Number(output[0])/255;
+				g = Number(output[1])/255;
+				b = Number(output[2])/255;
+				a = Number(output[3]);
+			}
+		} else {	// >>> is an unsigned shift which is what we want as 0x80000000 and up are negative values
+			r = ((color & 0xFF000000) >>> 24)/255;
+			g = ((color & 0x00FF0000) >>> 16)/255;
+			b = ((color & 0x0000FF00) >>> 8)/255;
+			a = (color & 0x000000FF)/255;
+		}
+
+		return {
+			r: Math.min(Math.max(0, r), 1),
+			g: Math.min(Math.max(0, g), 1),
+			b: Math.min(Math.max(0, b), 1),
+			a: Math.min(Math.max(0, a), 1)
+		}
+	};
+
+// static properties:
+	/**
+	 * The number of properties defined per vertex (x, y, textureU, textureV, textureIndex, alpha)
+	 * @property VERTEX_PROPERTY_COUNT
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {Number}
+	 * @default 6
+	 * @readonly
+	 */
+	StageGL.VERTEX_PROPERTY_COUNT = 6;
+
+	/**
+	 * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
+	 * @property INDICIES_PER_CARD
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {Number}
+	 * @default 6
+	 * @readonly
+	 */
+	StageGL.INDICIES_PER_CARD = 6;
+
+	/**
+	 * The default value for the maximum number of cards we want to process in a batch. See
+	 * {{#crossLink "StageGL/WEBGL_MAX_INDEX_NUM:property"}}{{/crossLink}} for a hard limit.
+	 * this value comes is designed to sneak under that limit.
+	 * @property DEFAULT_MAX_BATCH_SIZE
+	 * @static
+	 * @final
+	 * @type {Number}
+	 * @default 10920
+	 * @readonly
+	 */
+	StageGL.DEFAULT_MAX_BATCH_SIZE = 10920;
+
+	/**
+	 * The default value for the minimum number of cards we want to process in a batch. Less
+	 * max cards can mean better performance, but anything below this is probably not worth it.
+	 * @property DEFAULT_MIN_BATCH_SIZE
+	 * @static
+	 * @final
+	 * @type {Number}
+	 * @default 170
+	 * @readonly
+	 */
+	StageGL.DEFAULT_MIN_BATCH_SIZE = 170;
+
+	/**
+	 * The maximum size WebGL allows for element index numbers. Uses a 16 bit unsigned integer. It takes 6 indices to
+	 * make a unique card.
+	 * @property WEBGL_MAX_INDEX_NUM
+	 * @static
+	 * @final
+	 * @type {Number}
+	 * @default 65536
+	 * @readonly
+	 */
+	StageGL.WEBGL_MAX_INDEX_NUM = Math.pow(2, 16);
+
+	/**
+	 * Default UV rect for dealing with full coverage from an image source.
+	 * @property UV_RECT
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {Object}
+	 * @default {t:0, l:0, b:1, r:1}
+	 * @readonly
+	 */
+	StageGL.UV_RECT = {t:1, l:0, b:0, r:1};
+
+	try {
+		/**
+		 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
+		 * @property COVER_VERT
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_VERT = new Float32Array([
+			-1,		 1,		//TL
+			 1,		 1,		//TR
+			-1,		-1,		//BL
+			 1,		 1,		//TR
+			 1,		-1,		//BR
+			-1,		-1		//BL
+		]);
+
+		/**
+		 * UV for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
+		 * @property COVER_UV
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_UV = new Float32Array([
+			 0,		 1,		//TL
+			 1,		 1,		//TR
+			 0,		 0,		//BL
+			 1,		 1,		//TR
+			 1,		 0,		//BR
+			 0,		 0		//BL
+		]);
+	} catch(e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
+
+	/**
+	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+	 * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
+	 * pre-compile.
+	 * @property REGULAR_VARYING_HEADER
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.REGULAR_VARYING_HEADER = (
+		"precision highp float;" +
+
+		"varying vec2 vTextureCoord;" +
+		"varying lowp float indexPicker;" +
+		"varying lowp float alphaValue;"
+	);
+
+	/**
+	 * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
+	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
+	 * @property REGULAR_VERTEX_HEADER
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.REGULAR_VERTEX_HEADER = (
+		StageGL.REGULAR_VARYING_HEADER +
+		"attribute vec2 vertexPosition;" +
+		"attribute vec2 uvPosition;" +
+		"attribute lowp float textureIndex;" +
+		"attribute lowp float objectAlpha;" +
+		"uniform mat4 pMatrix;"
+	);
+
+	/**
+	 * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
+	 * all expected objects. Shader code may contain templates that are replaced pre-compile.
+	 * @property REGULAR_FRAGMENT_HEADER
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.REGULAR_FRAGMENT_HEADER = (
+		StageGL.REGULAR_VARYING_HEADER +
+		"uniform sampler2D uSampler[{{count}}];"
+	);
+
+	/**
+	 * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
+	 * templates that are replaced pre-compile.
+	 * @property REGULAR_VERTEX_BODY
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.REGULAR_VERTEX_BODY  = (
+		"void main(void) {" +
+			"gl_Position = pMatrix * vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
+			"alphaValue = objectAlpha;" +
+			"indexPicker = textureIndex;" +
+			"vTextureCoord = uvPosition;" +
+		"}"
+	);
+
+	/**
+	 * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
+	 * contain templates that are replaced pre-compile.
+	 * @property REGULAR_FRAGMENT_BODY
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.REGULAR_FRAGMENT_BODY = (
+		"void main(void) {" +
+			"vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
+
+			"if (indexPicker <= 0.5) {" +
+				"color = texture2D(uSampler[0], vTextureCoord);" +
+				"{{alternates}}" +
+			"}" +
+
+			"gl_FragColor = vec4(color.rgb * alphaValue, color.a * alphaValue);" +
+		"}"
+	);
+
+	/**
+	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+	 * cover shader is designed to be a simple vertex/uv only texture render that covers the render surface. Shader
+	 * code may contain templates that are replaced pre-compile.
+	 * @property COVER_VARYING_HEADER
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.COVER_VARYING_HEADER = (
+		"precision highp float;" +	//this is usually essential for filter math
+
+		"varying vec2 vTextureCoord;"
+	);
+
+	/**
+	 * Actual full header for the vertex shader. Includes the varying header. The cover shader is designed to be a
+	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
+	 * replaced pre-compile.
+	 * @property COVER_VERTEX_HEADER
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.COVER_VERTEX_HEADER = (
+		StageGL.COVER_VARYING_HEADER +
+		"attribute vec2 vertexPosition;" +
+		"attribute vec2 uvPosition;"
+	);
+
+	/**
+	 * Actual full header for the fragment shader. Includes the varying header. The cover shader is designed to be a
+	 * simple vertex/uv only texture render that covers the render surface. Shader code may contain templates that are
+	 * replaced pre-compile.
+	 * @property COVER_FRAGMENT_HEADER
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.COVER_FRAGMENT_HEADER = (
+		StageGL.COVER_VARYING_HEADER +
+		"uniform sampler2D uSampler;"
+	);
+
+	/**
+	 * Body of the vertex shader. The cover shader is designed to be a simple vertex/uv only texture render that covers
+	 * the render surface. Shader code may contain templates that are replaced pre-compile.
+	 * @property COVER_VERTEX_BODY
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.COVER_VERTEX_BODY  = (
+		"void main(void) {" +
+			"gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0.0, 1.0);" +
+			"vTextureCoord = uvPosition;" +
+		"}"
+	);
+
+	/**
+	 * Body of the fragment shader. The cover shader is designed to be a simple vertex/uv only texture render that
+	 * covers the render surface. Shader code may contain templates that are replaced pre-compile.
+	 * @property COVER_FRAGMENT_BODY
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.COVER_FRAGMENT_BODY = (
+		"void main(void) {" +
+			"gl_FragColor = texture2D(uSampler, vTextureCoord);" +
+		"}"
+	);
+
+	/**
+	 * The starting template of a cover fragment shader with simple blending equations
+	 * @property BLEND_FRAGMENT_SIMPLE
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_SIMPLE = (
+		"uniform sampler2D uMixSampler;"+
+		"void main(void) {" +
+			"vec4 src = texture2D(uMixSampler, vTextureCoord);" +
+			"vec4 dst = texture2D(uSampler, vTextureCoord);"
+		// note this is an open bracket on main!
+	);
+
+	/**
+	 * The starting template of a cover fragment shader which has complex blending equations
+	 * @property BLEND_FRAGMENT_COMPLEX
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_COMPLEX = (
+		StageGL.BLEND_FRAGMENT_SIMPLE +
+			"vec3 srcClr = min(src.rgb/src.a, 1.0);" +
+			"vec3 dstClr = min(dst.rgb/dst.a, 1.0);" +
+
+			"float totalAlpha = min(1.0 - (1.0-dst.a) * (1.0-src.a), 1.0);" +
+			"float srcFactor = min(max(src.a - dst.a, 0.0) / totalAlpha, 1.0);" +
+			"float dstFactor = min(max(dst.a - src.a, 0.0) / totalAlpha, 1.0);" +
+			"float mixFactor = max(max(1.0 - srcFactor, 0.0) - dstFactor, 0.0);" +
+
+			"gl_FragColor = vec4(" +
+				"(" +
+					"srcFactor * srcClr +" +
+					"dstFactor * dstClr +" +
+					"mixFactor * vec3("
+		// this should be closed with the cap!
+	);
+
+	/**
+	 * The closing portion of a template for a cover fragment shader which has complex blending equations
+	 * @property BLEND_FRAGMENT_COMPLEX_CAP
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_COMPLEX_CAP = (
+					")" +
+				") * totalAlpha, totalAlpha" +
+			");" +
+		"}"
+	);
+
+	/**
+	 * A shader utility function, used to calculate the "overlay" blend of two elements
+	 * @property BLEND_FRAGMENT_OVERLAY_UTIL
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_OVERLAY_UTIL = (
+		"float overlay(float a, float b) {" +
+			"if(a < 0.5) { return 2.0 * a * b; }" +
+			"return 1.0 - 2.0 * (1.0-a) * (1.0-b);" +
+		"}"
+	);
+
+	/**
+	 * A collection of shader utility functions, used to calculate HSL math. Taken from W3C spec
+	 * https://www.w3.org/TR/compositing-1/#blendingnonseparable
+	 * @property BLEND_FRAGMENT_HSL_UTIL
+	 * @protected
+	 * @static
+	 * @final
+	 * @type {String}
+	 * @readonly
+	 */
+	StageGL.BLEND_FRAGMENT_HSL_UTIL = (
+		"float getLum(vec3 c) { return 0.299*c.r + 0.589*c.g + 0.109*c.b; }" +
+		"float getSat(vec3 c) { return max(max(c.r, c.g), c.b) - min(min(c.r, c.g), c.b); }" +
+		"vec3 clipHSL(vec3 c) {" +
+			"float lum = getLum(c);" +
+			"float n = min(min(c.r, c.g), c.b);" +
+			"float x = max(max(c.r, c.g), c.b);" +
+			"if(n < 0.0){ c = lum + (((c - lum) * lum) / (lum - n)); }" +
+			"if(x > 1.0){ c = lum + (((c - lum) * (1.0 - lum)) / (x - lum)); }" +
+			"return clamp(c, 0.0, 1.0);" +
+		"}" +
+		"vec3 setLum(vec3 c, float lum) {" +
+			"return clipHSL(c + (lum - getLum(c)));" +
+		"}" +
+		"vec3 setSat(vec3 c, float val) {" +
+			"vec3 result = vec3(0.0);" +
+			"float minVal = min(min(c.r, c.g), c.b);" +
+			"float maxVal = max(max(c.r, c.g), c.b);" +
+			"vec3 minMask = vec3(c.r == minVal, c.g == minVal, c.b == minVal);" +
+			"vec3 maxMask = vec3(c.r == maxVal, c.g == maxVal, c.b == maxVal);" +
+			"vec3 midMask = 1.0 - min(minMask+maxMask, 1.0);" +
+			"float midVal = (c*midMask).r + (c*midMask).g + (c*midMask).b;" +
+			"if(maxVal > minVal) {" +
+				"result = midMask * min( ((midVal - minVal) * val) / (maxVal - minVal), 1.0);" +
+				"result += maxMask * val;" +
+			"}" +
+			"return result;" +
+		"}"
+	);
+
+	/**
+	 * The hash of supported blend modes and their properties
+	 * @property BLEND_SOURCES
+	 * @static
+	 * @final
+	 * @type {Object}
+	 * @readonly
+	 */
+	StageGL.BLEND_SOURCES = {
+		"source-over": { // empty object verifies it as a blend mode, but default values handle actual settings
+			//eqRGB: "FUNC_ADD",						eqA: "FUNC_ADD"
+			//srcRGB: "ONE",							srcA: "ONE"
+			//dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE_MINUS_SRC_ALPHA"
+		},
+		"source-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb * dst.a, src.a * dst.a);" +
+			"}")
+		},
+		"source-in_cheap": {
+			srcRGB: "DST_ALPHA",					srcA: "ZERO",
+			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
+		},
+		"source-out": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb * (1.0 - dst.a), src.a - dst.a);" +
+			"}")
+		},
+		"source-out_cheap": {
+			eqA: "FUNC_SUBTRACT",
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "ZERO",							dstA: "SRC_ALPHA"
+		},
+		"source-atop": {
+			srcRGB: "DST_ALPHA",					srcA: "ZERO",
+			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
+		},
+		"destination-over": {
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE_MINUS_DST_ALPHA",
+			dstRGB: "ONE",							dstA: "ONE"
+		},
+		"destination-in": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(dst.rgb * src.a, src.a * dst.a);" +
+			"}")
+		},
+		"destination-in_cheap": {
+			srcRGB: "ZERO",							srcA: "DST_ALPHA",
+			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
+		},
+		"destination-out": {
+			eqA: "FUNC_REVERSE_SUBTRACT",
+			srcRGB: "ZERO",							srcA: "DST_ALPHA",
+			dstRGB: "ONE_MINUS_SRC_ALPHA",			dstA: "ONE"
+		},
+		"destination-atop": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(dst.rgb * src.a + src.rgb * (1.0 - dst.a), src.a);" +
+			"}")
+		},
+		"destination-atop_cheap": {
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "SRC_ALPHA",					dstA: "ZERO"
+		},
+		"copy": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"gl_FragColor = vec4(src.rgb, src.a);" +
+			"}")
+		},
+		"copy_cheap": {
+			dstRGB: "ZERO",							dstA: "ZERO"
+		},
+		"xor": {
+			shader: (StageGL.BLEND_FRAGMENT_SIMPLE +
+				"float omSRC = (1.0 - src.a);" +
+				"float omDST = (1.0 - dst.a);" +
+				"gl_FragColor = vec4(src.rgb * omDST + dst.rgb * omSRC, src.a * omDST + dst.a * omSRC);"
+			+ "}")
+		},
+
+		"multiply": { // this has to be complex to handle retention of both dst and src in non mixed scenarios
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"srcClr * dstClr"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"multiply_cheap": { // NEW, handles retention of src data incorrectly when no dst data present
+			srcRGB: "ONE_MINUS_DST_ALPHA",			srcA: "ONE",
+			dstRGB: "SRC_COLOR",					dstA: "ONE"
+		},
+		"screen": {
+			srcRGB: "ONE",							srcA: "ONE",
+			dstRGB: "ONE_MINUS_SRC_COLOR",			dstA: "ONE_MINUS_SRC_ALPHA"
+		},
+		"lighter": {
+			dstRGB: "ONE",							dstA:"ONE"
+		},
+		"lighten": { //WebGL 2.0 can optimize this
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"max(srcClr, dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"darken": { //WebGL 2.0 can optimize this
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"min(srcClr, dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+
+		"overlay": {
+			shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"overlay(dstClr.r,srcClr.r), overlay(dstClr.g,srcClr.g), overlay(dstClr.b,srcClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"hard-light": {
+			shader: (StageGL.BLEND_FRAGMENT_OVERLAY_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"overlay(srcClr.r,dstClr.r), overlay(srcClr.g,dstClr.g), overlay(srcClr.b,dstClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"soft-light": {
+			shader: (
+				"float softcurve(float a) {" +
+					"if(a > 0.25) { return sqrt(a); }" +
+					"return ((16.0 * a - 12.0) * a + 4.0) * a;" +
+				"}" +
+				"float softmix(float a, float b) {" +
+					"if(b <= 0.5) { return a - (1.0 - 2.0*b) * a * (1.0 - a); }" +
+					"return a + (2.0 * b - 1.0) * (softcurve(a) - a);" +
+				"}" + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"softmix(dstClr.r,srcClr.r), softmix(dstClr.g,srcClr.g), softmix(dstClr.b,srcClr.b)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color-dodge": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"clamp(dstClr / (1.0 - srcClr), 0.0, 1.0)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color-burn": {
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"1.0 - clamp((1.0 - smoothstep(0.0035, 0.9955, dstClr)) / smoothstep(0.0035, 0.9955, srcClr), 0.0, 1.0)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"difference": { // do this to match visible results in browsers
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"abs(src.rgb - dstClr)"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"exclusion": { // do this to match visible results in browsers
+			shader: (StageGL.BLEND_FRAGMENT_COMPLEX +
+				"dstClr + src.rgb - 2.0 * src.rgb * dstClr"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+
+		"hue": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(setSat(srcClr, getSat(dstClr)), getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"saturation": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(setSat(dstClr, getSat(srcClr)), getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"color": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(srcClr, getLum(dstClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		},
+		"luminosity": {
+			shader: (StageGL.BLEND_FRAGMENT_HSL_UTIL + StageGL.BLEND_FRAGMENT_COMPLEX +
+				"setLum(dstClr, getLum(srcClr))"
+			+ StageGL.BLEND_FRAGMENT_COMPLEX_CAP)
+		}
+	};
+
+// events:
+	/**
+	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it. You can call
+	 * {{#crossLink "Event/preventDefault"}}{{/crossLink}} on the event to cancel the draw.
+	 * @event drawstart
+	 */
+
+	/**
+	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
+	 * @event drawend
+	 */
+
+// getter / setters:
+	p._get_isWebGL = function () {
+		return !!this._webGLContext;
+	};
+
+	p._set_autoPurge = function (value) {
+		value = isNaN(value)?1200:value;
+		if (value !== -1) {
+			value = value<10?10:value;
+		}
+		this._autoPurge = value;
+	};
+	p._get_autoPurge = function () {
+		return Number(this._autoPurge);
+	};
+
+	try {
+		Object.defineProperties(p, {
+			/**
+			 * Indicates whether WebGL is being used for rendering. For example, this would be `false` if WebGL is not
+			 * supported in the browser.
+			 * @property isWebGL
+			 * @type {Boolean}
+			 * @readonly
+			 */
+			isWebGL: { get: p._get_isWebGL },
+
+			/**
+			 * Specifies whether or not StageGL is automatically purging unused textures. Higher numbers purge less
+			 * often. Values below 10 are upgraded to 10, and -1 disables this feature. If you are not dynamically adding
+			 * and removing new images this can be se9000t to -1, and should be for performance reasons. If you only add images,
+			 * or add and remove the same images for the entire application, it is safe to turn off this feature. Alternately,
+			 * manually manage removing textures yourself with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}}
+			 * @property autoPurge
+			 * @type {int}
+			 * @default 1000
+			 */
+			autoPurge: { get: p._get_autoPurge, set: p._set_autoPurge }
+		});
+	} catch (e) {} // TODO: use Log
+
+
+// constructor methods:
+	/**
+	 * Create and properly initialize the WebGL instance.
+	 * @method _initializeWebGL
+	 * @protected
+	 * @return {WebGLRenderingContext}
+	 */
+	p._initializeWebGL = function () {
+		if (this.canvas) {
+			if (!this._webGLContext || this._webGLContext.canvas !== this.canvas) {
+				// A context hasn't been defined yet,
+				// OR the defined context belongs to a different canvas, so reinitialize.
+
+				// defaults and options
+				var options = {
+					depth: false, // nothing has depth
+					stencil: false, // while there's uses for this, we're not using any yet
+					premultipliedAlpha: this._transparent, // this is complicated, trust it
+
+					alpha: this._transparent,
+					antialias: this._antialias,
+					preserveDrawingBuffer: this._preserveBuffer
+				};
+
+				var gl = this._webGLContext = this._fetchWebGLContext(this.canvas, options);
+				if (!gl) { return null; }
+
+				gl.disable(gl.DEPTH_TEST);
+				gl.depthMask(false);
+				gl.enable(gl.BLEND);
+				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+				gl.clearColor(0.0, 0.0, 0.0, 0);
+				gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+				gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+				this._createBuffers();
+				this._initMaterials();
+				this._updateRenderMode("source-over");
+
+				this.updateViewport(this.canvas.width, this.canvas.height);
+				if (!this._directDraw) {
+					this._bufferTextureOutput = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+				}
+
+				this.canvas._invalid = true;
+			}
+		} else {
+			this._webGLContext = null;
+		}
+		return this._webGLContext;
+	};
+
+// public methods:
+	// Docced in superclass
+	p.update = function (props) {
+		if (!this.canvas) { return; }
+		if (this.tickOnUpdate) { this.tick(props); }
+		this.dispatchEvent("drawstart");
+
+		if (this._webGLContext) {
+			this.draw(this._webGLContext, false);
+		} else {
+			// Use 2D.
+			if (this.autoClear) { this.clear(); }
+			var ctx = this.canvas.getContext("2d");
+			ctx.save();
+			this.updateContext(ctx);
+			this.draw(ctx, false);
+			ctx.restore();
+		}
+		this.dispatchEvent("drawend");
+	};
+
+	// Docced in superclass
+	p.clear = function () {
+		if (!this.canvas) { return; }
+
+		var gl = this._webGLContext;
+		if (!StageGL.isWebGLActive(gl)) { // Use 2D.
+			this.Stage_clear();
+			return;
+		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		this._clearFrameBuffer(this._transparent ? this._clearColor.a : 1);
+	};
+
+	/**
+	 * Draws the stage into the supplied context if possible. Many WebGL properties only exist on their context. As such
+	 * you cannot share contexts among many StageGLs and each context requires a unique StageGL instance. Contexts that
+	 * don't match the context managed by this StageGL will be treated as a 2D context.
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D | WebGLRenderingContext} context The context object to draw into.
+	 * @param {Boolean} [ignoreCache=false] Indicates whether the draw operation should ignore any current cache. For
+	 *  example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
+	 * @return {Boolean} If the draw was handled by this function
+	 */
+	p.draw = function (context, ignoreCache) {
+		var gl = this._webGLContext;
+		// 2D context fallback
+		if (!(context === this._webGLContext && StageGL.isWebGLActive(gl))) {
+			return this.Stage_draw(context, ignoreCache);
+		}
+
+		var storeBatchOutput = this._batchTextureOutput;
+		var storeBatchConcat = this._batchTextureConcat;
+		var storeBatchTemp = this._batchTextureTemp;
+
+		// Use WebGL
+		this._renderPerDraw = 0;
+		this._batchVertexCount = 0;
+		this._drawID++;
+
+		if (this._directDraw) {
+			this._batchTextureOutput = this;
+			if (this.autoClear) { this.clear(); }
+		} else {
+			this._batchTextureOutput = this._bufferTextureOutput;
+			this._batchTextureConcat = this._bufferTextureConcat;
+			this._batchTextureTemp = this._bufferTextureTemp;
+		}
+
+		this._updateRenderMode("source-over");
+		this._drawContent(this, ignoreCache);
+
+		if (!this._directDraw) {
+			if (this.autoClear) { this.clear(); }
+			this.batchReason = "finalOutput";
+			if(this._renderPerDraw) {
+				this._drawCover(null, this._batchTextureOutput);
+			}
+		}
+
+		// batches may generate or swap around textures. To be sure we capture them, store them back into buffer
+		this._bufferTextureOutput = this._batchTextureOutput;
+		this._bufferTextureConcat = this._batchTextureConcat;
+		this._bufferTextureTemp = this._batchTextureTemp;
+
+		this._batchTextureOutput = storeBatchOutput;
+		this._batchTextureConcat = storeBatchConcat;
+		this._batchTextureTemp = storeBatchTemp;
+
+		if (this._autoPurge !== -1 && !(this._drawID%((this._autoPurge/2)|0))) {
+			this.purgeTextures(this._autoPurge);
+		}
+
+		return true;
+	};
+
+	/**
+	 * Draws the target into the correct context, be it a canvas or Render Texture using WebGL.
+	 *
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method cacheDraw
+	 * @param {DisplayObject} target The object we're drawing into cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
+	 * @param {BitmapCache} manager The BitmapCache instance looking after the cache
+	 * @return {Boolean} If the draw was handled by this function
+	 */
+	p.cacheDraw = function (target, manager) {
+		// 2D context fallback
+		if (!StageGL.isWebGLActive(this._webGLContext)) {
+			return false;
+		}
+
+		for (var i = 0; i < this._gpuTextureCount; i++) {
+			if(this._batchTextures[i]._frameBuffer) {
+				this._batchTextures[i] = this._baseTextures[i];
+			}
+		}
+
+		var storeBatchOutput = this._batchTextureOutput;
+		var storeBatchConcat = this._batchTextureConcat;
+		var storeBatchTemp = this._batchTextureTemp;
+
+		var filterCount = manager._filterCount, filtersLeft = filterCount;
+		var backupWidth = this._viewportWidth, backupHeight = this._viewportHeight;
+		this._updateDrawingSurface(manager._drawWidth, manager._drawHeight);
+
+		this._batchTextureOutput = (manager._filterCount%2) ? manager._bufferTextureConcat : manager._bufferTextureOutput;
+		this._batchTextureConcat = (manager._filterCount%2) ? manager._bufferTextureOutput : manager._bufferTextureConcat;
+		this._batchTextureTemp = manager._bufferTextureTemp;
+
+		var container = this._cacheContainer;
+		container.children = [target];
+		container.transformMatrix = this._alignTargetToCache(target, manager);
+
+		this._updateRenderMode("source-over");
+		this._drawContent(container, true);
+
+		// re-align buffers with fake filter passes to solve certain error cases
+		if (this.isCacheControlled) {
+			// post filter pass to place content into output buffer
+			//TODO: add in directDraw support for cache controlled StageGLs
+			filterCount++;
+			filtersLeft++;
+		} else if (manager._cacheCanvas !== ((manager._filterCount%2) ? this._batchTextureConcat : this._batchTextureOutput)) {
+			// pre filter pass to align output, may of become misaligned due to composite operations
+			filtersLeft++;
+		}
+
+		while (filtersLeft) { //warning: pay attention to where filtersLeft is modified, this is a micro-optimization
+			var filter = manager._getGLFilter(filterCount - (filtersLeft--));
+			var swap = this._batchTextureConcat;
+			this._batchTextureConcat = this._batchTextureOutput;
+			this._batchTextureOutput = (this.isCacheControlled && filtersLeft === 0) ? this : swap;
+			this.batchReason = "filterPass";
+			this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, filter);
+		}
+
+		manager._bufferTextureOutput = this._batchTextureOutput;
+		manager._bufferTextureConcat = this._batchTextureConcat;
+		manager._bufferTextureTemp = this._batchTextureTemp;
+
+		this._batchTextureOutput = storeBatchOutput;
+		this._batchTextureConcat = storeBatchConcat;
+		this._batchTextureTemp = storeBatchTemp;
+
+		this._updateDrawingSurface(backupWidth, backupHeight);
+		return true;
+	};
+
+	/**
+	 * For every image encountered StageGL registers and tracks it automatically. This tracking can cause memory leaks 
+	 * if not purged. StageGL, by default, automatically purges them. This does have a cost and may unfortunately find
+	 * false positives. This function is for manual management of this memory instead of the automatic system controlled
+	 * by the {{#crossLink "StageGL/autoPurge:property"}}{{/crossLink}} property.
+	 *
+	 * This function will recursively remove all textures found on the object, its children, cache, etc. It will uncache 
+	 * objects and remove any texture it finds REGARDLESS of whether it is currently in use elsewhere. It is up to the
+	 * developer to ensure that a texture in use is not removed.
+	 *
+	 * Textures in use, or to be used again shortly, should not be removed. This is simply for performance reasons.
+	 * Removing a texture in use will cause the texture to end up being re-uploaded slowing rendering.
+	 * @method releaseTexture
+	 * @param {DisplayObject | WebGLTexture | Image | Canvas} item An object that used the texture to be discarded.
+	 * @param {Boolean} [safe=false] Should the release attempt to be "safe" and only delete this usage.
+	 */
+	p.releaseTexture = function (item, safe) {
+		var i, l;
+		if (!item) { return; }
+
+		// this is a container object
+		if (item.children) {
+			for (i = 0, l = item.children.length; i < l; i++) {
+				this.releaseTexture(item.children[i], safe);
+			}
+		}
+
+		// this has a cache canvas
+		if (item.cacheCanvas) {
+			item.uncache();
+		}
+
+		var foundImage = undefined;
+		if (item._storeID !== undefined) {
+			// this is a texture itself
+			if (item === this._textureDictionary[item._storeID]) {
+				this._killTextureObject(item);
+				item._storeID = undefined;
+				return;
+			}
+
+			// this is an image or canvas
+			foundImage = item;
+		} else if (item._webGLRenderStyle === 2) {
+			// this is a Bitmap class
+			foundImage = item.image;
+		} else if (item._webGLRenderStyle === 1) {
+			// this is a SpriteSheet, we can't tell which image we used from the list easily so remove them all!
+			for (i = 0, l = item.spriteSheet._images.length; i < l; i++) {
+				this.releaseTexture(item.spriteSheet._images[i], safe);
+			}
+			return;
+		}
+
+		// did we find anything
+		if (foundImage === undefined) {
+			if (this.vocalDebug) {
+				console.log("No associated texture found on release");
+			}
+			return;
+		}
+
+		// remove it
+		var texture = this._textureDictionary[foundImage._storeID];
+		if (safe) {
+			var data = texture._imageData;
+			var index = data.indexOf(foundImage);
+			if (index >= 0) { data.splice(index, 1); }
+			foundImage._storeID = undefined;
+			if (data.length === 0) { this._killTextureObject(texture); }
+		} else {
+			this._killTextureObject(texture);
+		}
+	};
+
+	/**
+	 * Similar to {{#crossLink "releaseTexture"}}{{/crossLink}}, but this function differs by searching for textures to
+	 * release. It works by assuming that it can purge any texture which was last used more than "count" draw calls ago.
+	 * Because this process is unaware of the objects and whether they may be used later on your stage, false positives can
+	 * occur. It is recommended to manually manage your memory with {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}},
+	 * however, there are many use cases where this is simpler and error-free. This process is also run by default under
+	 * the hood to prevent leaks. To disable it see the {{#crossLink "StageGL/autoPurge:property"}}{{/crossLink}} property.
+	 * @method purgeTextures
+	 * @param {Number} [count=100] How many renders ago the texture was last used
+	 */
+	p.purgeTextures = function (count) {
+		if (!(count >= 0)){ count = 100; }
+
+		var dict = this._textureDictionary;
+		var l = dict.length;
+		for (var i = 0; i<l; i++) {
+			var data, texture = dict[i];
+			if (!texture || !(data = texture._imageData)) { continue; }
+
+			for (var j = 0; j<data.length; j++) {
+				var item = data[j];
+				if (item._drawID + count <= this._drawID) {
+					item._storeID = undefined;
+					data.splice(j, 1);
+					j--;
+				}
+			}
+
+			if (!data.length) { this._killTextureObject(texture); }
+		}
+	};
+
+	/**
+	 * Update the WebGL viewport. Note that this does <strong>not</strong> update the canvas element's width/height, but
+	 * the render surface's instead. This is necessary after manually resizing the canvas element on the DOM to avoid a
+	 * up/down scaled render.
+	 * @method updateViewport
+	 * @param {int} width The width of the render surface in pixels.
+	 * @param {int} height The height of the render surface in pixels.
+	 */
+	p.updateViewport = function (width, height) {
+		width = Math.abs(width|0) || 1;
+		height = Math.abs(height|0) || 1;
+
+		this._updateDrawingSurface(width, height);
+
+		if (this._bufferTextureOutput !== this && this._bufferTextureOutput !== null) {
+			this.resizeTexture(this._bufferTextureOutput, this._viewportWidth, this._viewportHeight);
+		}
+		if (this._bufferTextureConcat !== null) {
+			this.resizeTexture(this._bufferTextureConcat, this._viewportWidth, this._viewportHeight);
+		}
+		if (this._bufferTextureTemp !== null) {
+			this.resizeTexture(this._bufferTextureTemp, this._viewportWidth, this._viewportHeight);
+		}
+	};
+
+	/**
+	 * Fetches the shader compiled and set up to work with the provided filter/object. The shader is compiled on first
+	 * use and returned on subsequent calls.
+	 * @method getFilterShader
+	 * @param  {Filter|Object} filter The object which will provide the information needed to construct the filter shader.
+	 * @return {WebGLProgram}
+	 */
+	p.getFilterShader = function (filter) {
+		if (!filter) { filter = this; }
+
+		var gl = this._webGLContext;
+		var targetShader = this._activeShader;
+
+		if (filter._builtShader) {
+			targetShader = filter._builtShader;
+			if (filter.shaderParamSetup) {
+				gl.useProgram(targetShader);
+				filter.shaderParamSetup(gl, this, targetShader);
+			}
+		} else {
+			try {
+				targetShader = this._fetchShaderProgram(
+					true, filter.VTX_SHADER_BODY, filter.FRAG_SHADER_BODY,
+					filter.shaderParamSetup && filter.shaderParamSetup.bind(filter)
+				);
+				filter._builtShader = targetShader;
+				targetShader._name = filter.toString();
+			} catch (e) {
+				console && console.log("SHADER SWITCH FAILURE", e);
+			}
+		}
+		return targetShader;
+	};
+
+	/**
+	 * Returns a base texture that has no image or data loaded. Not intended for loading images. It may return `null`
+	 * in some error cases, and trying to use a "null" texture can cause renders to fail.
+	 * @method getBaseTexture
+	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
+	 */
+	p.getBaseTexture = function (w, h) {
+		var width = Math.ceil(w > 0 ? w : 1) || 1;
+		var height = Math.ceil(h > 0 ? h : 1) || 1;
+
+		var gl = this._webGLContext;
+		var texture = gl.createTexture();
+		this.resizeTexture(texture, width, height);
+		this.setTextureParams(gl, false);
+
+		return texture;
+	};
+
+	/**
+	 * Resizes a supplied texture element. May generate invalid textures in some error cases such as; when the texture
+	 * is too large, when an out of texture memory error occurs, or other error scenarios. Trying to use an invalid texture
+	 * can cause renders to hard stop on some devices. Check the WebGL bound texture after running this function.
+	 *
+	 * NOTE: The supplied texture must have been made with the WebGL "texImage2D" function, all default APIs in StageGL
+	 * use this, so this note only matters for library developers and plugins.
+	 *
+	 * @protected
+	 * @method resizeTexture
+	 * @param  {WebGLTexture} texture The GL Texture to be modified.
+	 * @param  {uint} width The width of the texture in pixels
+	 * @param  {uint} height The height of the texture in pixels
+	 */
+	p.resizeTexture = function (texture, width,height) {
+		if (texture.width === width && texture.height === height){ return; }
+
+		var gl = this._webGLContext;
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(
+			gl.TEXTURE_2D,				// target
+			0,							// level of detail
+			gl.RGBA,					// internal format
+			width, height, 0,			// width, height, border (only for array/null sourced textures)
+			gl.RGBA,					// format (match internal format)
+			gl.UNSIGNED_BYTE,			// type of texture(pixel color depth)
+			null						// image data, we can do null because we're doing array data
+		);
+
+		// set its width and height for spoofing as an image and tracking
+		texture.width = width;
+		texture.height = height;
+	};
+
+	/**
+	 * Returns a base texture (see {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}) for details. Also includes an
+	 * attached and linked render buffer in `texture._frameBuffer`. RenderTextures can be thought of as an internal
+	 * canvas on the GPU that can be drawn to. Being internal to the GPU they are much faster than "offscreen canvases".
+	 * @method getRenderBufferTexture
+	 * @param  {Number} w The width of the texture in pixels.
+	 * @param  {Number} h The height of the texture in pixels.
+	 * @return {WebGLTexture} the basic texture instance with a render buffer property.
+	 */
+	p.getRenderBufferTexture = function (w, h) {
+		var gl = this._webGLContext;
+
+		var renderTexture = this.getBaseTexture(w, h);
+		if (!renderTexture) { return null; }
+
+		var frameBuffer = gl.createFramebuffer();
+		if (!frameBuffer) { return null; }
+
+		// set its width and height for spoofing as an image and tracking
+		renderTexture.width = w;
+		renderTexture.height = h;
+
+		// attach frame buffer to texture and provide cross links to look up each other
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTexture, 0);
+		frameBuffer._renderTexture = renderTexture;
+		renderTexture._frameBuffer = frameBuffer;
+
+		// these keep track of themselves simply to reduce complexity of some lookup code
+		renderTexture._storeID = this._textureDictionary.length;
+		this._textureDictionary[renderTexture._storeID] = renderTexture;
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		return renderTexture;
+	};
+
+	/**
+	 * Common utility function used to apply the correct texture processing parameters for the bound texture.
+	 * @method setTextureParams
+	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @param  {Boolean} [isPOT=false] Marks whether the texture is "Power of Two", this may allow better quality AA.
+	 */
+	p.setTextureParams = function (gl, isPOT) {
+		if (isPOT && this._antialias) {
+			//non POT linear works in some devices, but performance is NOT good, investigate
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		} else {
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		}
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	};
+
+	/**
+	 * Changes the webGL clear, aka "background" color to the provided value. A transparent clear is recommended, as
+	 * non-transparent colours may create undesired boxes around some visuals.
+	 *
+	 * The clear color will also be used for filters and other "render textures". The stage background will ignore the
+	 * transparency value and display a solid color normally. For the stage to recognize and use transparency it must be
+	 * created with the transparent flag set to `true` (see {{#crossLink "StageGL/constructor"}}{{/crossLink}})).
+	 *
+	 * Using "transparent white" to demonstrate, the valid data formats are as follows:
+	 * <ul>
+	 *     <li>"#FFF"</li>
+	 *     <li>"#FFFFFF"</li>
+	 *     <li>"#FFFFFF00"</li>
+	 *     <li>"rgba(255,255,255,0.0)"</li>
+	 * </ul>
+	 * @method setClearColor
+	 * @param {String|int} [color=0x00000000] The new color to use as the background
+	 */
+	p.setClearColor = function (color) {
+		this._clearColor = StageGL.colorToObj(color);
+	};
+
+	/**
+	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
+	 * be specified as the src value of an image element. StageGL renders differently than Context2D and the information
+	 * of the last render is harder to get. For best results turn directDraw to false, or preserveBuffer to true and no
+	 * backgorund color.
+	 * @method toDataURL
+	 * @param {String} [backgroundColor=undefined] The background color to be used for the generated image. See setClearColor
+	 * for valid values. A value of undefined will make no adjustments to the existing background which may be significantly faster.
+	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
+	 * @param {Number} [encoderOptions=0.92] A Number between 0 and 1 indicating the image quality to use for image
+	 * formats that use lossy  compression such as image/jpeg and image/webp.
+	 * @return {String} a Base64 encoded image.
+	 **/
+	p.toDataURL = function(backgroundColor, mimeType, encoderOptions) {
+		var dataURL, gl = this._webGLContext;
+		this.batchReason = "dataURL";
+		var clearBackup = this._clearColor;
+
+		if (!this.canvas) { return; }
+		if (!StageGL.isWebGLActive(gl)) {
+			return this.Stage_toDataURL(backgroundColor, mimeType, encoderOptions);
+		}
+
+		// if the buffer is preserved and we don't want a background we can just output what we have, otherwise we'll have to render it
+		if(!this._preserveBuffer || backgroundColor !== undefined) {
+			// render it onto the right background
+			if(backgroundColor !== undefined) {
+				this._clearColor = StageGL.colorToObj(backgroundColor);
+			}
+			this.clear();
+			// if we're not using directDraw then we can just trust the last buffer content
+			if(!this._directDraw) {
+				this._drawCover(null, this._bufferTextureOutput);
+			} else {
+				console.log("No stored/useable gl render info, result may be incorrect if content was changed since render");
+				this.draw(gl);
+			}
+		}
+
+		// create the dataurl
+		dataURL = this.canvas.toDataURL(mimeType||"image/png", encoderOptions);
+
+		// reset the picture in the canvas
+		if(!this._preserveBuffer || backgroundColor !== undefined) {
+			if(backgroundColor !== undefined) {
+				this._clearColor = clearBackup;
+			}
+			this.clear();
+			if(!this._directDraw) {
+				this._drawCover(null, this._bufferTextureOutput);
+			} else {
+				this.draw(gl);
+			}
+		}
+
+		return dataURL;
+	};
+
+	// Docced in subclass
+	p.toString = function () {
+		return "[StageGL (name="+  this.name +")]";
+	};
+
+// private methods:
+	/**
+	 * Changes the active drawing surface and view matrix to the correct parameters without polluting the concept
+	 * of the current stage size
+	 * @param  {uint} w The width of the surface in pixels, defaults to _viewportWidth
+	 * @param  {uint} h The height of the surface in pixels, defaults to _viewportHeight
+	 */
+	p._updateDrawingSurface = function(w, h) {
+		this._viewportWidth = w;
+		this._viewportHeight = h;
+
+		this._webGLContext.viewport(0, 0, this._viewportWidth, this._viewportHeight);
+
+		// WebGL works with a -1,1 space on its screen. It also follows Y-Up
+		// we need to flip the y, scale and then translate the co-ordinates to match this
+		// additionally we offset into they Y so the polygons are inside the camera's "clipping" plane
+		this._projectionMatrix = new Float32Array([
+			2 / w,		0,			0,			0,
+			0,			-2 / h,		0,			0,
+			0,			0,			1,			0,
+			-1,			1,			0,			1
+		]);
+	};
+
+	/**
+	 * Returns a base texture that has no image or data loaded. Not intended for loading images. In some error cases,
+	 * the texture creation will fail. This function differs from {{#crossLink "StageGL/getBaseTexture"}}{{/crossLink}}
+	 * in that the failed textures will be replaced with a safe to render "nothing" texture.
+	 * @method _getSafeTexture
+	 * @param  {uint} [w=1] The width of the texture in pixels, defaults to 1
+	 * @param  {uint} [h=1] The height of the texture in pixels, defaults to 1
+	 * @protected
+	 */
+	p._getSafeTexture = function (w, h) {
+		var texture = this.getBaseTexture(w, h);
+
+		if (!texture) {
+			var msg = "Problem creating texture, possible cause: using too much VRAM, please try releasing texture memory";
+			(console.error && console.error(msg)) || console.log(msg);
+
+			texture = this._baseTextures[0];
+		}
+
+		return texture;
+	};
+
+	/**
+	 * Visually clear out the currently active FrameBuffer, does not rebind or adjust the frameBuffer in use.
+	 * @method _getSafeTexture
+	 * @param alpha
+	 * @protected
+	 */
+	p._clearFrameBuffer = function (alpha) {
+		var gl = this._webGLContext;
+		var cc = this._clearColor;
+
+		if (alpha > 0) { alpha = 1; }
+		if (alpha < 0) { alpha = 0; }
+
+		// Use WebGL settings; adjust for pre multiplied alpha appropriate to scenario
+		gl.clearColor(cc.r * alpha, cc.g * alpha, cc.b * alpha, alpha);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 0);
+	};
+
+	/**
+	 * Sets up and returns the WebGL context for the canvas. May return undefined in error scenarios. These can include 
+	 * situations where the canvas element already has a context, 2D or GL.
+	 * @param  {Canvas} canvas The DOM canvas element to attach to
+	 * @param  {Object} options The options to be handed into the WebGL object, see WebGL spec
+	 * @method _fetchWebGLContext
+	 * @protected
+	 * @return {WebGLRenderingContext} The WebGL context, may return undefined in error scenarios
+	 */
+	p._fetchWebGLContext = function (canvas, options) {
+		var gl;
+
+		try {
+			gl = canvas.getContext("webgl", options) || canvas.getContext("experimental-webgl", options);
+		} catch (e) {
+			// don't do anything in catch, null check will handle it
+		}
+
+		if (!gl) {
+			var msg = "Could not initialize WebGL";
+			console.error?console.error(msg):console.log(msg);
+		} else {
+			gl.viewportWidth = canvas.width;
+			gl.viewportHeight = canvas.height;
+		}
+
+		return gl;
+	};
+
+	/**
+	 * Create the completed Shader Program from the vertex and fragment shaders. Allows building of custom shaders for
+	 * filters. Once compiled, shaders are saved so. If the Shader code requires dynamic alterations re-run this function
+	 * to generate a new shader.
+	 * @method _fetchShaderProgram
+	 * @param  {Boolean} coverShader Is this a per object shader or a cover shader
+	 * Filter and override both accept the custom params. Regular and override have all features. Filter is a special case reduced feature shader meant to be over-ridden.
+	 * @param  {String | undefined} [customVTX=undefined] Extra vertex shader information to replace a regular draw, see
+	 * {{#crossLink "StageGL/COVER_VERTEX_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {String | undefined} [customFRAG=undefined] Extra fragment shader information to replace a regular draw, see
+	 * {{#crossLink "StageGL/COVER_FRAGMENT_BODY"}}{{/crossLink}} for default and {{#crossLink "Filter"}}{{/crossLink}} for examples.
+	 * @param  {Function | undefined} [shaderParamSetup=undefined] Function to run so custom shader parameters can get applied for the render.
+	 * @protected
+	 * @return {WebGLProgram} The compiled and linked shader
+	 */
+	p._fetchShaderProgram = function (coverShader, customVTX, customFRAG, shaderParamSetup) {
+		var gl = this._webGLContext;
+
+		gl.useProgram(null);		// safety to avoid collisions
+
+		// build the correct shader string out of the right headers and bodies
+		var targetFrag, targetVtx;
+		if (coverShader) {
+			targetVtx = StageGL.COVER_VERTEX_HEADER + (customVTX || StageGL.COVER_VERTEX_BODY);
+			targetFrag = StageGL.COVER_FRAGMENT_HEADER + (customFRAG || StageGL.COVER_FRAGMENT_BODY);
+		} else {
+			targetVtx = StageGL.REGULAR_VERTEX_HEADER + (customVTX || StageGL.REGULAR_VERTEX_BODY);
+			targetFrag = StageGL.REGULAR_FRAGMENT_HEADER + (customFRAG || StageGL.REGULAR_FRAGMENT_BODY);
+		}
+
+		// create the separate vars
+		var vertexShader = this._createShader(gl, gl.VERTEX_SHADER, targetVtx);
+		var fragmentShader = this._createShader(gl, gl.FRAGMENT_SHADER, targetFrag);
+
+		// link them together
+		var shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
+
+		// check compile status
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			gl.useProgram(this._activeShader);
+			throw gl.getProgramInfoLog(shaderProgram);
+		}
+
+		// set up the parameters on the shader
+		gl.useProgram(shaderProgram);
+
+		// get the places in memory the shader is stored so we can feed information into them
+		// then save it off on the shader because it's so tied to the shader itself
+		shaderProgram.positionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+		gl.enableVertexAttribArray(shaderProgram.positionAttribute);
+
+		shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
+		gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
+
+		if (coverShader) {
+			shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+			gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+			// if there's some custom attributes be sure to hook them up
+			if (shaderParamSetup) {
+				shaderParamSetup(gl, this, shaderProgram);
+			}
+		} else {
+			shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
+			gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+
+			shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
+			gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
+
+			var samplers = [];
+			for (var i = 0; i < this._gpuTextureCount; i++) {
+				samplers[i] = i;
+			}
+			shaderProgram.samplerData = samplers;
+
+			shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+			gl.uniform1iv(shaderProgram.samplerUniform, shaderProgram.samplerData);
+
+			shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
+		}
+
+		shaderProgram._type = coverShader ? "cover" : "batch";
+
+		gl.useProgram(this._activeShader);
+		return shaderProgram;
+	};
+
+	/**
+	 * Creates a shader from the specified string replacing templates. Template items are defined via `{{` `key` `}}``.
+	 * @method _createShader
+	 * @param  {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @param  {Number} type The type of shader to create. gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
+	 * @param  {String} str The definition for the shader.
+	 * @return {WebGLShader}
+	 * @protected
+	 */
+	p._createShader = function (gl, type, str) {
+		var textureCount = this._batchTextureCount;
+
+		// inject the static number
+		str = str.replace(/\{\{count}}/g, textureCount);
+
+		if (type === gl.FRAGMENT_SHADER) {
+			// resolve issue with no dynamic samplers by creating correct samplers in if else chain
+			// TODO: WebGL 2.0 does not need this support
+			var insert = "";
+			for (var i = 1; i<textureCount; i++) {
+				insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
+			}
+			str = str.replace(/\{\{alternates}}/g, insert);
+		}
+
+		// actually compile the shader
+		var shader = gl.createShader(type);
+		gl.shaderSource(shader, str);
+		gl.compileShader(shader);
+
+		// check compile status
+		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+			throw gl.getShaderInfoLog(shader);
+		}
+
+		return shader;
+	};
+
+	/**
+	 * Sets up the necessary vertex property buffers, including position and UV.
+	 * @method _createBuffers
+	 * @protected
+	 */
+	p._createBuffers = function () {
+		var gl = this._webGLContext;
+		var groupCount = this._maxBatchVertexCount;
+		var groupSize, i, l, config, atrBuffer;
+
+		// TODO benchmark and test using unified main buffer
+
+		// regular
+		config = this._attributeConfig["default"] = {};
+
+		groupSize = 2;
+		var vertices = new Float32Array(groupCount * groupSize);
+		for (i=0, l=vertices.length; i<l; i+=groupSize) { vertices[i] = vertices[i+1] = 0.0; }
+		atrBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+		config["position"] = { array: vertices,
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
+		};
+
+		groupSize = 2;
+		var uvs = new Float32Array(groupCount * groupSize);
+		for (i=0, l=uvs.length; i<l; i+=groupSize) { uvs[i] = uvs[i+1] = 0.0; }
+		atrBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
+		config["uv"] = { array: uvs,
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
+		};
+
+		groupSize = 1;
+		var indices = new Float32Array(groupCount * groupSize);
+		for (i=0, l=indices.length; i<l; i++) { indices[i] = 0.0; }
+		atrBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
+		config["texture"] = { array: indices,
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
+		};
+
+		groupSize = 1;
+		var alphas = new Float32Array(groupCount * groupSize);
+		for (i=0, l=alphas.length; i<l; i++) { alphas[i] = 1.0; }
+		atrBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
+		config["alpha"] = { array: alphas,
+			buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: 0, offset: 0, offB: 0, size: groupSize
+		};
+
+		// micro
+		config = this._attributeConfig["micro"] = {};
+		groupCount = 5; // we probably do not need this much space, but it's safer and barely more expensive
+		groupSize = 2 + 2 + 1 + 1;
+		var stride = groupSize * 4; // they're all floats, so 4 bytes each
+
+		var microArray = new Float32Array(groupCount * groupSize);
+		for (i=0, l=microArray.length; i<l; i+=groupSize) {
+			microArray[i]   = microArray[i+1] = 0.0; // vertex
+			microArray[i+1] = microArray[i+2] = 0.0; // uv
+			microArray[i+3] = 0.0;                   // texture
+			microArray[i+4] = 1.0;                   // alpha
+		}
+		atrBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, atrBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, microArray, gl.DYNAMIC_DRAW);
+
+		config["position"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 0, offB: 0, size: 2
+		};
+		config["uv"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 2, offB: 2*4, size: 2
+		};
+		config["texture"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 4, offB: 4*4, size: 1
+		};
+		config["alpha"] = {
+			array: microArray, buffer: atrBuffer, type: gl.FLOAT, spacing: groupSize, stride: stride,
+			offset: 5, offB: 5*4, size: 1
+		};
+
+		// defaults
+		this._activeConfig = this._attributeConfig["default"];
+	};
+
+	/**
+	 * Do all the setup steps for standard textures & shaders.
+	 * @method _initMaterials
+	 * @protected
+	 */
+	p._initMaterials = function () {
+		var gl = this._webGLContext;
+
+		// reset counters
+		this._lastTextureInsert = -1;
+
+		// clear containers
+		this._textureDictionary = [];
+		this._textureIDs = {};
+		this._baseTextures = [];
+		this._batchTextures = [];
+
+		this._gpuTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS); // this is what we can draw with
+		this._gpuTextureMax = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS); // this could be higher
+
+		this._batchTextureCount = this._gpuTextureCount;
+		var success = false;
+		while (!success) {
+			try {
+				this._activeShader = this._fetchShaderProgram(false);
+				success = true;
+			} catch(e) {
+				if (this._batchTextureCount <= 1) { throw "Cannot compile shader " + e; }
+				this._batchTextureCount = (this._batchTextureCount / 2)|0;
+
+				if (this.vocalDebug) {
+					console.log("Reducing possible texture count due to errors: " + this._batchTextureCount);
+				}
+			}
+		}
+
+		this._mainShader = this._activeShader;
+		this._mainShader._name = "main";
+
+		// fill in blanks as it helps the renderer be stable while textures are loading and reduces need for safety code
+		var texture = this.getBaseTexture();
+		if (!texture) {
+			throw "Problems creating basic textures, known causes include using too much VRAM by not releasing WebGL texture instances";
+		} else {
+			texture._storeID = -1;
+		}
+		for (var i=0; i<this._batchTextureCount; i++) {
+			this._baseTextures[i] = this._batchTextures[i] = texture;
+		}
+	};
+
+	/**
+	 * Load a specific texture, accounting for potential delay, as it might not be preloaded.
+	 * @method _loadTextureImage
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Image | Canvas} image Actual image to be loaded
+	 * @return {WebGLTexture} The resulting Texture object
+	 * @protected
+	 */
+	p._loadTextureImage = function (gl, image) {
+		var srcPath, texture, msg;
+		if ((image instanceof Image || image instanceof HTMLImageElement) && image.src) {
+			srcPath = image.src;
+		} else if (image instanceof HTMLCanvasElement) {
+			image._isCanvas = true; //canvases are already loaded and assumed unique so note that
+			srcPath = "canvas_" + (++this._lastTrackedCanvas);
+		} else {
+			msg = "Invalid image provided as source. Please ensure source is a correct DOM element.";
+			(console.error && console.error(msg, image)) || console.log(msg, image);
+			return;
+		}
+
+		// create the texture lookup and texture
+		var storeID = this._textureIDs[srcPath];
+		if (storeID === undefined) {
+			this._textureIDs[srcPath] = storeID = this._textureDictionary.length;
+			image._storeID = storeID;
+			image._invalid = true;
+			texture = this._getSafeTexture();
+			this._textureDictionary[storeID] = texture;
+		} else {
+			image._storeID = storeID;
+			texture = this._textureDictionary[storeID];
+		}
+
+		// allow the texture to track its references for cleanup, if it's not an error ref
+		if (texture._storeID !== -1) {
+			texture._storeID = storeID;
+			if (texture._imageData) {
+				texture._imageData.push(image);
+			} else {
+				texture._imageData = [image];
+			}
+		}
+
+		// insert texture into batch
+		this._insertTextureInBatch(gl, texture);
+
+		return texture;
+	};
+
+	/**
+	 * Necessary to upload the actual image data to the GPU. Without this the texture will be blank. Called automatically
+	 * in most cases due to loading and caching APIs. Flagging an image source with `_invalid = true` will trigger this
+	 * next time the image is rendered.
+	 * @method _updateTextureImageData
+	 * @param {WebGLRenderingContext} gl
+	 * @param {Image | Canvas} image The image data to be uploaded
+	 * @protected
+	 */
+	p._updateTextureImageData = function (gl, image) {
+		// the image isn't loaded and isn't ready to be updated, because we don't set the invalid flag we should try again later
+		if (!(image.complete || image._isCanvas || image.naturalWidth)) {
+			return;
+		}
+
+		// the bitwise & is intentional, cheap exponent 2 check
+		var isNPOT = (image.width & image.width-1) || (image.height & image.height-1);
+		var texture = this._textureDictionary[image._storeID];
+
+		gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+
+		texture.isPOT = !isNPOT;
+		this.setTextureParams(gl, texture.isPOT);
+
+		try {
+			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		} catch(e) {
+			var errString = "\nAn error has occurred. This is most likely due to security restrictions on WebGL images with local or cross-domain origins";
+			if (console.error) {
+				//TODO: LM: I recommend putting this into a log function internally, since you do it so often, and each is implemented differently.
+				console.error(errString);
+				console.error(e);
+			} else if (console) {
+				console.log(errString);
+				console.log(e);
+			}
+		}
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+
+		if (image._invalid !== undefined) { image._invalid = false; } // only adjust what is tracking this data
+
+		texture.width = image.width;
+		texture.height = image.height;
+
+		if (this.vocalDebug) {
+			if (isNPOT && this._antialias) {
+				console.warn("NPOT(Non Power of Two) Texture with context.antialias true: "+ image.src);
+			}
+			if (image.width > gl.MAX_TEXTURE_SIZE || image.height > gl.MAX_TEXTURE_SIZE){
+				console && console.error("Oversized Texture: "+ image.width+"x"+image.height +" vs "+ gl.MAX_TEXTURE_SIZE +"max");
+			}
+		}
+	};
+
+	/**
+	 * Adds the texture to a spot in the current batch, forcing a draw if no spots are free.
+	 * @method _insertTextureInBatch
+	 * @param {WebGLRenderingContext} gl The canvas WebGL context object to draw into.
+	 * @param {WebGLTexture} texture The texture to be inserted.
+	 * @protected
+	 */
+	p._insertTextureInBatch = function (gl, texture) {
+		var image;
+		if (this._batchTextures[texture._activeIndex] !== texture) {	// if it wasn't used last batch
+			// we've got to find it a a spot.
+			var found = -1;
+			var start = (this._lastTextureInsert+1) % this._batchTextureCount;
+			var look = start;
+			do {
+				if (this._batchTextures[look]._batchID !== this._batchID && !this._slotBlacklist[look]) {
+					found = look;
+					break;
+				}
+				look = (look+1) % this._batchTextureCount;
+			} while (look !== start);
+
+			// we couldn't find anywhere for it go, meaning we're maxed out
+			if (found === -1) {
+				this.batchReason = "textureOverflow";
+				this._renderBatch();		// <------------------------------------------------------------------------
+				found = start; //TODO: how do we optimize this to be smarter?
+			}
+
+			// lets put it into that spot
+			this._batchTextures[found] = texture;
+			texture._activeIndex = found;
+			image = texture._imageData && texture._imageData[0]; // first come first served, potentially problematic
+			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
+				this._updateTextureImageData(gl, image);
+			} else {
+				// probably redundant, confirm functionality then remove from codebase
+				//gl.activeTexture(gl.TEXTURE0 + found);
+				//gl.bindTexture(gl.TEXTURE_2D, texture);
+				//this.setTextureParams(gl);
+			}
+			this._lastTextureInsert = found;
+
+		} else if (texture._drawID !== this._drawID) {	// being active from previous draws doesn't mean up to date
+			image = texture._imageData && texture._imageData[0];
+			if (image && ((image._invalid === undefined && image._isCanvas) || image._invalid)) {
+				this._updateTextureImageData(gl, image);
+			}
+		}
+
+		texture._drawID = this._drawID;
+		texture._batchID = this._batchID;
+	};
+
+	/**
+	 * Remove and clean the texture, expects a texture and is inflexible. Mostly for internal use, recommended to call 
+	 * {{#crossLink "StageGL/releaseTexture"}}{{/crossLink}} instead as it will call this with the correct texture object(s).
+	 * Note: Testing shows this may not happen immediately, have to wait frames for WebGL to have actually adjust memory.
+	 * @method _killTextureObject
+	 * @param {WebGLTexture} texture The texture to be cleaned out
+	 * @protected
+	 */
+	p._killTextureObject = function (texture) {
+		if (!texture) { return; }
+		var gl = this._webGLContext;
+
+		// remove linkage
+		if (texture._storeID !== undefined && texture._storeID >= 0) {
+			this._textureDictionary[texture._storeID] = undefined;
+			for (var n in this._textureIDs) {
+				if (this._textureIDs[n] === texture._storeID) { delete this._textureIDs[n]; }
+			}
+			var data = texture._imageData;
+			if (data) {
+				for (var i=data.length-1; i>=0; i--) { data[i]._storeID = undefined; }
+			}
+			texture._imageData = texture._storeID = undefined;
+		}
+
+		// make sure to drop it out of an active slot
+		if (texture._activeIndex !== undefined && this._batchTextures[texture._activeIndex] === texture) {
+			this._batchTextures[texture._activeIndex] = this._baseTextures[texture._activeIndex];
+		}
+
+		// remove buffers if present
+		try {
+			if (texture._frameBuffer) { gl.deleteFramebuffer(texture._frameBuffer); }
+			texture._frameBuffer = undefined;
+		} catch(e) {
+			/* suppress delete errors because it's already gone or didn't need deleting probably */
+			if (this.vocalDebug) { console.log(e); }
+		}
+
+		// remove entry
+		try {
+			gl.deleteTexture(texture);
+		} catch(e) {
+			/* suppress delete errors because it's already gone or didn't need deleting probably */
+			if (this.vocalDebug) { console.log(e); }
+		}
+	};
+
+	/**
+	 * Small utility function to keep internal API consistent and set the uniforms for a dual texture cover render
+	 * @method _setCoverMixShaderParams
+	 * @param {WebGLRenderingContext} gl The context where the drawing takes place
+	 * @param stage unused
+	 * @param shaderProgram unused
+	 * @protected
+	 */
+	p._setCoverMixShaderParams = function (gl, stage, shaderProgram) {
+		gl.uniform1i(
+			gl.getUniformLocation(shaderProgram, "uMixSampler"),
+			1
+		);
+	};
+
+	/**
+	 * Change the respective render settings and filters to the correct settings. Will build the shader on first use.
+	 * @method _updateRenderMode
+	 * @param {String} newMode Composite operation name
+	 * @protected
+	 */
+	p._updateRenderMode = function (newMode) {
+		if ( newMode === null || newMode === undefined){ newMode = "source-over"; }
+
+		var blendSrc = StageGL.BLEND_SOURCES[newMode];
+		if (blendSrc === undefined) {
+			if (this.vocalDebug){ console.log("Unknown compositeOperation ["+ newMode +"], reverting to default"); }
+			blendSrc = StageGL.BLEND_SOURCES[newMode = "source-over"];
+		}
+
+		if (this._renderMode === newMode) { return; }
+
+		var gl = this._webGLContext;
+		var shaderData = this._builtShaders[newMode];
+		if (shaderData === undefined) {
+			try {
+				shaderData = this._builtShaders[newMode] = {
+					eqRGB: gl[blendSrc.eqRGB || "FUNC_ADD"],
+					srcRGB: gl[blendSrc.srcRGB || "ONE"],
+					dstRGB: gl[blendSrc.dstRGB || "ONE_MINUS_SRC_ALPHA"],
+					eqA: gl[blendSrc.eqA || "FUNC_ADD"],
+					srcA: gl[blendSrc.srcA || "ONE"],
+					dstA: gl[blendSrc.dstA || "ONE_MINUS_SRC_ALPHA"],
+					immediate: blendSrc.shader !== undefined,
+					shader: (blendSrc.shader || this._builtShaders["source-over"] === undefined) ?
+						this._fetchShaderProgram(
+							true, undefined, blendSrc.shader,
+							this._setCoverMixShaderParams
+						) : this._builtShaders["source-over"].shader // re-use source-over when we don't need a new shader
+				};
+				if (blendSrc.shader) { shaderData.shader._name = newMode; }
+			} catch (e) {
+				this._builtShaders[newMode] = undefined;
+				console && console.log("SHADER SWITCH FAILURE", e);
+				return;
+			}
+		}
+
+		if (shaderData.immediate) {
+			if (this._directDraw) {
+				if (this.vocalDebug) { console.log("Illegal compositeOperation ["+ newMode +"] due to StageGL.directDraw = true, reverting to default"); }
+				return;
+			}
+			this._activeConfig = this._attributeConfig["micro"];
+		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+
+		this.batchReason = "shaderSwap";
+		this._renderBatch();		// <--------------------------------------------------------------------------------
+
+		this._renderMode = newMode;
+		this._immediateRender = shaderData.immediate;
+		gl.blendEquationSeparate(shaderData.eqRGB, shaderData.eqA);
+		gl.blendFuncSeparate(shaderData.srcRGB, shaderData.dstRGB, shaderData.srcA, shaderData.dstA);
+	};
+
+	/**
+	 * Helper function for the standard content draw
+	 * @method _drawContent
+	 * @param {Stage | Container} content
+	 * @param {Boolean} ignoreCache
+	 * @protected
+	 */
+	p._drawContent = function (content, ignoreCache) {
+		var gl = this._webGLContext;
+
+		this._activeShader = this._mainShader;
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+		if(this._batchTextureOutput._frameBuffer !== null) { gl.clear(gl.COLOR_BUFFER_BIT); }
+
+		this._appendToBatch(content, new createjs.Matrix2D(), this.alpha, ignoreCache);
+
+		this.batchReason = "contentEnd";
+		this._renderBatch();
+	};
+
+	/**
+	 * Used to draw one or more textures potentially using a filter into the supplied buffer.
+	 * Mostly used for caches, filters, and outputting final render frames.
+	 * Draws `dst` into `out` after applying `srcFilter` depending on its current value.
+	 * @method _drawCover
+	 * @param {WebGLFramebuffer} out Buffer to draw the results into (null is the canvas element)
+	 * @param {WebGLTexture} dst Base texture layer aka "destination" in image blending terminology
+	 * @param {WebGLTexture | Filter} [srcFilter = undefined] Modification parameter for the draw. If a texture, the
+	 * current _renderMode applies it as a "source" image. If a Filter, the filter is applied to the dst with its params.
+	 * @protected
+	 */
+	p._drawCover = function (out, dst, srcFilter) {
+		var gl = this._webGLContext;
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, out);
+		if (out !== null){ gl.clear(gl.COLOR_BUFFER_BIT); }
+
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, dst);
+		this.setTextureParams(gl);
+
+		if (srcFilter instanceof createjs.Filter) {
+			this._activeShader = this.getFilterShader(srcFilter);
+		} else {
+			if (srcFilter instanceof WebGLTexture) {
+				gl.activeTexture(gl.TEXTURE1);
+				gl.bindTexture(gl.TEXTURE_2D, srcFilter);
+				this.setTextureParams(gl);
+			} else if (srcFilter !== undefined && this.vocalDebug) {
+				console.log("Unknown data handed to function: ", srcFilter);
+			}
+			this._activeShader = this._builtShaders[this._renderMode].shader;
+		}
+
+		this._renderCover();
+	};
+
+	/**
+	 * Returns a matrix that can be used to counter position the `target` so that it fits and scales to the `manager`
+	 * @param {DisplayObject} target The object to be counter positioned
+	 * @param {BitmapCache} manager The cache manager to be aligned to
+	 * @returns {Matrix2D} The matrix that can be used used to counter position the container
+	 * @method _alignTargetToCache
+	 * @private
+	 */
+	p._alignTargetToCache = function(target, manager) {
+		if (manager._counterMatrix === null) {
+			manager._counterMatrix = target.getMatrix();
+		} else {
+			target.getMatrix(manager._counterMatrix)
+		}
+
+		var mtx = manager._counterMatrix;
+		mtx.scale(1/manager.scale, 1/manager.scale);
+		mtx = mtx.invert();
+		mtx.translate(-manager.offX/manager.scale*target.scaleX, -manager.offY/manager.scale*target.scaleY);
+
+		return mtx;
+	};
+
+	/**
+	 * Add all the contents of a container to the pending buffers, called recursively on each container. This may
+	 * trigger a draw if a buffer runs out of space. This is the main workforce of the render loop.
+	 * @method _appendToBatch
+	 * @param {Container} container The {{#crossLink "Container"}}{{/crossLink}} that contains everything to be drawn.
+	 * @param {Matrix2D} concatMtx The effective (concatenated) transformation matrix when beginning this container
+	 * @param {Number} concatAlpha The effective (concatenated) alpha when beginning this container
+	 * @param {Boolean} [ignoreCache=false] Don't use an element's cache during this draw
+	 * @protected
+	 */
+	p._appendToBatch = function (container, concatMtx, concatAlpha, ignoreCache) {
+		var gl = this._webGLContext;
+
+		// sort out shared properties
+		var cMtx = container._glMtx;
+		cMtx.copy(concatMtx);
+		if (container.transformMatrix !== null) {
+			cMtx.appendMatrix(container.transformMatrix);
+		} else {
+			cMtx.appendTransform(
+				container.x, container.y,
+				container.scaleX, container.scaleY,
+				container.rotation, container.skewX, container.skewY,
+				container.regX, container.regY
+			);
+		}
+
+		var previousRenderMode = this._renderMode;
+		if (container.compositeOperation) {
+			this._updateRenderMode(container.compositeOperation);
+		}
+
+		// sub components of figuring out the position an object holds
+		var subL, subT, subR, subB;
+
+		// actually apply its data to the buffers
+		var l = container.children.length;
+		for (var i = 0; i < l; i++) {
+			var item = container.children[i];
+			var useCache = (!ignoreCache && item.cacheCanvas) || false;
+
+			if (!(item.visible && concatAlpha > 0.0035)) { continue; }
+			var itemAlpha = item.alpha;
+
+			if (useCache === false) {
+				if (item._updateState){
+					item._updateState();
+				}
+
+				if(!this._directDraw && (!ignoreCache && item.cacheCanvas === null && item.filters !== null && item.filters.length)) {
+					var bounds;
+					if (item.bitmapCache === null) {
+						bounds = item.getBounds();
+						item.bitmapCache = new createjs.BitmapCache();
+						item.bitmapCache._autoGenerated = true;
+					}
+					if (item.bitmapCache._autoGenerated) {
+						this.batchReason = "cachelessFilterInterupt";
+						this._renderBatch();					// <----------------------------------------------------
+
+						item.alpha = 1;
+						var shaderBackup = this._activeShader;
+						bounds = bounds || item.getBounds();
+						item.bitmapCache.define(item, bounds.x, bounds.y, bounds.width, bounds.height, 1, {useGL:this});
+						useCache = item.bitmapCache._cacheCanvas;
+
+						item.alpha = itemAlpha;
+						this._activeShader = shaderBackup;
+						gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+					}
+				}
+			}
+
+			if (useCache === false && item.children) {
+				this._appendToBatch(item, cMtx, itemAlpha * concatAlpha);
+				continue;
+			}
+
+			var containerRenderMode = this._renderMode;
+			if (item.compositeOperation) {
+				this._updateRenderMode(item.compositeOperation);
+			}
+
+			// check for overflowing batch, if yes then force a render
+			if (this._batchVertexCount + StageGL.INDICIES_PER_CARD > this._maxBatchVertexCount) {
+				this.batchReason = "vertexOverflow";
+				this._renderBatch();					// <------------------------------------------------------------
+			}
+
+			// keep track of concatenated position
+			var iMtx = item._glMtx;
+			iMtx.copy(cMtx);
+			if (item.transformMatrix) {
+				iMtx.appendMatrix(item.transformMatrix);
+			} else {
+				iMtx.appendTransform(
+					item.x, item.y,
+					item.scaleX, item.scaleY,
+					item.rotation, item.skewX, item.skewY,
+					item.regX, item.regY
+				);
+			}
+
+			var uvRect, texIndex, image, frame, texture, src;
+
+			// get the image data, or abort if not present
+			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache !== false) {
+				image = useCache === false ? item.image : useCache;
+
+			// SPRITE
+			} else if (item._webGLRenderStyle === 1) {
+				frame = item.spriteSheet.getFrame(item.currentFrame);
+				if (frame === null) { continue; }
+				image = frame.image;
+
+			// MISC (DOM objects render themselves later)
+			} else {
+				continue;
+			}
+			if (!image) { continue; }
+
+			// calculate texture
+			if (image._storeID === undefined) {
+				// this texture is new to us so load it and add it to the batch
+				texture = this._loadTextureImage(gl, image);
+			} else {
+				// fetch the texture (render textures know how to look themselves up to simplify this logic)
+				texture = this._textureDictionary[image._storeID];
+
+				if (!texture){ //TODO: this should really not occur but has due to bugs, hopefully this can be removed eventually
+					if (this.vocalDebug){ console.log("Image source should not be lookup a non existent texture, please report a bug."); }
+					continue;
+				}
+
+				// put it in the batch if needed
+				if (texture._batchID !== this._batchID) {
+					this._insertTextureInBatch(gl, texture);
+				}
+			}
+			texIndex = texture._activeIndex;
+			image._drawID = this._drawID;
+
+			// BITMAP / Cached Canvas
+			if (item._webGLRenderStyle === 2 || useCache !== false) {
+				if (useCache === false && item.sourceRect) {
+					// calculate uvs
+					if (!item._uvRect) { item._uvRect = {}; }
+					src = item.sourceRect;
+					uvRect = item._uvRect;
+					uvRect.t = 1 - ((src.y)/image.height);
+					uvRect.l = (src.x)/image.width;
+					uvRect.b = 1 - ((src.y + src.height)/image.height);
+					uvRect.r = (src.x + src.width)/image.width;
+
+					// calculate vertices
+					subL = 0;							subT = 0;
+					subR = src.width+subL;				subB = src.height+subT;
+				} else {
+					// calculate uvs
+					uvRect = StageGL.UV_RECT;
+					// calculate vertices
+					if (useCache === false) {
+						subL = 0;						subT = 0;
+						subR = image.width+subL;		subB = image.height+subT;
+					} else {
+						src = item.bitmapCache;
+						subL = src.x+(src._filterOffX/src.scale);	subT = src.y+(src._filterOffY/src.scale);
+						subR = (src._drawWidth/src.scale)+subL;		subB = (src._drawHeight/src.scale)+subT;
+					}
+				}
+
+			// SPRITE
+			} else if (item._webGLRenderStyle === 1) {
+				var rect = frame.rect;
+
+				// calculate uvs
+				uvRect = frame.uvRect;
+				if (!uvRect) {
+					uvRect = StageGL.buildUVRects(item.spriteSheet, item.currentFrame, false);
+				}
+
+				// calculate vertices
+				subL = -frame.regX;								subT = -frame.regY;
+				subR = rect.width-frame.regX;					subB = rect.height-frame.regY;
+			}
+
+			var spacing = 0;
+			var cfg =  this._activeConfig;
+			var vpos = cfg.position.array;
+			var uvs = cfg.uv.array;
+			var texI = cfg.texture.array;
+			var alphas = cfg.alpha.array;
+
+			// apply vertices
+			spacing = cfg.position.spacing;
+			var vtxOff = this._batchVertexCount * spacing + cfg.position.offset;
+			vpos[vtxOff] = subL*iMtx.a + subT*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subL*iMtx.b + subT*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subL*iMtx.a + subB*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subL*iMtx.b + subB*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subR*iMtx.a + subT*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subR*iMtx.b + subT*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subL*iMtx.a + subB*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subL*iMtx.b + subB*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subR*iMtx.a + subT*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subR*iMtx.b + subT*iMtx.d + iMtx.ty;
+			vtxOff += spacing;
+			vpos[vtxOff] = subR*iMtx.a + subB*iMtx.c + iMtx.tx;    vpos[vtxOff+1] = subR*iMtx.b + subB*iMtx.d + iMtx.ty;
+
+			// apply uvs
+			spacing = cfg.uv.spacing;
+			var uvOff = this._batchVertexCount * spacing + cfg.uv.offset;
+			uvs[uvOff] = uvRect.l;        uvs[uvOff+1] = uvRect.t;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.l;        uvs[uvOff+1] = uvRect.b;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.r;        uvs[uvOff+1] = uvRect.t;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.l;        uvs[uvOff+1] = uvRect.b;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.r;        uvs[uvOff+1] = uvRect.t;
+			uvOff += spacing;
+			uvs[uvOff] = uvRect.r;        uvs[uvOff+1] = uvRect.b;
+
+			// apply texture
+			spacing = cfg.texture.spacing;
+			var texOff = this._batchVertexCount * spacing + cfg.texture.offset;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+			texOff += spacing;
+			texI[texOff] = texIndex;
+
+			// apply alpha
+			spacing = cfg.alpha.spacing;
+			var aOff = this._batchVertexCount * spacing + cfg.alpha.offset;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+			aOff += spacing;
+			alphas[aOff] = itemAlpha * concatAlpha;
+
+			this._batchVertexCount += StageGL.INDICIES_PER_CARD;
+
+			if (this._immediateRender) {
+				this._activeConfig = this._attributeConfig["default"];
+				this._immediateBatchRender();
+			}
+
+			if (this._renderMode !== containerRenderMode) {
+				this._updateRenderMode(containerRenderMode);
+			}
+		}
+
+		if (this._renderMode !== previousRenderMode) {
+			this._updateRenderMode(previousRenderMode);
+		}
+	};
+
+	/**
+	 * The shader or effect needs to be drawn immediately, sub function of `_appendToBatch`
+	 * @method _immediateBatchRender
+	 * @protected
+	 */
+	p._immediateBatchRender = function() {
+		var gl = this._webGLContext;
+
+		if (this._batchTextureConcat === null){
+			this._batchTextureConcat = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+		} else {
+			this.resizeTexture(this._batchTextureConcat, this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureConcat._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+		if (this._batchTextureTemp === null){
+			this._batchTextureTemp = this.getRenderBufferTexture(this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
+		} else {
+			this.resizeTexture(this._batchTextureTemp, this._viewportWidth, this._viewportHeight);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureTemp._frameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+
+		var swap = this._batchTextureOutput;
+		this._batchTextureOutput = this._batchTextureConcat;
+		this._batchTextureConcat = swap;
+
+		this._activeShader = this._mainShader;
+		this.batchReason = "immediatePrep";
+		this._renderBatch();//<-----------------------------------------------------------------------------------------
+
+		this.batchReason = "immediateResults";
+		this._drawCover(this._batchTextureOutput._frameBuffer, this._batchTextureConcat, this._batchTextureTemp);
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this._batchTextureOutput._frameBuffer);
+	};
+
+	/**
+	 * Draws all the currently defined cards in the buffer to the render surface.
+	 * @method _renderBatch
+	 * @protected
+	 */
+	p._renderBatch = function () {
+		if (this._batchVertexCount <= 0) { return; }	// prevents error logs on stages filled with un-renederable content.
+		var gl = this._webGLContext;
+		this._renderPerDraw++;
+
+		if (this.vocalDebug) {
+			console.log("Batch["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
+		}
+		var shaderProgram = this._activeShader;
+		var pc, config = this._activeConfig;
+
+		gl.useProgram(shaderProgram);
+
+		pc = config.position;
+		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
+		gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
+
+		pc = config.texture;
+		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
+		gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
+
+		pc = config.uv;
+		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
+
+		pc = config.alpha;
+		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
+		gl.vertexAttribPointer(shaderProgram.alphaAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, pc.array);
+
+		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, this._projectionMatrix);
+
+		for (var i = 0; i < this._batchTextureCount; i++) {
+			gl.activeTexture(gl.TEXTURE0 + i);
+			gl.bindTexture(gl.TEXTURE_2D, this._batchTextures[i]);
+		}
+
+		gl.drawArrays(gl.TRIANGLES, 0, this._batchVertexCount);
+
+		this._batchVertexCount = 0;
+		this._batchID++;
+	};
+
+	/**
+	 * Draws a card that covers the entire render surface. Mainly used for filters and composite operations.
+	 * @method _renderCover
+	 * @protected
+	 */
+	p._renderCover = function () {
+		var gl = this._webGLContext;
+		this._renderPerDraw++;
+
+		if (this.vocalDebug) {
+			console.log("Cover["+ this._drawID +":"+ this._batchID +"] : "+ this.batchReason);
+		}
+		var shaderProgram = this._activeShader;
+		var pc, config = this._attributeConfig.default;
+
+		gl.useProgram(shaderProgram);
+
+		pc = config.position;
+		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
+		gl.vertexAttribPointer(shaderProgram.positionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_VERT);
+
+		pc = config.uv;
+		gl.bindBuffer(gl.ARRAY_BUFFER, pc.buffer);
+		gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, pc.size, pc.type, false, pc.stride, pc.offB);
+		gl.bufferSubData(gl.ARRAY_BUFFER, 0, StageGL.COVER_UV);
+
+		gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+		gl.drawArrays(gl.TRIANGLES, 0, StageGL.INDICIES_PER_CARD);
+		this._batchID++; // while this isn't a batch, this fixes issues with expected textures in expected places
+	};
+
+	createjs.StageGL = createjs.promote(StageGL, "Stage");
 }());
 
 //##############################################################################
@@ -13159,729 +13226,742 @@ this.createjs = this.createjs || {};
 // MovieClip.js
 //##############################################################################
 
-this.createjs = this.createjs || {};
-
-(function () {
-    "use strict";
-
-
-    // constructor:
-    /**
-     * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
-     * you to create objects which encapsulate timeline animations, state changes, and synched actions. The MovieClip
-     * class has been included in the EaselJS minified file since 0.7.0.
-     *
-     * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
-     * been made to support time-based timelines in the future.
-     *
-     * <h4>Example</h4>
-     * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
-     * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
-     *
-     *      var stage = new createjs.Stage("canvas");
-     *      createjs.Ticker.addEventListener("tick", stage);
-     *
-     *      var mc = new createjs.MovieClip({loop:-1, labels:{myLabel:20}});
-     *      stage.addChild(mc);
-     *
-     *      var child1 = new createjs.Shape(
-     *          new createjs.Graphics().beginFill("#999999")
-     *              .drawCircle(30,30,30));
-     *      var child2 = new createjs.Shape(
-     *          new createjs.Graphics().beginFill("#5a9cfb")
-     *              .drawCircle(30,30,30));
-     *
-     *      mc.timeline.addTween(
-     *          createjs.Tween.get(child1)
-     *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
-     *      mc.timeline.addTween(
-     *          createjs.Tween.get(child2)
-     *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
-     *
-     *      mc.gotoAndPlay("start");
-     *
-     * It is recommended to use <code>tween.to()</code> to animate and set properties (use no duration to have it set
-     * immediately), and the <code>tween.wait()</code> method to create delays between animations. Note that using the
-     * <code>tween.set()</code> method to affect properties will likely not provide the desired result.
-     *
-     * @class MovieClip
-     * @main MovieClip
-     * @param {Object} [props] The configuration properties to apply to this instance (ex. `{mode:MovieClip.SYNCHED}`).
-     * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties except where
-     * specified.<UL>
-     *    <LI> `mode`</LI>
-     *    <LI> `startPosition`</LI>
-     *    <LI> `frameBounds`</LI>
-     * </UL>
-     * 
-     * This object will also be passed into the Timeline instance associated with this MovieClip. See the documentation
-     * for Timeline for a list of supported props (ex. `paused`, `labels`, `loop`, `reversed`, etc.)
-     * @extends Container
-     * @constructor
-     **/
-    function MovieClip(props) {
-        this.Container_constructor();
-        !MovieClip.inited && MovieClip.init(); // static init
-
-        var mode, startPosition, loop, labels;
-
-        // handle old params (mode, startPosition, loop, labels):
-        // TODO: deprecated param handling:
-        if (props instanceof String || arguments.length > 1) {
-            mode = props;
-            startPosition = arguments[ 1 ];
-            loop = arguments[ 2 ];
-            labels = arguments[ 3 ];
-            if (loop == null) { loop = -1; }
-            props = null;
-        } else if (props) {
-            mode = props.mode;
-            startPosition = props.startPosition;
-            loop = props.loop;
-            labels = props.labels;
-        }
-        if (!props) { props = { labels: labels }; }
-
-
-        // public properties:
-        /**
-         * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
-         * See each constant for a description of the behaviour.
-         * @property mode
-         * @type String
-         * @default null
-         **/
-        this.mode = mode || MovieClip.INDEPENDENT;
-
-        /**
-         * Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
-         * @property startPosition
-         * @type Number
-         * @default 0
-         */
-        this.startPosition = startPosition || 0;
-
-        /**
-         * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
-         * 1 would cause it to loop once (ie. play a total of twice).
-         * @property loop
-         * @type Number
-         * @default -1
-         */
-        this.loop = loop === true ? -1 : (loop || 0);
-
-        /**
-         * The current frame of the movieclip.
-         * @property currentFrame
-         * @type Number
-         * @default 0
-         * @readonly
-         */
-        this.currentFrame = 0;
-
-        /**
-         * If true, the MovieClip's position will not advance when ticked.
-         * @property paused
-         * @type Boolean
-         * @default false
-         */
-        this.paused = props.paused || false;
-
-        /**
-         * If true, actions in this MovieClip's tweens will be run when the playhead advances.
-         * @property actionsEnabled
-         * @type Boolean
-         * @default true
-         */
-        this.actionsEnabled = true;
-
-        /**
-         * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
-         * it back onto the display list. This only applies to MovieClip instances with mode=INDEPENDENT.
-         * <br><br>
-         * For example, if you had a character animation with a "body" child MovieClip instance
-         * with different costumes on each frame, you could set body.autoReset = false, so that
-         * you can manually change the frame it is on, without worrying that it will be reset
-         * automatically.
-         * @property autoReset
-         * @type Boolean
-         * @default true
-         */
-        this.autoReset = true;
-
-        /**
-         * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
-         * @property frameBounds
-         * @type Array
-         * @default null
-         */
-        this.frameBounds = this.frameBounds || props.frameBounds; // frameBounds are set on the prototype in Animate.
-
-        /**
-         * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
-         * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
-         * framerate.
-         *
-         * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
-         * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
-         * vary slightly between frames.
-         *
-         * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
-         * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
-         * @property framerate
-         * @type {Number}
-         * @default null
-         **/
-        this.framerate = null;
-
-        // set up the needed props for Timeline:
-        props.useTicks = props.paused = true;
-
-        /**
-         * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-         * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
-         * instances to the timeline.
-         *
-         * <h4>Example</h4>
-         *
-         *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
-         *      var mc = new createjs.MovieClip();
-         *      mc.timeline.addTween(tween);
-         *
-         * Elements can be added and removed from the timeline by toggling an "_off" property
-         * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
-         * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
-         * frame 1. You can use the "visible" property to achieve the same effect.
-         *
-         *      var tween = createjs.Tween.get(target).to({_off:false})
-         *          .wait(1).to({_off:true})
-         *          .wait(1).to({_off:false});
-         *
-         * @property timeline
-         * @type Timeline
-         * @default null
-         */
-        this.timeline = new createjs.Timeline(props);
-
-
-        // private properties:
-        /**
-         * @property _synchOffset
-         * @type Number
-         * @default 0
-         * @private
-         */
-        this._synchOffset = 0;
-
-        /**
-         * @property _rawPosition
-         * @type Number
-         * @default -1
-         * @private
-         */
-        this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
-
-        /**
-         * @property _bound_resolveState
-         * @type Function
-         * @private
-         */
-        this._bound_resolveState = this._resolveState.bind(this);
-
-
-        /**
-         * The time remaining from the previous tick, only applicable when .framerate is set.
-         * @property _t
-         * @type Number
-         * @private
-         */
-        this._t = 0;
-
-        /**
-         * List of display objects that are actively being managed by the MovieClip.
-         * @property _managed
-         * @type Object
-         * @private
-         */
-        this._managed = {};
-    }
-    var p = createjs.extend(MovieClip, createjs.Container);
-
-
-    // constants:
-    /**
-     * The MovieClip will advance independently of its parent, even if its parent is paused.
-     * This is the default mode.
-     * @property INDEPENDENT
-     * @static
-     * @type String
-     * @default "independent"
-     * @readonly
-     **/
-    MovieClip.INDEPENDENT = "independent";
-
-    /**
-     * The MovieClip will only display a single frame (as determined by the startPosition property).
-     * @property SINGLE_FRAME
-     * @static
-     * @type String
-     * @default "single"
-     * @readonly
-     **/
-    MovieClip.SINGLE_FRAME = "single";
-
-    /**
-     * The MovieClip will be advanced only when its parent advances and will be synched to the position of
-     * the parent MovieClip.
-     * @property SYNCHED
-     * @static
-     * @type String
-     * @default "synched"
-     * @readonly
-     **/
-    MovieClip.SYNCHED = "synched";
-
-
-    // static properties:
-    MovieClip.inited = false;
-
-
-    // static methods:
-    MovieClip.init = function () {
-        if (MovieClip.inited) { return; }
-        // plugins introduce some overhead to Tween, so we only install this if an MC is instantiated.
-        MovieClipPlugin.install();
-        MovieClip.inited = true;
-    };
-
-
-    // getter / setters:
-    /**
-     * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
-     * @method _getLabels
-     * @protected
-     * @return {Array}
-     **/
-    p._getLabels = function () {
-        return this.timeline.getLabels();
-    };
-    // MovieClip.getLabels is @deprecated. Remove for 1.1+
-    p.getLabels = createjs.deprecate(p._getLabels, "MovieClip.getLabels");
-
-    /**
-     * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
-     * @method _getCurrentLabel
-     * @protected
-     * @return {String}
-     **/
-    p._getCurrentLabel = function () {
-        return this.timeline.currentLabel;
-    };
-    // MovieClip.getCurrentLabel is @deprecated. Remove for 1.1+
-    p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "MovieClip.getCurrentLabel");
-
-    /**
-     * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
-     * @method _getDuration
-     * @protected
-     * @return {Number}
-     **/
-    p._getDuration = function () {
-        return this.timeline.duration;
-    };
-    // MovieClip.getDuration is @deprecated. Remove for 1.1+
-    p.getDuration = createjs.deprecate(p._getDuration, "MovieClip.getDuration");
-
-    /**
-     * Returns an array of objects with label and position (aka frame) properties, sorted by position.
-     * @property labels
-     * @type {Array}
-     * @readonly
-     **/
-
-    /**
-     * Returns the name of the label on or immediately before the current frame.
-     * @property currentLabel
-     * @type {String}
-     * @readonly
-     **/
-
-    /**
-     * Returns the duration of this MovieClip in seconds or ticks.
-     * @property totalFrames
-     * @type {Number}
-     * @readonly
-     **/
-
-    /**
-     * Returns the duration of this MovieClip in seconds or ticks.
-     * @property duration
-     * @type {Number}
-     * @readonly
-     **/
-    try {
-        Object.defineProperties(p, {
-            labels: { get: p._getLabels },
-            currentLabel: { get: p._getCurrentLabel },
-            totalFrames: { get: p._getDuration },
-            duration: { get: p._getDuration }
-            // TODO: can we just proxy .currentFrame to tl.position as well? Ditto for .loop (or just remove entirely).
-        });
-    } catch (e) { }
-
-
-    // public methods:
-    /**
-     * Constructor alias for backwards compatibility. This method will be removed in future versions.
-     * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
-     * @method initialize
-     * @deprecated in favour of `createjs.promote()`
-     **/
-    p.initialize = MovieClip; // TODO: Deprecated. This is for backwards support of Adobe Flash/Animate
-
-    /**
-     * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
-     * This does not account for whether it would be visible within the boundaries of the stage.
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method isVisible
-     * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
-     **/
-    p.isVisible = function () {
-        // children are placed in draw, so we can't determine if we have content.
-        return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
-    };
-
-    /**
-     * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
-     * Returns true if the draw was handled (useful for overriding functionality).
-     * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-     * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
-     * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-     * into itself).
-     **/
-    p.draw = function (ctx, ignoreCache) {
-        // draw to cache first:
-        if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
-        this._updateState();
-        this.Container_draw(ctx, ignoreCache);
-        return true;
-    };
-
-    /**
-     * Sets paused to false.
-     * @method play
-     **/
-    p.play = function () {
-        this.paused = false;
-    };
-
-    /**
-     * Sets paused to true.
-     * @method stop
-     **/
-    p.stop = function () {
-        this.paused = true;
-    };
-
-    /**
-     * Advances this movie clip to the specified position or label and sets paused to false.
-     * @method gotoAndPlay
-     * @param {String|Number} positionOrLabel The animation name or frame number to go to.
-     **/
-    p.gotoAndPlay = function (positionOrLabel) {
-        this.paused = false;
-        this._goto(positionOrLabel);
-    };
-
-    /**
-     * Advances this movie clip to the specified position or label and sets paused to true.
-     * @method gotoAndStop
-     * @param {String|Number} positionOrLabel The animation or frame name to go to.
-     **/
-    p.gotoAndStop = function (positionOrLabel) {
-        this.paused = true;
-        this._goto(positionOrLabel);
-    };
-
-    /**
-     * Advances the playhead. This occurs automatically each tick by default.
-     * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set.
-     * @method advance
-    */
-    p.advance = function (time) {
-        var independent = MovieClip.INDEPENDENT;
-        if (this.mode !== independent) { return; } // update happens in draw for synched clips
-
-        // if this MC doesn't have a framerate, hunt ancestors for one:
-        var o = this, fps = o.framerate;
-        while ((o = o.parent) && fps === null) { if (o.mode === independent) { fps = o._framerate; } }
-        this._framerate = fps;
-
-        if (this.paused) { return; }
-
-        // calculate how many frames to advance:
-        var t = (fps !== null && fps !== -1 && time !== null) ? time / (1000 / fps) + this._t : 1;
-        var frames = t | 0;
-        this._t = t - frames; // leftover time, save to add to next advance.
-
-        while (frames--) { this._updateTimeline(this._rawPosition + 1, false); }
-    };
-
-    /**
-     * MovieClip instances cannot be cloned.
-     * @method clone
-     **/
-    p.clone = function () {
-        // TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
-        throw ("MovieClip cannot be cloned.");
-    };
-
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     **/
-    p.toString = function () {
-        return "[MovieClip (name=" + this.name + ")]";
-    };
-
-
-    // private methods:
-    /**
-     * Docced in superclass.
-     **/
-    p._updateState = function () {
-        if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
-    };
-
-    /**
-     * @method _tick
-     * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
-     * function.
-     * @protected
-     **/
-    p._tick = function (evtObj) {
-        this.advance(evtObj && evtObj.delta);
-        this.Container__tick(evtObj);
-    };
-
-    /**
-     * @method _goto
-     * @param {String|Number} positionOrLabel The animation name or frame number to go to.
-     * @protected
-     **/
-    p._goto = function (positionOrLabel) {
-        var pos = this.timeline.resolve(positionOrLabel);
-        if (pos == null) { return; }
-        this._t = 0;
-        this._updateTimeline(pos, true);
-    };
-
-    /**
-     * @method _reset
-     * @private
-     **/
-    p._reset = function () {
-        this._rawPosition = -1;
-        this._t = this.currentFrame = 0;
-        this.paused = false;
-    };
-
-    /**
-     * @method _updateTimeline
-     * @param {Boolean} jump Indicates whether this update is due to jumping (via gotoAndXX) to a new position.
-     * @protected
-     **/
-    p._updateTimeline = function (rawPosition, jump) {
-        var synced = this.mode !== MovieClip.INDEPENDENT, tl = this.timeline;
-        if (synced) { rawPosition = this.startPosition + (this.mode === MovieClip.SINGLE_FRAME ? 0 : this._synchOffset); }
-        if (rawPosition < 0) { rawPosition = 0; }
-        if (this._rawPosition === rawPosition && !synced) { return; }
-        this._rawPosition = rawPosition;
-
-        // update timeline position, ignoring actions if this is a graphic.
-        tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
-        tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._bound_resolveState);
-    };
-
-    /**
-     * Renders position 0 without running actions or updating _rawPosition.
-     * Primarily used by Animate CC to build out the first frame in the constructor of MC symbols.
-     * NOTE: not tested when run after the MC advances past the first frame.
-     * @method _renderFirstFrame
-     * @protected
-     **/
-    p._renderFirstFrame = function () {
-        var tl = this.timeline, pos = tl.rawPosition;
-        tl.setPosition(0, true, true, this._bound_resolveState);
-        tl.rawPosition = pos;
-    };
-
-    /**
-     * Runs via a callback after timeline property updates and before actions.
-     * @method _resolveState
-     * @protected
-     **/
-    p._resolveState = function () {
-        var tl = this.timeline;
-        this.currentFrame = tl.position;
-
-        for (var n in this._managed) { this._managed[ n ] = 1; }
-
-        var tweens = tl.tweens;
-        for (var i = 0, l = tweens.length; i < l; i++) {
-            var tween = tweens[ i ], target = tween.target;
-            if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. There's likely a better approach.
-            var offset = tween._stepPosition;
-
-            if (target instanceof createjs.DisplayObject) {
-                // motion tween.
-                this._addManagedChild(target, offset);
-            } else {
-                // state tween.
-                this._setState(target.state, offset);
-            }
-        }
-
-        var kids = this.children;
-        for (i = kids.length - 1; i >= 0; i--) {
-            var id = kids[ i ].id;
-            if (this._managed[ id ] === 1) {
-                this.removeChildAt(i);
-                delete (this._managed[ id ]);
-            }
-        }
-    };
-
-    /**
-     * @method _setState
-     * @param {Array} state
-     * @param {Number} offset
-     * @protected
-     **/
-    p._setState = function (state, offset) {
-        if (!state) { return; }
-        for (var i = state.length - 1; i >= 0; i--) {
-            var o = state[ i ];
-            var target = o.t;
-            var props = o.p;
-            for (var n in props) { target[ n ] = props[ n ]; }
-            this._addManagedChild(target, offset);
-        }
-    };
-
-    /**
-     * Adds a child to the timeline, and sets it up as a managed child.
-     * @method _addManagedChild
-     * @param {MovieClip} child The child MovieClip to manage
-     * @param {Number} offset
-     * @private
-     **/
-    p._addManagedChild = function (child, offset) {
-        if (child._off) { return; }
-        this.addChildAt(child, 0);
-
-        if (child instanceof MovieClip) {
-            child._synchOffset = offset;
-            // TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
-            // TODO: should also reset when MovieClip loops, though that will be a bit tricky to detect.
-            if (child.mode === MovieClip.INDEPENDENT && child.autoReset && (!this._managed[ child.id ])) { child._reset(); }
-        }
-        this._managed[ child.id ] = 2;
-    };
-
-    /**
-     * @method _getBounds
-     * @param {Matrix2D} matrix
-     * @param {Boolean} ignoreTransform
-     * @return {Rectangle}
-     * @protected
-     **/
-    p._getBounds = function (matrix, ignoreTransform) {
-        var bounds = this.DisplayObject_getBounds();
-        if (!bounds) {
-            if (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[ this.currentFrame ]); }
-        }
-        if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
-        return this.Container__getBounds(matrix, ignoreTransform);
-    };
-
-
-    createjs.MovieClip = createjs.promote(MovieClip, "Container");
-
-
-
-    // MovieClipPlugin for TweenJS:
-    /**
-     * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
-     * property from tweening.
-     * @private
-     * @class MovieClipPlugin
-     * @constructor
-     **/
-    function MovieClipPlugin() {
-        throw ("MovieClipPlugin cannot be instantiated.")
-    }
-
-    /**
-     * @property priority
-     * @type {Number}
-     * @static
-     * @readonly
-     **/
-    MovieClipPlugin.priority = 100; // very high priority, should run first
-
-    /**
-     * @property ID
-     * @type {String}
-     * @static
-     * @readonly
-     **/
-    MovieClipPlugin.ID = "MovieClip";
-
-    /**
-     * @method install
-     * @static
-     **/
-    MovieClipPlugin.install = function () {
-        createjs.Tween._installPlugin(MovieClipPlugin);
-    };
-
-    /**
-     * @method init
-     * @param {Tween} tween
-     * @param {String} prop
-     * @param {*} value
-     * @static
-     **/
-    MovieClipPlugin.init = function (tween, prop, value) {
-        if (prop === "startPosition" && tween.target instanceof MovieClip) { tween._addPlugin(MovieClipPlugin); }
-    };
-
-    /**
-     * @method step
-     * @param {Tween} tween
-     * @param {TweenStep} step
-     * @param {Object} props
-     * @static
-     **/
-    MovieClipPlugin.step = function (tween, step, props) { };
-
-    /**
-     * @method change
-     * @param {Tween} tween
-     * @param {TweenStep} step
-     * @param {*} value
-     * @param {Number} ratio
-     * @param {Object} end
-     * @return {*}
-     * @static
-     */
-    MovieClipPlugin.change = function (tween, step, prop, value, ratio, end) {
-        if (prop === "startPosition") { return (ratio === 1 ? step.props[ prop ] : step.prev.props[ prop ]); }
-    };
+this.createjs = this.createjs||{};
+
+(function() {
+	"use strict";
+
+
+// constructor:
+	/**
+	 * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
+	 * you to create objects which encapsulate timeline animations, state changes, and synched actions. The MovieClip
+	 * class has been included in the EaselJS minified file since 0.7.0.
+	 *
+	 * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
+	 * been made to support time-based timelines in the future.
+	 *
+	 * <h4>Example</h4>
+	 * This example animates two shapes back and forth. The grey shape starts on the left, but we jump to a mid-point in
+	 * the animation using {{#crossLink "MovieClip/gotoAndPlay"}}{{/crossLink}}.
+	 *
+	 *      var stage = new createjs.Stage("canvas");
+	 *      createjs.Ticker.addEventListener("tick", stage);
+	 *
+	 *      var mc = new createjs.MovieClip({loop:-1, labels:{myLabel:20}});
+	 *      stage.addChild(mc);
+	 *
+	 *      var child1 = new createjs.Shape(
+	 *          new createjs.Graphics().beginFill("#999999")
+	 *              .drawCircle(30,30,30));
+	 *      var child2 = new createjs.Shape(
+	 *          new createjs.Graphics().beginFill("#5a9cfb")
+	 *              .drawCircle(30,30,30));
+	 *
+	 *      mc.timeline.addTween(
+	 *          createjs.Tween.get(child1)
+	 *              .to({x:0}).to({x:60}, 50).to({x:0}, 50));
+	 *      mc.timeline.addTween(
+	 *          createjs.Tween.get(child2)
+	 *              .to({x:60}).to({x:0}, 50).to({x:60}, 50));
+	 *
+	 *      mc.gotoAndPlay("start");
+	 *
+	 * It is recommended to use `tween.to()` to animate and set properties (use no duration to have it set
+	 * immediately), and the `tween.wait()`method to create delays between animations. Note that using the
+	 * `tween.set()` method to affect properties will likely not provide the desired result.
+	 *
+	 * @class MovieClip
+	 * @main MovieClip
+	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{mode:MovieClip.SYNCHED}`).
+	 * Supported props for the MovieClip are listed below. These props are set on the corresponding instance properties
+	 * except where specified.<UL>
+	 *    <LI> `mode`</LI>
+	 *    <LI> `startPosition`</LI>
+	 *    <LI> `frameBounds`</LI>
+	 * </UL>
+	 * 
+	 * This object will also be passed into the Timeline instance associated with this MovieClip. See the documentation
+	 * for Timeline for a list of supported props (ex. `paused`, `labels`, `loop`, `reversed`, etc.)
+	 * @extends Container
+	 * @constructor
+	 **/
+	function MovieClip(props) {
+		this.Container_constructor();
+		!MovieClip.inited&&MovieClip.init(); // static init
+		
+		var mode, startPosition, loop, labels;
+		
+		// handle old params (mode, startPosition, loop, labels):
+		// TODO: deprecated param handling:
+		if (props instanceof String || arguments.length > 1) {
+			mode = props;
+			startPosition = arguments[1];
+			loop = arguments[2];
+			labels = arguments[3];
+			if (loop == null) { loop = -1; }
+			props = null;
+		} else if (props) {
+			mode = props.mode;
+			startPosition = props.startPosition;
+			loop = props.loop;
+			labels = props.labels;
+		}
+		if (!props) { props = {labels:labels}; }
+		
+		
+	// public properties:
+		/**
+		 * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
+		 * See each constant for a description of the behaviour.
+		 * @property mode
+		 * @type String
+		 * @default null
+		 **/
+		this.mode = mode||MovieClip.INDEPENDENT;
+	
+		/**
+		 * Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
+		 * @property startPosition
+		 * @type Number
+		 * @default 0
+		 */
+		this.startPosition = startPosition||0;
+	
+		/**
+		 * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
+		 * 1 would cause it to loop once (ie. play a total of twice).
+		 * @property loop
+		 * @type Number
+		 * @default -1
+		 */
+		this.loop = loop === true ? -1 : (loop || 0);
+	
+		/**
+		 * The current frame of the movieclip.
+		 * @property currentFrame
+		 * @type Number
+		 * @default 0
+		 * @readonly
+		 */
+		this.currentFrame = 0;
+	
+		/**
+		 * If true, the MovieClip's position will not advance when ticked.
+		 * @property paused
+		 * @type Boolean
+		 * @default false
+		 */
+		this.paused = props.paused||false;
+	
+		/**
+		 * If true, actions in this MovieClip's tweens will be run when the playhead advances.
+		 * @property actionsEnabled
+		 * @type Boolean
+		 * @default true
+		 */
+		this.actionsEnabled = true;
+	
+		/**
+		 * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
+		 * it back onto the display list. This only applies to MovieClip instances with `mode` of "INDEPENDENT".
+
+		 * For example, if you had a character animation with a "body" child MovieClip instance with different costumes
+		 * on each frame, you could set `body.autoReset = false`, so that you can manually change the frame it is on,
+		 * without worrying that it will be reset automatically.
+		 * @property autoReset
+		 * @type Boolean
+		 * @default true
+		 */
+		this.autoReset = true;
+		
+		/**
+		 * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
+		 * @property frameBounds
+		 * @type Array
+		 * @default null
+		 */
+		this.frameBounds = this.frameBounds||props.frameBounds; // frameBounds are set on the prototype in Animate.
+		
+		/**
+		 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
+		 * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
+		 * framerate.
+		 *
+		 * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
+		 * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
+		 * vary slightly between frames.
+		 *
+		 * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
+		 * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+		 * @property framerate
+		 * @type {Number}
+		 * @default null
+		 **/
+		this.framerate = null;
+		
+		// set up the needed props for Timeline:
+		props.useTicks = props.paused = true;
+		
+		/**
+		 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
+		 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+		 * instances to the timeline.
+		 *
+		 * <h4>Example</h4>
+		 *
+		 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+		 *      var mc = new createjs.MovieClip();
+		 *      mc.timeline.addTween(tween);
+		 *
+		 * Elements can be added and removed from the timeline by toggling an "_off" property
+		 * using the `tweenInstance.to()` method. Note that using `Tween.set` is not recommended to create MovieClip
+		 * animations. The following example will toggle the target off on frame 0, and then back on for frame 1. You
+		 * can use the "visible" property to achieve the same effect.
+		 *
+		 *      var tween = createjs.Tween.get(target).to({_off:false})
+		 *          .wait(1).to({_off:true})
+		 *          .wait(1).to({_off:false});
+		 *
+		 * @property timeline
+		 * @type Timeline
+		 * @default null
+		 */
+		this.timeline = new createjs.Timeline(props);
+		
+		
+	// private properties:
+		/**
+		 * @property _synchOffset
+		 * @type Number
+		 * @default 0
+		 * @private
+		 */
+		this._synchOffset = 0;
+	
+		/**
+		 * @property _rawPosition
+		 * @type Number
+		 * @default -1
+		 * @private
+		 */
+		this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
+		
+		/**
+		 * @property _bound_resolveState
+		 * @type Function
+		 * @private
+		 */
+		this._bound_resolveState = this._resolveState.bind(this);
+	
+	
+		/**
+		 * The time remaining from the previous tick, only applicable when .framerate is set.
+		 * @property _t
+		 * @type Number
+		 * @private
+		 */
+		this._t = 0;
+	
+		/**
+		 * List of display objects that are actively being managed by the MovieClip.
+		 * @property _managed
+		 * @type Object
+		 * @private
+		 */
+		this._managed = {};
+	}
+	var p = createjs.extend(MovieClip, createjs.Container);
+
+
+// constants:
+	/**
+	 * The MovieClip will advance independently of its parent, even if its parent is paused.
+	 * This is the default mode.
+	 * @property INDEPENDENT
+	 * @static
+	 * @type String
+	 * @default "independent"
+	 * @readonly
+	 **/
+	MovieClip.INDEPENDENT = "independent";
+
+	/**
+	 * The MovieClip will only display a single frame (as determined by the startPosition property).
+	 * @property SINGLE_FRAME
+	 * @static
+	 * @type String
+	 * @default "single"
+	 * @readonly
+	 **/
+	MovieClip.SINGLE_FRAME = "single";
+
+	/**
+	 * The MovieClip will be advanced only when its parent advances and will be synched to the position of
+	 * the parent MovieClip.
+	 * @property SYNCHED
+	 * @static
+	 * @type String
+	 * @default "synched"
+	 * @readonly
+	 **/
+	MovieClip.SYNCHED = "synched";
+	
+	
+// static properties:
+	MovieClip.inited = false;
+	
+	
+// static methods:
+	MovieClip.init = function() {
+		if (MovieClip.inited) { return; }
+		// plugins introduce some overhead to Tween, so we only install this if an MC is instantiated.
+		MovieClipPlugin.install();
+		MovieClip.inited = true;
+	};
+	
+	
+// getter / setters:
+	/**
+	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
+	 * @method _getLabels
+	 * @protected
+	 * @return {Array}
+	 **/
+	p._getLabels = function() {
+		return this.timeline.getLabels();
+	};
+
+	/**
+	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
+	 * @method getLabels
+	 * @deprecated
+	 */
+	// MovieClip.getLabels is @deprecated. Remove for 1.1+
+	p.getLabels = createjs.deprecate(p._getLabels, "MovieClip.getLabels");
+
+	/**
+	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
+	 * @method _getCurrentLabel
+	 * @protected
+	 * @return {String}
+	 **/
+	p._getCurrentLabel = function() {
+		return this.timeline.currentLabel;
+	};
+
+	/**
+	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
+	 * @method getCurrentLabel
+	 * @deprecated
+	 */
+	// MovieClip.getCurrentLabel is @deprecated. Remove for 1.1+
+	p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "MovieClip.getCurrentLabel");
+
+	/**
+	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
+	 * @method _getDuration
+	 * @protected
+	 * @return {Number}
+	 **/
+	p._getDuration = function() {
+		return this.timeline.duration;
+	};
+
+	/**
+	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
+	 * @method getDuration
+	 * @deprecated
+	 */
+	// MovieClip.getDuration is @deprecated. Remove for 1.1+
+	p.getDuration = createjs.deprecate(p._getDuration, "MovieClip.getDuration");
+
+	/**
+	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
+	 * @property labels
+	 * @type {Array}
+	 * @readonly
+	 **/
+	
+	/**
+	 * Returns the name of the label on or immediately before the current frame.
+	 * @property currentLabel
+	 * @type {String}
+	 * @readonly
+	 **/
+	
+	/**
+	 * Returns the duration of this MovieClip in seconds or ticks.
+	 * @property totalFrames
+	 * @type {Number}
+	 * @readonly
+	 **/
+	
+	/**
+	 * Returns the duration of this MovieClip in seconds or ticks.
+	 * @property duration
+	 * @type {Number}
+	 * @readonly
+	 **/
+	try {
+		Object.defineProperties(p, {
+			labels: { get: p._getLabels },
+			currentLabel: { get: p._getCurrentLabel },
+			totalFrames: { get: p._getDuration },
+			duration: { get: p._getDuration }
+			// TODO: can we just proxy .currentFrame to tl.position as well? Ditto for .loop (or just remove entirely).
+		});
+	} catch (e) {}
+
+
+// public methods:
+	/**
+	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
+	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and
+	 * {{#crossLink "Utility Methods/promote"}}{{/crossLink}} instead.
+	 * @method initialize
+	 * @deprecated
+	 **/
+	p.initialize = MovieClip; // TODO: Deprecated. This is for backwards support of Adobe Flash/Animate
+
+	/**
+	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
+	 * This does not account for whether it would be visible within the boundaries of the stage.
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method isVisible
+	 * @return {Boolean} Boolean indicating whether the display object would be visible if drawn to a canvas
+	 **/
+	p.isVisible = function() {
+		// children are placed in draw, so we can't determine if we have content.
+		return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0);
+	};
+
+	/**
+	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
+	 * Returns true if the draw was handled (useful for overriding functionality).
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 * @param {Boolean} ignoreCache Indicates whether the draw operation should ignore any current cache.
+	 * For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
+	 * into itself).
+	 **/
+	p.draw = function(ctx, ignoreCache) {
+		// draw to cache first:
+		if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+		this._updateState();
+		this.Container_draw(ctx, ignoreCache);
+		return true;
+	};
+
+	/**
+	 * Sets paused to false.
+	 * @method play
+	 **/
+	p.play = function() {
+		this.paused = false;
+	};
+	
+	/**
+	 * Sets paused to true.
+	 * @method stop
+	 **/
+	p.stop = function() {
+		this.paused = true;
+	};
+	
+	/**
+	 * Advances this movie clip to the specified position or label and sets paused to false.
+	 * @method gotoAndPlay
+	 * @param {String|Number} positionOrLabel The animation name or frame number to go to.
+	 **/
+	p.gotoAndPlay = function(positionOrLabel) {
+		this.paused = false;
+		this._goto(positionOrLabel);
+	};
+	
+	/**
+	 * Advances this movie clip to the specified position or label and sets paused to true.
+	 * @method gotoAndStop
+	 * @param {String|Number} positionOrLabel The animation or frame name to go to.
+	 **/
+	p.gotoAndStop = function(positionOrLabel) {
+		this.paused = true;
+		this._goto(positionOrLabel);
+	};
+	
+	/**
+	 * Advances the playhead. This occurs automatically each tick by default.
+	 * @param [time] {Number} The amount of time in ms to advance by. Only applicable if framerate is set.
+	 * @method advance
+	*/
+	p.advance = function(time) {
+		var independent = MovieClip.INDEPENDENT;
+		if (this.mode !== independent) { return; } // update happens in draw for synched clips
+		
+		// if this MC doesn't have a framerate, hunt ancestors for one:
+		var o=this, fps = o.framerate;
+		while ((o = o.parent) && fps === null) { if (o.mode === independent) { fps = o._framerate; } }
+		this._framerate = fps;
+		
+		// calculate how many frames to advance:
+		var t = (fps !== null && fps !== -1 && time !== null) ? time/(1000/fps) + this._t : 1;
+		var frames = t|0;
+		this._t = t-frames; // leftover time, save to add to next advance.
+		
+		while (!this.paused && frames--) { this._updateTimeline(this._rawPosition+1, false); }
+	};
+	
+	/**
+	 * MovieClip instances cannot be cloned.
+	 * @method clone
+	 **/
+	p.clone = function() {
+		// TODO: add support for this? Need to clone the Timeline & retarget tweens - pretty complex.
+		throw("MovieClip cannot be cloned.");
+	};
+	
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function() {
+		return "[MovieClip (name="+  this.name +")]";
+	};
+
+
+// private methods:
+	p._updateState = function() {
+		if (this._rawPosition === -1 || this.mode !== MovieClip.INDEPENDENT) { this._updateTimeline(-1); }
+	};
+
+	/**
+	 * @method _tick
+	 * @param {Object} evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
+	 * function.
+	 * @protected
+	 **/
+	p._tick = function(evtObj) {
+		this.advance(evtObj&&evtObj.delta);
+		this.Container__tick(evtObj);
+	};
+	
+	/**
+	 * @method _goto
+	 * @param {String|Number} positionOrLabel The animation name or frame number to go to.
+	 * @protected
+	 **/
+	p._goto = function(positionOrLabel) {
+		var pos = this.timeline.resolve(positionOrLabel);
+		if (pos == null) { return; }
+		this._t = 0;
+		this._updateTimeline(pos, true);
+	};
+	
+	/**
+	 * @method _reset
+	 * @private
+	 **/
+	p._reset = function() {
+		this._rawPosition = -1;
+		this._t = this.currentFrame = 0;
+		this.paused = false;
+	};
+	
+	/**
+	 * @method _updateTimeline
+	 * @param {Boolean} jump Indicates whether this update is due to jumping (via gotoAndXX) to a new position.
+	 * @protected
+	 **/
+	p._updateTimeline = function(rawPosition, jump) {
+		var synced = this.mode !== MovieClip.INDEPENDENT, tl = this.timeline;
+		if (synced) { rawPosition = this.startPosition + (this.mode===MovieClip.SINGLE_FRAME?0:this._synchOffset); }
+		if (rawPosition < 0) { rawPosition = 0; }
+		if (this._rawPosition === rawPosition && !synced) { return; }
+		this._rawPosition = rawPosition;
+		
+		// update timeline position, ignoring actions if this is a graphic.
+		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
+		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._bound_resolveState);
+	};
+	
+	/**
+	 * Renders position 0 without running actions or updating _rawPosition.
+	 * Primarily used by Animate CC to build out the first frame in the constructor of MC symbols.
+	 * NOTE: not tested when run after the MC advances past the first frame.
+	 * @method _renderFirstFrame
+	 * @protected
+	 **/
+	p._renderFirstFrame = function() {
+		var tl = this.timeline, pos = tl.rawPosition;
+		tl.setPosition(0, true, true, this._bound_resolveState);
+		tl.rawPosition = pos;
+	};
+	
+	/**
+	 * Runs via a callback after timeline property updates and before actions.
+	 * @method _resolveState
+	 * @protected
+	 **/
+	p._resolveState = function() {
+		var tl = this.timeline;
+		this.currentFrame = tl.position;
+		
+		for (var n in this._managed) { this._managed[n] = 1; }
+
+		var tweens = tl.tweens;
+		for (var i=0, l=tweens.length; i<l; i++) {
+			var tween = tweens[i],  target = tween.target;
+			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. There's likely a better approach.
+			var offset = tween._stepPosition;
+
+			if (target instanceof createjs.DisplayObject) {
+				// motion tween.
+				this._addManagedChild(target, offset);
+			} else {
+				// state tween.
+				this._setState(target.state, offset);
+			}
+		}
+
+		var kids = this.children;
+		for (i=kids.length-1; i>=0; i--) {
+			var id = kids[i].id;
+			if (this._managed[id] === 1) {
+				this.removeChildAt(i);
+				delete(this._managed[id]);
+			}
+		}
+	};
+
+	/**
+	 * @method _setState
+	 * @param {Array} state
+	 * @param {Number} offset
+	 * @protected
+	 **/
+	p._setState = function(state, offset) {
+		if (!state) { return; }
+		for (var i=state.length-1;i>=0;i--) {
+			var o = state[i];
+			var target = o.t;
+			var props = o.p;
+			for (var n in props) { target[n] = props[n]; }
+			this._addManagedChild(target, offset);
+		}
+	};
+
+	/**
+	 * Adds a child to the timeline, and sets it up as a managed child.
+	 * @method _addManagedChild
+	 * @param {MovieClip} child The child MovieClip to manage
+	 * @param {Number} offset
+	 * @private
+	 **/
+	p._addManagedChild = function(child, offset) {
+		if (child._off) { return; }
+		this.addChildAt(child,0);
+
+		if (child instanceof MovieClip) {
+			child._synchOffset = offset;
+			// TODO: this does not precisely match Adobe Flash/Animate, which loses track of the clip if it is renamed or removed from the timeline, which causes it to reset.
+			// TODO: should also reset when MovieClip loops, though that will be a bit tricky to detect.
+			if (child.mode === MovieClip.INDEPENDENT && child.autoReset && (!this._managed[child.id])) { child._reset(); }
+		}
+		this._managed[child.id] = 2;
+	};
+	
+	/**
+	 * @method _getBounds
+	 * @param {Matrix2D} matrix
+	 * @param {Boolean} ignoreTransform
+	 * @return {Rectangle}
+	 * @protected
+	 **/
+	p._getBounds = function(matrix, ignoreTransform) {
+		var bounds = this.DisplayObject_getBounds();
+		if (!bounds) {
+			if (this.frameBounds) { bounds = this._rectangle.copy(this.frameBounds[this.currentFrame]); }
+		}
+		if (bounds) { return this._transformBounds(bounds, matrix, ignoreTransform); }
+		return this.Container__getBounds(matrix, ignoreTransform);
+	};
+
+
+	createjs.MovieClip = createjs.promote(MovieClip, "Container");
+
+
+
+// MovieClipPlugin for TweenJS:
+	/**
+	 * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
+	 * property from tweening.
+	 * @private
+	 * @class MovieClipPlugin
+	 * @constructor
+	 **/
+	function MovieClipPlugin() {
+		throw("MovieClipPlugin cannot be instantiated.")
+	}
+	
+	/**
+	 * @property priority
+	 * @type {Number}
+	 * @static
+	 * @readonly
+	 **/
+	MovieClipPlugin.priority = 100; // very high priority, should run first
+	
+	/**
+	 * @property ID
+	 * @type {String}
+	 * @static
+	 * @readonly
+	 **/
+	MovieClipPlugin.ID = "MovieClip";
+
+	/**
+	 * @method install
+	 * @static
+	 **/
+	MovieClipPlugin.install = function() {
+		createjs.Tween._installPlugin(MovieClipPlugin);
+	};
+	
+	/**
+	 * @method init
+	 * @param {Tween} tween
+	 * @param {String} prop
+	 * @param {*} value
+	 * @static
+	 **/
+	MovieClipPlugin.init = function(tween, prop, value) {
+		if (prop === "startPosition" && tween.target instanceof MovieClip) { tween._addPlugin(MovieClipPlugin); }
+	};
+	
+	/**
+	 * @method step
+	 * @param {Tween} tween
+	 * @param {TweenStep} step
+	 * @param {Object} props
+	 * @static
+	 **/
+	MovieClipPlugin.step = function(tween, step, props) {};
+
+	/**
+	 * @method change
+	 * @param {Tween} tween
+	 * @param {TweenStep} step
+	 * @param {*} value
+	 * @param {Number} ratio
+	 * @param {Object} end
+	 * @return {*}
+	 * @static
+	 */
+	MovieClipPlugin.change = function(tween, step, prop, value, ratio, end) {
+		if (prop === "startPosition") { return (ratio === 1 ? step.props[prop] : step.prev.props[prop]); }
+	};
 
 }());
 
@@ -14980,711 +15060,678 @@ this.createjs = this.createjs || {};
 // BitmapCache.js
 //##############################################################################
 
-/*
-* Filter
-* Visit http://createjs.com/ for documentation, updates and examples.
-*
-* Copyright (c) 2010 gskinner.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-*/
-
-/**
- * @module EaselJS
- */
-
-// namespace:
-this.createjs = this.createjs || {};
-
-(function () {
-    "use strict";
-
-    // constructor:
-    /**
-     * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache"
-     * an object. This information and functionality used to be located on a {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
-     * method in {{#crossLink "DisplayObject"}}{{/crossLink}}, but was moved to its own class.
-     *
-     * Caching in this context is purely visual, and will render the DisplayObject out into an image to be used instead
-     * of the object. The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}}.
-     * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing
-     * a cache as it is already a single image. Caching is best done on containers containing multiple complex parts that
-     * do not move often, so that rendering the image instead will improve overall rendering speed. A cached object will
-     * not visually update until explicitly told to do so with a call to update, much like a Stage. If a cache is being
-     * updated every frame it is likely not improving rendering performance. Cache are best used when updates will be sparse.
-     *
-     * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need,
-     * and to physically enable some effects. The BitmapCache is also responsible for applying filters to objects and
-     * reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship. Real-time Filters are not recommended
-     * performance wise when dealing with a Context2D canvas. On a StageGL performance is better so the presence of a
-     * filter will automatically create a cache if one is not made manually.
-     *
-     * Some visual effects can be achieved with a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
-     * so check out that setting before settling on a filter.
-     * @class BitmapCache
-     * @constructor
-     **/
-    function BitmapCache() {
-
-        // public:
-        /**
-         * Width of the cache relative to the target object.
-         * @property width
-         * @protected
-         * @type {Number}
-         * @default undefined
-         **/
-        this.width = undefined;
-
-        /**
-         * Height of the cache relative to the target object.
-         * @property height
-         * @protected
-         * @type {Number}
-         * @default undefined
-         * @todo Should the width and height be protected?
-         **/
-        this.height = undefined;
-
-        /**
-         * Horizontal position of the cache relative to the target's origin.
-         * @property x
-         * @protected
-         * @type {Number}
-         * @default undefined
-         **/
-        this.x = undefined;
-
-        /**
-         * Vertical position of the cache relative to target's origin.
-         * @property y
-         * @protected
-         * @type {Number}
-         * @default undefined
-         **/
-        this.y = undefined;
-
-        /**
-         * The internal scale of the cache image, does not affects display size. This is useful to both increase and
-         * decrease render quality. Objects with increased scales are more likely to look good when scaled up or rotated.
-         * Objects with decreased scales can save on rendering performance.
-         * @property scale
-         * @protected
-         * @type {Number}
-         * @default 1
-         **/
-        this.scale = 1;
-
-        /**
-         * The x offset used for drawing into the cache itself, accounts for both transforms applied.
-         * @property offX
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this.offX = 0;
-
-        /**
-         * The y offset used for drawing into the cache itself, accounts for both transforms applied.
-         * @property offY
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this.offY = 0;
-
-        /**
-         * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs.
-         * This can be useful to see if a cache has been updated.
-         * @property cacheID
-         * @type {Number}
-         * @default 0
-         **/
-        this.cacheID = 0;
-
-        // protected:
-        /**
-         * The number of filters found to process this update, used to optimize some decisions and surfaces
-         * @type {number}
-         * @private
-         */
-        this._filterCount = 0;
-
-        /**
-         * The relative offset of the filter's x position, used for drawing the cache onto its container.
-         * Re-calculated every update call before drawing.
-         * @property _filterOffY
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this._filterOffX = 0;
-
-        /**
-         * The relative offset of the filter's y position, used for drawing the cache onto its container.
-         * Re-calculated every update call before drawing.
-         * @property _filterOffY
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this._filterOffY = 0;
-
-        /**
-         * Internal tracking of the disabled state, use the getter/setters.
-         * @property _disabled
-         * @type {boolean}
-         * @protected
-         */
-        this._disabled = false;
-
-        /**
-         * Internal tracking of whether this cache was automatically created and thus automatically controlled
-         * @type {boolean}
-         * @protected
-         */
-        this._autoGenerated = false;
-
-        /**
-         * Internal tracking of intended cacheCanvas, may or may not be assigned based on disabled state.
-         * @property _cacheCanvas
-         * @type {HTMLCanvasElement | WebGLTexture | Object}
-         * @protected
-         */
-        this._cacheCanvas = null;
-
-        /**
-         * Output StageGL target for GL drawing
-         * @property _stageGL
-         * @type {StageGL}
-         * @protected
-         */
-        this._stageGL = null;
-
-        /**
-         * The cacheID when a DataURL was requested.
-         * @property _cacheDataURLID
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this._cacheDataURLID = 0;
-
-        /**
-         * The cache's DataURL, generated on-demand using the getter.
-         * @property _cacheDataURL
-         * @protected
-         * @type {String}
-         * @default null
-         **/
-        this._cacheDataURL = null;
-
-        /**
-         * Internal tracking of final bounding width, approximately width*scale; however, filters can complicate the actual value.
-         * @property _drawWidth
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this._drawWidth = 0;
-
-        /**
-         * Internal tracking of final bounding height, approximately height*scale; however, filters can complicate the actual value.
-         * @property _drawHeight
-         * @protected
-         * @type {Number}
-         * @default 0
-         **/
-        this._drawHeight = 0;
-
-        /**
-         * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation
-         * @property _boundRect
-         * @protected
-         * @type {Rectangle}
-         * @default 0
-         **/
-        this._boundRect = new createjs.Rectangle();
-
-        // semi protected: not public API but modified by other classes
-        /**
-         * Storage for the StageGL counter positioning matrix used on the object being cached
-         * @property _counterMatrix
-         * @type {Matrix2D}
-         */
-        this._counterMatrix = null;
-
-        /**
-         * One of the major render buffers used in composite blending and filter drawing. Do not expect this to always be the same object.
-         * "What you're drawing to", object occasionally swaps with concat.
-         * @property _bufferTextureOutput
-         * @type {WebGLTexture}
-         */
-        this._bufferTextureOutput = null;
-
-        /**
-         * One of the major render buffers used in composite blending and filter drawing. Do not expect this to always be the same object.
-         * "What you've draw before now", object occasionally swaps with output.
-         * @property _bufferTextureConcat
-         * @type {WebGLTexture}
-         */
-        this._bufferTextureConcat = null;
-
-        /**
-         * One of the major render buffers used only for composite blending draws.
-         * "Temporary mixing surface"
-         * @property _bufferTextureTemp
-         * @type {WebGLTexture}
-         */
-        this._bufferTextureTemp = null;
-    }
-    var p = BitmapCache.prototype;
-
-    p._get_disabled = function () {
-        return this._disabled;
-    };
-    p._set_disabled = function (value) {
-        this._disabled = !!value;
-        if (this.target) {
-            this.target.cacheCanvas = (this._disabled || this._autoGenerated) ? null : this._cacheCanvas;
-        }
-    };
-
-    try {
-        Object.defineProperties(p, {
-            /**
-             * Disable or enable the BitmapCache from displaying. Does not cause or block cache or cache updates when toggled.
-             * Best used if the cached state is always identical, but the object will need temporary uncaching.
-             * @property autoPurge
-             * @type {Boolean}
-             * @default false
-             */
-            disabled: { get: p._get_disabled, set: p._set_disabled }
-        });
-    } catch (e) { } // TODO: use Log
-
-    /**
-     * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
-     * @method getFilterBounds
-     * @param {DisplayObject} target The object to check the filter bounds for.
-     * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that object.
-     * @return {Rectangle} bounds object representing the bounds with filters.
-     * @static
-     **/
-    BitmapCache.getFilterBounds = function (target, output) {
-        if (!output) { output = new createjs.Rectangle(); }
-        var filters = target.filters;
-        var filterCount = filters && filters.length;
-        if (!!filterCount <= 0) { return output; }
-
-        for (var i = 0; i < filterCount; i++) {
-            var f = filters[ i ];
-            if (!f || !f.getBounds) { continue; }
-            var test = f.getBounds();
-            if (!test) { continue; }
-            if (i === 0) {
-                output.setValues(test.x, test.y, test.width, test.height);
-            } else {
-                output.extend(test.x, test.y, test.width, test.height);
-            }
-        }
-
-        return output;
-    };
-
-    /**
-     * Utility function, use with `displayObject.filters.reduce(BitmapCache.filterCounter, 0);`
-     * @param acc Accumulator
-     * @param o Object
-     * @returns {*}
-     */
-    BitmapCache.filterCounter = function (acc, o) {
-        var out = 1; while (o._multiPass) { o = o._multiPass; out++; } return acc + out;
-    };
-
-    // public methods:
-    /**
-     * Returns a string representation of this object.
-     * @method toString
-     * @return {String} a string representation of the instance.
-     **/
-    p.toString = function () {
-        return "[BitmapCache]";
-    };
-
-    /**
-     * Actually create the correct cache surface and properties associated with it. Caching and it's benefits are discussed
-     * by the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} function and this class description. Here are the detailed
-     * specifics of how to use the options object.
-     *
-     * - If options.useGL is set to "new" a StageGL is created and contained on this for use when rendering the cache.
-     * - If options.useGL is set to "stage" if the current stage is a StageGL it will be used. Must be added to a stage first to work.
-     * - If options.useGL is a StageGL instance then it will use it to cache. Warning, caches made on one StageGL will not render on any other StageGL.
-     * - If options.useGL is undefined a Context 2D cache will be performed.
-     *
-     * This means you can use any combination of StageGL and 2D with either, neither, or both the stage and cache being
-     * WebGL. Using "new" with a StageGL display list is highly unrecommended, but still an option. It should be avoided
-     * due to negative performance reasons and the Image loading limitation noted in the class complications above.
-     *
-     * When "options.useGL" is set to the parent stage of the target and WebGL, performance is increased by using
-     * "RenderTextures" instead of canvas elements. These are internal Textures on the graphics card stored in the GPU.
-     * Because they are no longer canvases you cannot perform operations you could with a regular canvas. The benefit
-     * is that this avoids the slowdown of copying the texture back and forth from the GPU to a Canvas element.
-     * This means "stage" is the recommended option when available.
-     *
-     * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw, i.e. do not use a
-     * WebGL context cache when caching a Shape, Text, etc.
-     * <h4>WebGL cache with a 2D context</h4>
-     *
-     *     var stage = new createjs.Stage();
-     *     var bmp = new createjs.Bitmap(src);
-     *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "new"});          // no StageGL to use, so make one
-     *
-     *     var shape = new createjs.Shape();
-     *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
-     *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
-     *
-     * <h4>WebGL cache with a WebGL context</h4>
-     *
-     *     var stageGL = new createjs.StageGL();
-     *     var bmp = new createjs.Bitmap(src);
-     *
-     *     // option 1
-     *     stageGL.addChild(bmp);
-     *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "stage"});       // when added to the display list we can look it up
-     *     // option 2
-     *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: stageGL});       // we can specify it explicitly if we add it later
-     *     stageGL.addChild(bmp);
-     *
-     *     var shape = new createjs.Shape();
-     *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
-     *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
-     *
-     * You may wish to create your own StageGL instance to control factors like clear color, transparency, AA, and
-     * others. If the specified stage is not rendering content and just the cache set{{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}}
-     * to true on your instance. This will trigger it to behave correctly for rendering your output.
-     *
-     * @public
-     * @method define
-     * @param {Number} x The x coordinate origin for the cache region.
-     * @param {Number} y The y coordinate origin for the cache region.
-     * @param {Number} width The width of the cache region.
-     * @param {Number} height The height of the cache region.
-     * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
-     * using myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and
-     * rotate cached elements with greater fidelity. Default is 1.
-     * @param {Object} [options=undefined] Specify additional parameters for the cache logic
-     * @param {undefined|"new"|"stage"|StageGL} [options.useGL=undefined] Select whether to use context 2D, or WebGL rendering, and
-     * whether to make a new stage instance or use an existing one. See above for extensive details on use.
-     * @for BitmapCache
-     */
-    p.define = function (target, x, y, width, height, scale, options) {
-        if (!target) { throw "No symbol to cache"; }
-        this._options = options;
-        this.target = target;
-
-        this.width = width >= 1 ? width : 1;
-        this.height = height >= 1 ? height : 1;
-        this.x = x || 0;
-        this.y = y || 0;
-        this.scale = scale || 1;
-
-        this.update();
-    };
-
-    /**
-     * Directly called via {{#crossLink "DisplayObject/updateCache:method"}}{{/crossLink}}, but also internally. This
-     * has the dual responsibility of making sure the surface is ready to be drawn to, and performing the draw. For
-     * full details of each behaviour, check the protected functions {{#crossLink "BitmapCache/_updateSurface"}}{{/crossLink}}
-     * and {{#crossLink "BitmapCache/_drawToCache"}}{{/crossLink}} respectively.
-     * @method update
-     * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
-     **/
-    p.update = function (compositeOperation) {
-        if (!this.target) { throw "define() must be called before update()"; }
-
-        var filterBounds = BitmapCache.getFilterBounds(this.target);
-        var surface = this._cacheCanvas;
-
-        this._drawWidth = Math.ceil(this.width * this.scale) + filterBounds.width;
-        this._drawHeight = Math.ceil(this.height * this.scale) + filterBounds.height;
-        this._filterCount = this.target.filters && this.target.filters.reduce(BitmapCache.filterCounter, 0);
-
-        if (!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
-            this._updateSurface();
-        }
-
-        if (this._stageGL) {
-            if (this._bufferTextureOutput === null) {
-                this._bufferTextureOutput = this._stageGL.getRenderBufferTexture(this._drawWidth, this._drawHeight);
-            } else {
-                this._stageGL.resizeTexture(this._bufferTextureOutput, this._drawWidth, this._drawHeight);
-            }
-
-            if (this._cacheCanvas === null) {
-                this._cacheCanvas = this._bufferTextureOutput;
-                this.disabled = this._disabled;
-            }
-            if (this._filterCount >= 1) {
-                if (this._bufferTextureConcat === null) {
-                    this._bufferTextureConcat = this._stageGL.getRenderBufferTexture(this._drawWidth, this._drawHeight);
-                } else {
-                    this._stageGL.resizeTexture(this._bufferTextureConcat, this._drawWidth, this._drawHeight);
-                }
-            }
-        }
-
-        this._filterOffX = filterBounds.x;
-        this._filterOffY = filterBounds.y;
-        this.offX = this.x * this.scale + this._filterOffX;
-        this.offY = this.y * this.scale + this._filterOffY;
-
-        this._drawToCache(compositeOperation);
-
-        this.cacheID = this.cacheID ? this.cacheID + 1 : 1;
-    };
-
-    /**
-     * Reset and release all the properties and memory associated with this cache.
-     * @method release
-     **/
-    p.release = function () {
-        if (this._stageGL) {
-            if (this._bufferTextureOutput !== null) { this._stageGL._killTextureObject(this._bufferTextureOutput); }
-            if (this._bufferTextureConcat !== null) { this._stageGL._killTextureObject(this._bufferTextureConcat); }
-            if (this._bufferTextureTemp !== null) { this._stageGL._killTextureObject(this._bufferTextureTemp); }
-            // set the context to none and let the garbage collector get the rest when the canvas itself gets removed
-            this._stageGL = false;
-        } else {
-            var stage = this.target.stage;
-            if (stage instanceof createjs.StageGL) {
-                stage.releaseTexture(this._cacheCanvas);
-            }
-        }
-
-        this.disabled = true;
-        this.target = this._cacheCanvas = null;
-        this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
-        this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
-        this.scale = 1;
-    };
-
-    /**
-     * Returns a data URL for the cache, or `null` if this display object is not cached.
-     * Uses {{#crossLink "BitmapCache/cacheID:property"}}{{/crossLink}} to ensure a new data URL is not generated if the
-     * cache has not changed.
-     * @method getCacheDataURL
-     * @return {String} The image data url for the cache.
-     **/
-    p.getCacheDataURL = function (type, encoderOptions) {
-        var cacheCanvas = this.target && this._cacheCanvas;
-        if (!cacheCanvas) { return null; }
-        if (this.cacheID !== this._cacheDataURLID) {
-            this._cacheDataURLID = this.cacheID;
-            this._cacheDataURL = cacheCanvas.getCacheDataURL ? cacheCanvas.getCacheDataURL(type, encoderOptions) : null;
-        }
-        return this._cacheDataURL;
-    };
-
-    /**
-     * Use context2D drawing commands to display the cache canvas being used.
-     * @method draw
-     * @param {CanvasRenderingContext2D} ctx The context to draw into.
-     * @return {Boolean} Whether the draw was handled successfully.
-     **/
-    p.draw = function (ctx) {
-        if (!this.target) { return false; }
-        ctx.drawImage(this._cacheCanvas,
-            this.x + (this._filterOffX / this.scale), this.y + (this._filterOffY / this.scale),
-            this._drawWidth / this.scale, this._drawHeight / this.scale
-        );
-        return true;
-    };
-
-    /**
-     * Determine the bounds of the shape in local space.
-     * @method getBounds
-     * @return {Rectangle}
-     */
-    p.getBounds = function () {
-        var scale = this.scale;
-        return this._boundRect.setValues(
-            this.x, this.y,
-            this.width / scale, this.height / scale
-        );
-    };
-
-    /**
-     * Fetch the correct filter in order, complicated by multipass filtering.
-     * @param {Number} lookup The filter in the list to return
-     */
-    p._getGLFilter = function (lookup) {
-        if (this.target.filters === null || lookup < 0) { return undefined; }
-        var i = 0;
-        var result = this.target.filters[ i ];
-        while (result && --lookup >= 0) {
-            result = result._multiPass ? result._multiPass : this.target.filters[ ++i ];
-        }
-        return result;
-    };
-
-    // private methods:
-    /**
-     * Create or resize the invisible canvas/surface that is needed for the display object(s) to draw to,
-     * and in turn be used in their stead when drawing. The surface is resized to the size defined
-     * by the width and height, factoring in scaling and filters. Adjust them to adjust the output size.
-     * @method _updateSurface
-     * @protected
-     **/
-    p._updateSurface = function () {
-        var surface;
-
-        if (!this._options || !this._options.useGL) {
-            surface = this._cacheCanvas;
-
-            // create it if it's missing
-            if (!surface) {
-                surface = this._cacheCanvas = createjs.createCanvas ? createjs.createCanvas() : document.createElement("canvas");
-                this.disabled = this._disabled;
-            }
-
-            // now size it
-            surface.width = this._drawWidth;
-            surface.height = this._drawHeight;
-            return;
-        }
-
-        // create it if it's missing
-        if (!this._stageGL) {
-            if (this._options.useGL === "stage") {
-                var targetStage = this.target.stage;
-                // use the stage that this object belongs on as the WebGL context
-                if (!(targetStage && targetStage.isWebGL)) {
-                    var error = "Cannot use 'stage' for cache because the object's parent stage is ";
-                    error += targetStage ? "non WebGL." : "not set, please addChild to the correct stage.";
-                    throw error;
-                }
-                this._stageGL = targetStage;
-
-            } else if (this._options.useGL === "new") {
-                // create a new WebGL context to run this cache
-                this._cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
-                this._stageGL = new createjs.StageGL(this._cacheCanvas, { antialias: true, transparent: true, autoPurge: 10 });
-                if (!this._stageGL._webGLContext) { throw "GL Cache asked for but unavailable"; }
-                this._stageGL.isCacheControlled = true;	// use this flag to control stage sizing and final output
-
-            } else if (this._options.useGL instanceof createjs.StageGL) {
-                // use the provided WebGL context to run this cache, trust the user it works and is configured.
-                this._stageGL = this._options.useGL;
-
-            } else {
-                throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got " + this._options.useGL;
-            }
-        }
-
-        this.disabled = this._disabled;
-
-        // if we have a dedicated stage we've got to size it
-        var stageGL = this._stageGL;
-        if (stageGL.isCacheControlled) {
-            surface = this._cacheCanvas;
-            surface.width = this._drawWidth;
-            surface.height = this._drawHeight;
-            stageGL.updateViewport(this._drawWidth, this._drawHeight);
-        }
-    };
-
-    /**
-     * Perform the cache draw out for context 2D now that the setup properties have been performed.
-     * @method _drawToCache
-     * @protected
-     **/
-    p._drawToCache = function (compositeOperation) {
-        var surface = this._cacheCanvas;
-        var target = this.target;
-        var webGL = this._stageGL;
-
-        if (webGL) {
-            webGL.cacheDraw(target, this);
-        } else {
-            var ctx = surface.getContext("2d");
-
-            if (!compositeOperation) {
-                ctx.clearRect(0, 0, this._drawWidth + 1, this._drawHeight + 1);
-            }
-
-            ctx.save();
-            ctx.globalCompositeOperation = compositeOperation;
-            ctx.setTransform(this.scale, 0, 0, this.scale, -this._filterOffX, -this._filterOffY);
-            ctx.translate(-this.x, -this.y);
-            target.draw(ctx, true);
-            ctx.restore();
-
-            if (target.filters && target.filters.length) {
-                this._applyFilters(ctx);
-            }
-        }
-        surface._invalid = true;
-    };
-
-    /**
-     * Work through every filter and apply its individual visual transformation.
-     * @method _applyFilters
-     * @protected
-     **/
-    p._applyFilters = function (ctx) {
-        var filters = this.target.filters;
-
-        var w = this._drawWidth;
-        var h = this._drawHeight;
-
-        var data;
-
-        var i = 0, filter = filters[ i ];
-        do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
-            if (filter.usesContext) {
-                if (data) {
-                    ctx.putImageData(data, 0, 0);
-                    data = null;
-                }
-                filter.applyFilter(ctx, 0, 0, w, h);
-            } else {
-                if (!data) {
-                    data = ctx.getImageData(0, 0, w, h);
-                }
-                filter._applyFilter(data);
-            }
-
-            // work through the multipass if it's there, otherwise move on
-            filter = filter._multiPass !== null ? filter._multiPass : filters[ ++i ];
-        } while (filter);
-
-        //done
-        if (data) {
-            ctx.putImageData(data, 0, 0);
-        }
-    };
-
-    createjs.BitmapCache = BitmapCache;
+this.createjs = this.createjs||{};
+
+(function() {
+	"use strict";
+
+// constructor:
+	/**
+	 * The BitmapCache is an internal representation of all the cache properties and logic required in order to "cache"
+	 * an object. This information and functionality used to be located on a {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
+	 * method in {{#crossLink "DisplayObject"}}{{/crossLink}}, but was moved to its own class.
+	 *
+	 * Caching in this context is purely visual, and will render the DisplayObject out into an image to be used instead
+	 * of the object. The actual cache itself is still stored on the target with the {{#crossLink "DisplayObject/cacheCanvas:property"}}{{/crossLink}}.
+	 * Working with a singular image like a {{#crossLink "Bitmap"}}{{/crossLink}} there is little benefit to performing
+	 * a cache as it is already a single image. Caching is best done on containers containing multiple complex parts that
+	 * do not move often, so that rendering the image instead will improve overall rendering speed. A cached object will
+	 * not visually update until explicitly told to do so with a call to update, much like a Stage. If a cache is being
+	 * updated every frame it is likely not improving rendering performance. Cache are best used when updates will be sparse.
+	 *
+	 * Caching is also a co-requisite for applying filters to prevent expensive filters running constantly without need,
+	 * and to physically enable some effects. The BitmapCache is also responsible for applying filters to objects and
+	 * reads each {{#crossLink "Filter"}}{{/crossLink}} due to this relationship. Real-time Filters are not recommended
+	 * performance wise when dealing with a Context2D canvas. On a StageGL performance is better so the presence of a
+	 * filter will automatically create a cache if one is not made manually.
+	 *
+	 * Some visual effects can be achieved with a {{#crossLink "DisplayObject/compositeOperation:property"}}{{/crossLink}}
+	 * so check out that setting before settling on a filter.
+	 * @class BitmapCache
+	 * @constructor
+	 **/
+	function BitmapCache() {
+
+		// public:
+		/**
+		 * Width of the cache relative to the target object.
+		 * @property width
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 **/
+		this.width = undefined;
+
+		/**
+		 * Height of the cache relative to the target object.
+		 * @property height
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 * @todo Should the width and height be protected?
+		 **/
+		this.height = undefined;
+
+		/**
+		 * Horizontal position of the cache relative to the target's origin.
+		 * @property x
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 **/
+		this.x = undefined;
+
+		/**
+		 * Vertical position of the cache relative to target's origin.
+		 * @property y
+		 * @protected
+		 * @type {Number}
+		 * @default undefined
+		 **/
+		this.y = undefined;
+
+		/**
+		 * The internal scale of the cache image, does not affects display size. This is useful to both increase and
+		 * decrease render quality. Objects with increased scales are more likely to look good when scaled up or rotated.
+		 * Objects with decreased scales can save on rendering performance.
+		 * @property scale
+		 * @protected
+		 * @type {Number}
+		 * @default 1
+		 **/
+		this.scale = 1;
+
+		/**
+		 * The x offset used for drawing into the cache itself, accounts for both transforms applied.
+		 * @property offX
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.offX = 0;
+
+		/**
+		 * The y offset used for drawing into the cache itself, accounts for both transforms applied.
+		 * @property offY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.offY = 0;
+
+		/**
+		 * Track how many times the cache has been updated, mostly used for preventing duplicate cacheURLs.
+		 * This can be useful to see if a cache has been updated.
+		 * @property cacheID
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this.cacheID = 0;
+
+		// protected:
+		/**
+		 * The number of filters found to process this update, used to optimize some decisions and surfaces
+		 * @type {number}
+		 * @private
+		 */
+		this._filterCount = 0;
+
+		/**
+		 * The relative offset of the filter's x position, used for drawing the cache onto its container.
+		 * Re-calculated every update call before drawing.
+		 * @property _filterOffY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._filterOffX = 0;
+
+		/**
+		 * The relative offset of the filter's y position, used for drawing the cache onto its container.
+		 * Re-calculated every update call before drawing.
+		 * @property _filterOffY
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._filterOffY = 0;
+
+		/**
+		 * Internal tracking of the disabled state, use the getter/setters.
+		 * @property _disabled
+		 * @type {boolean}
+		 * @protected
+		 */
+		this._disabled = false;
+
+		/**
+		 * Internal tracking of whether this cache was automatically created and thus automatically controlled
+		 * @type {boolean}
+		 * @protected
+		 */
+		this._autoGenerated = false;
+
+		/**
+		 * Internal tracking of intended cacheCanvas, may or may not be assigned based on disabled state.
+		 * @property _cacheCanvas
+		 * @type {HTMLCanvasElement | WebGLTexture | Object}
+		 * @protected
+		 */
+		this._cacheCanvas = null;
+
+		/**
+		 * Output StageGL target for GL drawing
+		 * @property _stageGL
+		 * @type {StageGL}
+		 * @protected
+		 */
+		this._stageGL = null;
+
+		/**
+		 * The cacheID when a DataURL was requested.
+		 * @property _cacheDataURLID
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._cacheDataURLID = 0;
+
+		/**
+		 * The cache's DataURL, generated on-demand using the getter.
+		 * @property _cacheDataURL
+		 * @protected
+		 * @type {String}
+		 * @default null
+		 **/
+		this._cacheDataURL = null;
+
+		/**
+		 * Internal tracking of final bounding width, approximately width*scale; however, filters can complicate the actual value.
+		 * @property _drawWidth
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._drawWidth = 0;
+
+		/**
+		 * Internal tracking of final bounding height, approximately height*scale; however, filters can complicate the actual value.
+		 * @property _drawHeight
+		 * @protected
+		 * @type {Number}
+		 * @default 0
+		 **/
+		this._drawHeight = 0;
+
+		/**
+		 * Internal tracking of the last requested bounds, may happen repeadtedly so stored to avoid object creation
+		 * @property _boundRect
+		 * @protected
+		 * @type {Rectangle}
+		 * @default 0
+		 **/
+		this._boundRect = new createjs.Rectangle();
+
+		// semi protected: not public API but modified by other classes
+		/**
+		 * Storage for the StageGL counter positioning matrix used on the object being cached
+		 * @property _counterMatrix
+		 * @type {Matrix2D}
+		 */
+		this._counterMatrix = null;
+
+		/**
+		 * One of the major render buffers used in composite blending and filter drawing. Do not expect this to always be the same object.
+		 * "What you're drawing to", object occasionally swaps with concat.
+		 * @property _bufferTextureOutput
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureOutput = null;
+
+		/**
+		 * One of the major render buffers used in composite blending and filter drawing. Do not expect this to always be the same object.
+		 * "What you've draw before now", object occasionally swaps with output.
+		 * @property _bufferTextureConcat
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureConcat = null;
+
+		/**
+		 * One of the major render buffers used only for composite blending draws.
+		 * "Temporary mixing surface"
+		 * @property _bufferTextureTemp
+		 * @type {WebGLTexture}
+		 */
+		this._bufferTextureTemp = null;
+	}
+	var p = BitmapCache.prototype;
+
+	p._get_disabled = function () {
+		return this._disabled;
+	};
+	p._set_disabled = function (value) {
+		this._disabled = !!value;
+		if (this.target) {
+			this.target.cacheCanvas = (this._disabled || this._autoGenerated) ? null : this._cacheCanvas;
+		}
+	};
+
+	try {
+		Object.defineProperties(p, {
+			/**
+			 * Disable or enable the BitmapCache from displaying. Does not cause or block cache or cache updates when toggled.
+			 * Best used if the cached state is always identical, but the object will need temporary uncaching.
+			 * @property autoPurge
+			 * @type {Boolean}
+			 * @default false
+			 */
+			disabled: { get: p._get_disabled, set: p._set_disabled }
+		});
+	} catch (e) {} // TODO: use Log
+
+	/**
+	 * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
+	 * @method getFilterBounds
+	 * @param {DisplayObject} target The object to check the filter bounds for.
+	 * @param {Rectangle} [output=null] Optional parameter, if provided then calculated bounds will be applied to that object.
+	 * @return {Rectangle} bounds object representing the bounds with filters.
+	 * @static
+	 **/
+	BitmapCache.getFilterBounds = function(target, output) {
+		if (!output){ output = new createjs.Rectangle(); }
+		var filters = target.filters;
+		var filterCount = filters && filters.length;
+		if (!!filterCount <= 0) { return output; }
+
+		for (var i=0; i<filterCount; i++) {
+			var f = filters[i];
+			if (!f || !f.getBounds){ continue; }
+			var test = f.getBounds();
+			if (!test){ continue; }
+			if (i === 0) {
+				output.setValues(test.x, test.y, test.width, test.height);
+			} else {
+				output.extend(test.x, test.y, test.width, test.height);
+			}
+		}
+
+		return output;
+	};
+
+	/**
+	 * Utility function, use with `displayObject.filters.reduce(BitmapCache.filterCounter, 0);`
+	 * @param acc Accumulator
+	 * @param o Object
+	 * @returns {*}
+	 */
+	BitmapCache.filterCounter =  function (acc, o) {
+		var out = 1; while (o._multiPass) { o = o._multiPass; out++; } return acc + out;
+	};
+
+// public methods:
+	/**
+	 * Returns a string representation of this object.
+	 * @method toString
+	 * @return {String} a string representation of the instance.
+	 **/
+	p.toString = function() {
+		return "[BitmapCache]";
+	};
+
+	/**
+	 * Actually create the correct cache surface and properties associated with it. Caching and it's benefits are discussed
+	 * by the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} function and this class description. Here are the detailed
+	 * specifics of how to use the options object.
+	 *
+	 * - If options.useGL is set to "new" a StageGL is created and contained on this for use when rendering the cache.
+	 * - If options.useGL is set to "stage" if the current stage is a StageGL it will be used. Must be added to a stage first to work.
+	 * - If options.useGL is a StageGL instance then it will use it to cache. Warning, caches made on one StageGL will not render on any other StageGL.
+	 * - If options.useGL is undefined a Context 2D cache will be performed.
+	 *
+	 * This means you can use any combination of StageGL and 2D with either, neither, or both the stage and cache being
+	 * WebGL. Using "new" with a StageGL display list is highly unrecommended, but still an option. It should be avoided
+	 * due to negative performance reasons and the Image loading limitation noted in the class complications above.
+	 *
+	 * When "options.useGL" is set to the parent stage of the target and WebGL, performance is increased by using
+	 * "RenderTextures" instead of canvas elements. These are internal Textures on the graphics card stored in the GPU.
+	 * Because they are no longer canvases you cannot perform operations you could with a regular canvas. The benefit
+	 * is that this avoids the slowdown of copying the texture back and forth from the GPU to a Canvas element.
+	 * This means "stage" is the recommended option when available.
+	 *
+	 * A StageGL cache does not infer the ability to draw objects a StageGL cannot currently draw, i.e. do not use a
+	 * WebGL context cache when caching a Shape, Text, etc.
+	 * <h4>WebGL cache with a 2D context</h4>
+	 *
+	 *     var stage = new createjs.Stage();
+	 *     var bmp = new createjs.Bitmap(src);
+	 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "new"});          // no StageGL to use, so make one
+	 *
+	 *     var shape = new createjs.Shape();
+	 *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
+	 *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
+	 *
+	 * <h4>WebGL cache with a WebGL context</h4>
+	 *
+	 *     var stageGL = new createjs.StageGL();
+	 *     var bmp = new createjs.Bitmap(src);
+	 *
+	 *     // option 1
+	 *     stageGL.addChild(bmp);
+	 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: "stage"});       // when added to the display list we can look it up
+	 *     // option 2
+	 *     bmp.cache(0, 0, bmp.width, bmp.height, 1, {gl: stageGL});       // we can specify it explicitly if we add it later
+	 *     stageGL.addChild(bmp);
+	 *
+	 *     var shape = new createjs.Shape();
+	 *     shape.graphics.clear().fill("red").drawRect(0,0,20,20);
+	 *     shape.cache(0, 0, 20, 20, 1);                             // cannot use WebGL cache
+	 *
+	 * You may wish to create your own StageGL instance to control factors like clear color, transparency, AA, and
+	 * others. If the specified stage is not rendering content and just the cache set{{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}}
+	 * to true on your instance. This will trigger it to behave correctly for rendering your output.
+	 *
+	 * @public
+	 * @method define
+	 * @param {Number} x The x coordinate origin for the cache region.
+	 * @param {Number} y The y coordinate origin for the cache region.
+	 * @param {Number} width The width of the cache region.
+	 * @param {Number} height The height of the cache region.
+	 * @param {Number} [scale=1] The scale at which the cache will be created. For example, if you cache a vector shape
+	 * using myShape.cache(0,0,100,100,2) then the resulting cacheCanvas will be 200x200 px. This lets you scale and
+	 * rotate cached elements with greater fidelity. Default is 1.
+	 * @param {Object} [options=undefined] Specify additional parameters for the cache logic
+	 * @param {undefined|"new"|"stage"|StageGL} [options.useGL=undefined] Select whether to use context 2D, or WebGL rendering, and
+	 * whether to make a new stage instance or use an existing one. See above for extensive details on use.
+	 * @for BitmapCache
+	 */
+	 p.define = function(target, x, y, width, height, scale, options) {
+		if (!target){ throw "No symbol to cache"; }
+		this._options = options;
+		this.target = target;
+
+		this.width =		width >= 1 ? width : 1;
+		this.height =		height >= 1 ? height : 1;
+		this.x =			x || 0;
+		this.y =			y || 0;
+		this.scale =		scale || 1;
+
+		this.update();
+	};
+
+	/**
+	 * Directly called via {{#crossLink "DisplayObject/updateCache:method"}}{{/crossLink}}, but also internally. This
+	 * has the dual responsibility of making sure the surface is ready to be drawn to, and performing the draw. For
+	 * full details of each behaviour, check the protected functions {{#crossLink "BitmapCache/_updateSurface"}}{{/crossLink}}
+	 * and {{#crossLink "BitmapCache/_drawToCache"}}{{/crossLink}} respectively.
+	 * @method update
+	 * @param {String} [compositeOperation=null] The DisplayObject this cache is linked to.
+	 **/
+	p.update = function(compositeOperation) {
+		if (!this.target) { throw "define() must be called before update()"; }
+
+		var filterBounds = BitmapCache.getFilterBounds(this.target);
+		var surface = this._cacheCanvas;
+
+		this._drawWidth = Math.ceil(this.width*this.scale) + filterBounds.width;
+		this._drawHeight = Math.ceil(this.height*this.scale) + filterBounds.height;
+		this._filterCount = this.target.filters && this.target.filters.reduce(BitmapCache.filterCounter, 0);
+
+		if (!surface || this._drawWidth !== surface.width || this._drawHeight !== surface.height) {
+			this._updateSurface();
+		}
+
+		if (this._stageGL) {
+			if (this._bufferTextureOutput === null) {
+				this._bufferTextureOutput = this._stageGL.getRenderBufferTexture(this._drawWidth, this._drawHeight);
+			} else {
+				this._stageGL.resizeTexture(this._bufferTextureOutput, this._drawWidth, this._drawHeight);
+			}
+
+			if (this._cacheCanvas === null){
+				this._cacheCanvas = this._bufferTextureOutput;
+				this.disabled = this._disabled;
+			}
+			if (this._filterCount >= 1) {
+				if (this._bufferTextureConcat === null) {
+					this._bufferTextureConcat = this._stageGL.getRenderBufferTexture(this._drawWidth, this._drawHeight);
+				} else {
+					this._stageGL.resizeTexture(this._bufferTextureConcat, this._drawWidth, this._drawHeight);
+				}
+			}
+		}
+
+		this._filterOffX = filterBounds.x;
+		this._filterOffY = filterBounds.y;
+		this.offX = this.x*this.scale + this._filterOffX;
+		this.offY = this.y*this.scale + this._filterOffY;
+
+		this._drawToCache(compositeOperation);
+
+		this.cacheID = this.cacheID?this.cacheID+1:1;
+	};
+
+	/**
+	 * Reset and release all the properties and memory associated with this cache.
+	 * @method release
+	 **/
+	p.release = function() {
+		if (this._stageGL) {
+			if (this._bufferTextureOutput !== null){ this._stageGL._killTextureObject(this._bufferTextureOutput); }
+			if (this._bufferTextureConcat !== null){ this._stageGL._killTextureObject(this._bufferTextureConcat); }
+			if (this._bufferTextureTemp !== null){ this._stageGL._killTextureObject(this._bufferTextureTemp); }
+			// set the context to none and let the garbage collector get the rest when the canvas itself gets removed
+			this._stageGL = false;
+		} else {
+			var stage = this.target.stage;
+			if (stage instanceof createjs.StageGL) {
+				stage.releaseTexture(this._cacheCanvas);
+			}
+		}
+
+		this.disabled = true;
+		this.target = this._cacheCanvas = null;
+		this.cacheID = this._cacheDataURLID = this._cacheDataURL = undefined;
+		this.width = this.height = this.x = this.y = this.offX = this.offY = 0;
+		this.scale = 1;
+	};
+
+	/**
+	 * Returns a data URL for the cache, or `null` if this display object is not cached.
+	 * Uses {{#crossLink "BitmapCache/cacheID:property"}}{{/crossLink}} to ensure a new data URL is not generated if the
+	 * cache has not changed.
+	 * @method getCacheDataURL
+	 * @return {String} The image data url for the cache.
+	 **/
+	p.getCacheDataURL = function(type, encoderOptions) {
+		var cacheCanvas = this.target && this._cacheCanvas;
+		if (!cacheCanvas) { return null; }
+		if (this.cacheID !== this._cacheDataURLID) {
+			this._cacheDataURLID = this.cacheID;
+			this._cacheDataURL = cacheCanvas.toDataURL ? cacheCanvas.toDataURL(type, encoderOptions) : null;
+		}
+		return this._cacheDataURL;
+	};
+
+	/**
+	 * Use context2D drawing commands to display the cache canvas being used.
+	 * @method draw
+	 * @param {CanvasRenderingContext2D} ctx The context to draw into.
+	 * @return {Boolean} Whether the draw was handled successfully.
+	 **/
+	p.draw = function(ctx) {
+		if (!this.target) { return false; }
+		ctx.drawImage(this._cacheCanvas,
+			this.x + (this._filterOffX/this.scale),		this.y + (this._filterOffY/this.scale),
+			this._drawWidth/this.scale,					this._drawHeight/this.scale
+		);
+		return true;
+	};
+
+	/**
+	 * Determine the bounds of the shape in local space.
+	 * @method getBounds
+	 * @return {Rectangle}
+	 */
+	p.getBounds = function() {
+		var scale = this.scale;
+		return this._boundRect.setValues(
+			this.x,					this.y,
+			this.width/scale,		this.height/scale
+		);
+	};
+
+	/**
+	 * Fetch the correct filter in order, complicated by multipass filtering.
+	 * @param {Number} lookup The filter in the list to return
+	 */
+	p._getGLFilter = function(lookup) {
+		if (this.target.filters === null || lookup < 0){ return undefined; }
+		var i = 0;
+		var result = this.target.filters[i];
+		while (result && --lookup >= 0) {
+			result = result._multiPass ? result._multiPass : this.target.filters[++i];
+		}
+		return result;
+	};
+
+// private methods:
+	/**
+	 * Create or resize the invisible canvas/surface that is needed for the display object(s) to draw to,
+	 * and in turn be used in their stead when drawing. The surface is resized to the size defined
+	 * by the width and height, factoring in scaling and filters. Adjust them to adjust the output size.
+	 * @method _updateSurface
+	 * @protected
+	 **/
+	p._updateSurface = function() {
+		var surface;
+
+		if (!this._options || !this._options.useGL) {
+			surface = this._cacheCanvas;
+
+			// create it if it's missing
+			if (!surface) {
+				surface = this._cacheCanvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				this.disabled = this._disabled;
+			}
+
+			// now size it
+			surface.width = this._drawWidth;
+			surface.height = this._drawHeight;
+			return;
+		}
+
+		// create it if it's missing
+		if (!this._stageGL) {
+			if (this._options.useGL === "stage") {
+				var targetStage = this.target.stage;
+				// use the stage that this object belongs on as the WebGL context
+				if (!(targetStage && targetStage.isWebGL)){
+					var error = "Cannot use 'stage' for cache because the object's parent stage is ";
+					error += targetStage ? "non WebGL." : "not set, please addChild to the correct stage.";
+					throw error;
+				}
+				this._stageGL = targetStage;
+
+			} else if (this._options.useGL === "new") {
+				// create a new WebGL context to run this cache
+				this._cacheCanvas = document.createElement("canvas"); // low autopurge in case of filter swapping and low texture count
+				this._stageGL = new createjs.StageGL(this._cacheCanvas, {antialias: true, transparent: true, autoPurge: 10});
+				if (!this._stageGL._webGLContext){ throw "GL Cache asked for but unavailable"; }
+				this._stageGL.isCacheControlled = true;	// use this flag to control stage sizing and final output
+
+			} else if (this._options.useGL instanceof createjs.StageGL) {
+				// use the provided WebGL context to run this cache, trust the user it works and is configured.
+				this._stageGL = this._options.useGL;
+
+			} else {
+				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
+			}
+		}
+
+		this.disabled = this._disabled;
+
+		// if we have a dedicated stage we've got to size it
+		var stageGL = this._stageGL;
+		if (stageGL.isCacheControlled) {
+			surface = this._cacheCanvas;
+			surface.width = this._drawWidth;
+			surface.height = this._drawHeight;
+			stageGL.updateViewport(this._drawWidth, this._drawHeight);
+		}
+	};
+
+	/**
+	 * Perform the cache draw out for context 2D now that the setup properties have been performed.
+	 * @method _drawToCache
+	 * @protected
+	 **/
+	p._drawToCache = function(compositeOperation) {
+		var surface = this._cacheCanvas;
+		var target = this.target;
+		var webGL = this._stageGL;
+
+		if (webGL) {
+			webGL.cacheDraw(target, this);
+		} else {
+			var ctx = surface.getContext("2d");
+
+			if (!compositeOperation) {
+				ctx.clearRect(0, 0, this._drawWidth+1, this._drawHeight+1);
+			}
+
+			ctx.save();
+			ctx.globalCompositeOperation = compositeOperation;
+			ctx.setTransform(this.scale,0,0,this.scale, -this._filterOffX,-this._filterOffY);
+			ctx.translate(-this.x, -this.y);
+			target.draw(ctx, true);
+			ctx.restore();
+
+			if (target.filters && target.filters.length) {
+				this._applyFilters(ctx);
+			}
+		}
+		surface._invalid = true;
+	};
+
+	/**
+	 * Work through every filter and apply its individual visual transformation.
+	 * @method _applyFilters
+	 * @protected
+	 **/
+	p._applyFilters = function(ctx) {
+		var filters = this.target.filters;
+
+		var w = this._drawWidth;
+		var h = this._drawHeight;
+
+		var data;
+
+		var i = 0, filter = filters[i];
+		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
+			if (filter.usesContext){
+				if (data) {
+					ctx.putImageData(data, 0,0);
+					data = null;
+				}
+				filter.applyFilter(ctx, 0,0, w,h);
+			} else {
+				if (!data) {
+					data = ctx.getImageData(0,0, w,h);
+				}
+				filter._applyFilter(data);
+			}
+
+			// work through the multipass if it's there, otherwise move on
+			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
+		} while (filter);
+
+		//done
+		if (data) {
+			ctx.putImageData(data, 0,0);
+		}
+	};
+
+	createjs.BitmapCache = BitmapCache;
 }());
 
 //##############################################################################
@@ -17066,14 +17113,14 @@ this.createjs = this.createjs || {};
 // Touch.js
 //##############################################################################
 
-this.createjs = this.createjs || {};
+this.createjs = this.createjs||{};
 
-(function () {
-    "use strict";
+(function() {
+	"use strict";
 
 
-    // constructor:
-    /**
+// constructor:
+	/**
  * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
  * modern Android browser) and the Pointer API (IE), including ms-prefixed events in IE10, and unprefixed in IE11.
  *
@@ -17092,260 +17139,260 @@ this.createjs = this.createjs || {};
  * @class Touch
  * @static
  **/
-    function Touch() {
-        throw "Touch cannot be instantiated";
-    }
+	function Touch() {
+		throw "Touch cannot be instantiated";
+	}
 
 
-    // public static methods:
-    /**
-     * Returns `true` if touch is supported in the current browser.
-     * @method isSupported
-     * @return {Boolean} Indicates whether touch is supported in the current browser.
-     * @static
-     **/
-    Touch.isSupported = function () {
-        return !!(('ontouchstart' in window) // iOS & Android
-            || (window.navigator[ 'msPointerEnabled' ] && window.navigator[ 'msMaxTouchPoints' ] > 0) // IE10
-            || (window.navigator[ 'pointerEnabled' ] && window.navigator[ 'maxTouchPoints' ] > 0)); // IE11+
-    };
+// public static methods:
+	/**
+	 * Returns `true` if touch is supported in the current browser.
+	 * @method isSupported
+	 * @return {Boolean} Indicates whether touch is supported in the current browser.
+	 * @static
+	 **/
+	Touch.isSupported = function() {
+		return !!(('ontouchstart' in window) // iOS & Android
+			|| (window.MSPointerEvent && window.navigator.msMaxTouchPoints > 0) // IE10
+			|| (window.PointerEvent && window.navigator.maxTouchPoints > 0)); // IE11+
+	};
 
-    /**
-     * Enables touch interaction for the specified EaselJS {{#crossLink "Stage"}}{{/crossLink}}. Currently supports iOS
-     * (and compatible browsers, such as modern Android browsers), and IE10/11. Supports both single touch and
-     * multi-touch modes. Extends the EaselJS {{#crossLink "MouseEvent"}}{{/crossLink}} model, but without support for
-     * double click or over/out events. See the MouseEvent {{#crossLink "MouseEvent/pointerId:property"}}{{/crossLink}}
-     * for more information.
-     * @method enable
-     * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to enable touch on.
-     * @param {Boolean} [singleTouch=false] If `true`, only a single touch will be active at a time.
-     * @param {Boolean} [allowDefault=false] If `true`, then default gesture actions (ex. scrolling, zooming) will be
-     * allowed when the user is interacting with the target canvas.
-     * @return {Boolean} Returns `true` if touch was successfully enabled on the target stage.
-     * @static
-     **/
-    Touch.enable = function (stage, singleTouch, allowDefault) {
-        if (!stage || !stage.canvas || !Touch.isSupported()) { return false; }
-        if (stage.__touch) { return true; }
+	/**
+	 * Enables touch interaction for the specified EaselJS {{#crossLink "Stage"}}{{/crossLink}}. Currently supports iOS
+	 * (and compatible browsers, such as modern Android browsers), and IE10/11. Supports both single touch and
+	 * multi-touch modes. Extends the EaselJS {{#crossLink "MouseEvent"}}{{/crossLink}} model, but without support for
+	 * double click or over/out events. See the MouseEvent {{#crossLink "MouseEvent/pointerId:property"}}{{/crossLink}}
+	 * for more information.
+	 * @method enable
+	 * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to enable touch on.
+	 * @param {Boolean} [singleTouch=false] If `true`, only a single touch will be active at a time.
+	 * @param {Boolean} [allowDefault=false] If `true`, then default gesture actions (ex. scrolling, zooming) will be
+	 * allowed when the user is interacting with the target canvas.
+	 * @return {Boolean} Returns `true` if touch was successfully enabled on the target stage.
+	 * @static
+	 **/
+	Touch.enable = function(stage, singleTouch, allowDefault) {
+		if (!stage || !stage.canvas || !Touch.isSupported()) { return false; }
+		if (stage.__touch) { return true; }
 
-        // inject required properties on stage:
-        stage.__touch = { pointers: {}, multitouch: !singleTouch, preventDefault: !allowDefault, count: 0 };
+		// inject required properties on stage:
+		stage.__touch = {pointers:{}, multitouch:!singleTouch, preventDefault:!allowDefault, count:0};
 
-        // note that in the future we may need to disable the standard mouse event model before adding
-        // these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
-        if ('ontouchstart' in window) { Touch._IOS_enable(stage); }
-        else if (window.navigator[ 'msPointerEnabled' ] || window.navigator[ "pointerEnabled" ]) { Touch._IE_enable(stage); }
-        return true;
-    };
+		// note that in the future we may need to disable the standard mouse event model before adding
+		// these to prevent duplicate calls. It doesn't seem to be an issue with iOS devices though.
+		if ('ontouchstart' in window) { Touch._IOS_enable(stage); }
+		else if (window.PointerEvent || window.MSPointerEvent) { Touch._IE_enable(stage); }
+		return true;
+	};
 
-    /**
-     * Removes all listeners that were set up when calling `Touch.enable()` on a stage.
-     * @method disable
-     * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to disable touch on.
-     * @static
-     **/
-    Touch.disable = function (stage) {
-        if (!stage) { return; }
-        if ('ontouchstart' in window) { Touch._IOS_disable(stage); }
-        else if (window.navigator[ 'msPointerEnabled' ] || window.navigator[ "pointerEnabled" ]) { Touch._IE_disable(stage); }
-
-        delete stage.__touch;
-    };
-
-
-    // Private static methods:
-    /**
-     * @method _IOS_enable
-     * @protected
-     * @param {Stage} stage
-     * @static
-     **/
-    Touch._IOS_enable = function (stage) {
-        var canvas = stage.canvas;
-        var f = stage.__touch.f = function (e) { Touch._IOS_handleEvent(stage, e); };
-        canvas.addEventListener("touchstart", f, false);
-        canvas.addEventListener("touchmove", f, false);
-        canvas.addEventListener("touchend", f, false);
-        canvas.addEventListener("touchcancel", f, false);
-    };
-
-    /**
-     * @method _IOS_disable
-     * @protected
-     * @param {Stage} stage
-     * @static
-     **/
-    Touch._IOS_disable = function (stage) {
-        var canvas = stage.canvas;
-        if (!canvas) { return; }
-        var f = stage.__touch.f;
-        canvas.removeEventListener("touchstart", f, false);
-        canvas.removeEventListener("touchmove", f, false);
-        canvas.removeEventListener("touchend", f, false);
-        canvas.removeEventListener("touchcancel", f, false);
-    };
-
-    /**
-     * @method _IOS_handleEvent
-     * @param {Stage} stage
-     * @param {Object} e The event to handle
-     * @protected
-     * @static
-     **/
-    Touch._IOS_handleEvent = function (stage, e) {
-        if (!stage) { return; }
-        if (stage.__touch.preventDefault) { e.preventDefault && e.preventDefault(); }
-        var touches = e.changedTouches;
-        var type = e.type;
-        for (var i = 0, l = touches.length; i < l; i++) {
-            var touch = touches[ i ];
-            var id = touch.identifier;
-            if (touch.target != stage.canvas) { continue; }
-
-            if (type == "touchstart") {
-                this._handleStart(stage, id, e, touch.pageX, touch.pageY);
-            } else if (type == "touchmove") {
-                this._handleMove(stage, id, e, touch.pageX, touch.pageY);
-            } else if (type == "touchend" || type == "touchcancel") {
-                this._handleEnd(stage, id, e);
-            }
-        }
-    };
-
-    /**
-     * @method _IE_enable
-     * @protected
-     * @param {Stage} stage
-     * @static
-     **/
-    Touch._IE_enable = function (stage) {
-        var canvas = stage.canvas;
-        var f = stage.__touch.f = function (e) { Touch._IE_handleEvent(stage, e); };
-
-        if (window.navigator[ "pointerEnabled" ] === undefined) {
-            canvas.addEventListener("MSPointerDown", f, false);
-            window.addEventListener("MSPointerMove", f, false);
-            window.addEventListener("MSPointerUp", f, false);
-            window.addEventListener("MSPointerCancel", f, false);
-            if (stage.__touch.preventDefault) { canvas.style.msTouchAction = "none"; }
-        } else {
-            canvas.addEventListener("pointerdown", f, false);
-            window.addEventListener("pointermove", f, false);
-            window.addEventListener("pointerup", f, false);
-            window.addEventListener("pointercancel", f, false);
-            if (stage.__touch.preventDefault) { canvas.style.touchAction = "none"; }
-
-        }
-        stage.__touch.activeIDs = {};
-    };
-
-    /**
-     * @method _IE_disable
-     * @protected
-     * @param {Stage} stage
-     * @static
-     **/
-    Touch._IE_disable = function (stage) {
-        var f = stage.__touch.f;
-
-        if (window.navigator[ "pointerEnabled" ] === undefined) {
-            window.removeEventListener("MSPointerMove", f, false);
-            window.removeEventListener("MSPointerUp", f, false);
-            window.removeEventListener("MSPointerCancel", f, false);
-            if (stage.canvas) {
-                stage.canvas.removeEventListener("MSPointerDown", f, false);
-            }
-        } else {
-            window.removeEventListener("pointermove", f, false);
-            window.removeEventListener("pointerup", f, false);
-            window.removeEventListener("pointercancel", f, false);
-            if (stage.canvas) {
-                stage.canvas.removeEventListener("pointerdown", f, false);
-            }
-        }
-    };
-
-    /**
-     * @method _IE_handleEvent
-     * @param {Stage} stage
-     * @param {Object} e The event to handle.
-     * @protected
-     * @static
-     **/
-    Touch._IE_handleEvent = function (stage, e) {
-        if (!stage) { return; }
-        if (stage.__touch.preventDefault) { e.preventDefault && e.preventDefault(); }
-        var type = e.type;
-        var id = e.pointerId;
-        var ids = stage.__touch.activeIDs;
-
-        if (type == "MSPointerDown" || type == "pointerdown") {
-            if (e.srcElement != stage.canvas) { return; }
-            ids[ id ] = true;
-            this._handleStart(stage, id, e, e.pageX, e.pageY);
-        } else if (ids[ id ]) { // it's an id we're watching
-            if (type == "MSPointerMove" || type == "pointermove") {
-                this._handleMove(stage, id, e, e.pageX, e.pageY);
-            } else if (type == "MSPointerUp" || type == "MSPointerCancel"
-                || type == "pointerup" || type == "pointercancel") {
-                delete (ids[ id ]);
-                this._handleEnd(stage, id, e);
-            }
-        }
-    };
-
-    /**
-     * @method _handleStart
-     * @param {Stage} stage
-     * @param {String|Number} id
-     * @param {Object} e
-     * @param {Number} x
-     * @param {Number} y
-     * @protected
-     **/
-    Touch._handleStart = function (stage, id, e, x, y) {
-        var props = stage.__touch;
-        if (!props.multitouch && props.count) { return; }
-        var ids = props.pointers;
-        if (ids[ id ]) { return; }
-        ids[ id ] = true;
-        props.count++;
-        stage._handlePointerDown(id, e, x, y);
-    };
-
-    /**
-     * @method _handleMove
-     * @param {Stage} stage
-     * @param {String|Number} id
-     * @param {Object} e
-     * @param {Number} x
-     * @param {Number} y
-     * @protected
-     **/
-    Touch._handleMove = function (stage, id, e, x, y) {
-        if (!stage.__touch.pointers[ id ]) { return; }
-        stage._handlePointerMove(id, e, x, y);
-    };
-
-    /**
-     * @method _handleEnd
-     * @param {Stage} stage
-     * @param {String|Number} id
-     * @param {Object} e
-     * @protected
-     **/
-    Touch._handleEnd = function (stage, id, e) {
-        // TODO: cancel should be handled differently for proper UI (ex. an up would trigger a click, a cancel would more closely resemble an out).
-        var props = stage.__touch;
-        var ids = props.pointers;
-        if (!ids[ id ]) { return; }
-        props.count--;
-        stage._handlePointerUp(id, e, true);
-        delete (ids[ id ]);
-    };
+	/**
+	 * Removes all listeners that were set up when calling `Touch.enable()` on a stage.
+	 * @method disable
+	 * @param {Stage} stage The {{#crossLink "Stage"}}{{/crossLink}} to disable touch on.
+	 * @static
+	 **/
+	Touch.disable = function(stage) {
+		if (!stage) { return; }
+		if ('ontouchstart' in window) { Touch._IOS_disable(stage); }
+		else if (window.PointerEvent || window.MSPointerEvent) { Touch._IE_disable(stage); }
+		
+		delete stage.__touch;
+	};
 
 
-    createjs.Touch = Touch;
+// Private static methods:
+	/**
+	 * @method _IOS_enable
+	 * @protected
+	 * @param {Stage} stage
+	 * @static
+	 **/
+	Touch._IOS_enable = function(stage) {
+		var canvas = stage.canvas;
+		var f = stage.__touch.f = function(e) { Touch._IOS_handleEvent(stage,e); };
+		canvas.addEventListener("touchstart", f, false);
+		canvas.addEventListener("touchmove", f, false);
+		canvas.addEventListener("touchend", f, false);
+		canvas.addEventListener("touchcancel", f, false);
+	};
+
+	/**
+	 * @method _IOS_disable
+	 * @protected
+	 * @param {Stage} stage
+	 * @static
+	 **/
+	Touch._IOS_disable = function(stage) {
+		var canvas = stage.canvas;
+		if (!canvas) { return; }
+		var f = stage.__touch.f;
+		canvas.removeEventListener("touchstart", f, false);
+		canvas.removeEventListener("touchmove", f, false);
+		canvas.removeEventListener("touchend", f, false);
+		canvas.removeEventListener("touchcancel", f, false);
+	};
+
+	/**
+	 * @method _IOS_handleEvent
+	 * @param {Stage} stage
+	 * @param {Object} e The event to handle
+	 * @protected
+	 * @static
+	 **/
+	Touch._IOS_handleEvent = function(stage, e) {
+		if (!stage) { return; }
+		if (stage.__touch.preventDefault) { e.preventDefault&&e.preventDefault(); }
+		var touches = e.changedTouches;
+		var type = e.type;
+		for (var i= 0,l=touches.length; i<l; i++) {
+			var touch = touches[i];
+			var id = touch.identifier;
+			if (touch.target != stage.canvas) { continue; }
+
+			if (type === "touchstart") {
+				this._handleStart(stage, id, e, touch.pageX, touch.pageY);
+			} else if (type === "touchmove") {
+				this._handleMove(stage, id, e, touch.pageX, touch.pageY);
+			} else if (type === "touchend" || type === "touchcancel") {
+				this._handleEnd(stage, id, e);
+			}
+		}
+	};
+
+	/**
+	 * @method _IE_enable
+	 * @protected
+	 * @param {Stage} stage
+	 * @static
+	 **/
+	Touch._IE_enable = function(stage) {
+		var canvas = stage.canvas;
+		var f = stage.__touch.f = function(e) { Touch._IE_handleEvent(stage,e); };
+
+		if (window.PointerEvent === undefined) {
+			canvas.addEventListener("MSPointerDown", f, false);
+			window.addEventListener("MSPointerMove", f, false);
+			window.addEventListener("MSPointerUp", f, false);
+			window.addEventListener("MSPointerCancel", f, false);
+			if (stage.__touch.preventDefault) { canvas.style.msTouchAction = "none"; }
+		} else {
+			canvas.addEventListener("pointerdown", f, false);
+			window.addEventListener("pointermove", f, false);
+			window.addEventListener("pointerup", f, false);
+			window.addEventListener("pointercancel", f, false);
+			if (stage.__touch.preventDefault) { canvas.style.touchAction = "none"; }
+
+		}
+		stage.__touch.activeIDs = {};
+	};
+
+	/**
+	 * @method _IE_disable
+	 * @protected
+	 * @param {Stage} stage
+	 * @static
+	 **/
+	Touch._IE_disable = function(stage) {
+		var f = stage.__touch.f;
+
+		if (window.PointerEvent === undefined) {
+			window.removeEventListener("MSPointerMove", f, false);
+			window.removeEventListener("MSPointerUp", f, false);
+			window.removeEventListener("MSPointerCancel", f, false);
+			if (stage.canvas) {
+				stage.canvas.removeEventListener("MSPointerDown", f, false);
+			}
+		} else {
+			window.removeEventListener("pointermove", f, false);
+			window.removeEventListener("pointerup", f, false);
+			window.removeEventListener("pointercancel", f, false);
+			if (stage.canvas) {
+				stage.canvas.removeEventListener("pointerdown", f, false);
+			}
+		}
+	};
+
+	/**
+	 * @method _IE_handleEvent
+	 * @param {Stage} stage
+	 * @param {Object} e The event to handle.
+	 * @protected
+	 * @static
+	 **/
+	Touch._IE_handleEvent = function(stage, e) {
+		if (!stage) { return; }
+		if (stage.__touch.preventDefault) { e.preventDefault && e.preventDefault(); }
+		var type = e.type;
+		var id = e.pointerId;
+		var ids = stage.__touch.activeIDs;
+
+		if (type === "MSPointerDown" || type === "pointerdown") {
+			if (e.srcElement != stage.canvas) { return; }
+			ids[id] = true;
+			this._handleStart(stage, id, e, e.pageX, e.pageY);
+		} else if (ids[id]) { // it's an id we're watching
+			if (type === "MSPointerMove" || type === "pointermove") {
+				this._handleMove(stage, id, e, e.pageX, e.pageY);
+			} else if (type === "MSPointerUp" || type === "MSPointerCancel"
+					|| type === "pointerup" || type === "pointercancel") {
+				delete(ids[id]);
+				this._handleEnd(stage, id, e);
+			}
+		}
+	};
+
+	/**
+	 * @method _handleStart
+	 * @param {Stage} stage
+	 * @param {String|Number} id
+	 * @param {Object} e
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @protected
+	 **/
+	Touch._handleStart = function(stage, id, e, x, y) {
+		var props = stage.__touch;
+		if (!props.multitouch && props.count) { return; }
+		var ids = props.pointers;
+		if (ids[id]) { return; }
+		ids[id] = true;
+		props.count++;
+		stage._handlePointerDown(id, e, x, y);
+	};
+
+	/**
+	 * @method _handleMove
+	 * @param {Stage} stage
+	 * @param {String|Number} id
+	 * @param {Object} e
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @protected
+	 **/
+	Touch._handleMove = function(stage, id, e, x, y) {
+		if (!stage.__touch.pointers[id]) { return; }
+		stage._handlePointerMove(id, e, x, y);
+	};
+
+	/**
+	 * @method _handleEnd
+	 * @param {Stage} stage
+	 * @param {String|Number} id
+	 * @param {Object} e
+	 * @protected
+	 **/
+	Touch._handleEnd = function(stage, id, e) {
+		// TODO: cancel should be handled differently for proper UI (ex. an up would trigger a click, a cancel would more closely resemble an out).
+		var props = stage.__touch;
+		var ids = props.pointers;
+		if (!ids[id]) { return; }
+		props.count--;
+		stage._handlePointerUp(id, e, true);
+		delete(ids[id]);
+	};
+
+
+	createjs.Touch = Touch;
 }());
 
 //##############################################################################
