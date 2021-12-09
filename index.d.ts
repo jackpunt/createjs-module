@@ -163,12 +163,12 @@ declare namespace createjs {
         snapToPixel: boolean;
 
         // methods
-        setDrawSize (newWidth: number, newHeight: number): void;
+        setDrawSize(newWidth: number, newHeight: number): void;
         clone(): ScaleBitmap;
     }
 
     export class BitmapText extends DisplayObject {
-        constructor(text?:string, spriteSheet?:SpriteSheet);
+        constructor(text?: string, spriteSheet?: SpriteSheet);
 
         static maxPoolSize: number;
 
@@ -248,7 +248,7 @@ declare namespace createjs {
         copy(...matrix: number[]): ColorMatrix;
         copy(matrix: ColorMatrix): ColorMatrix;
         reset(): ColorMatrix;
-        setColor( brightness: number, contrast: number, saturation: number, hue: number ): ColorMatrix;
+        setColor(brightness: number, contrast: number, saturation: number, hue: number): ColorMatrix;
         toArray(): number[];
         toString(): string;
     }
@@ -282,7 +282,7 @@ declare namespace createjs {
         addChildAt<T extends DisplayObject>(child: T, index: number): T;
         addChildAt<T extends DisplayObject>(child0: DisplayObject, lastChild: T, index: number): T;
         addChildAt<T extends DisplayObject>(child0: DisplayObject, child1: DisplayObject, lastChild: T, index: number): T;
-        addChildAt(...childOrIndex: (DisplayObject|number)[]): DisplayObject; // actually (...child: DisplayObject[], index: number)
+        addChildAt(...childOrIndex: (DisplayObject | number)[]): DisplayObject; // actually (...child: DisplayObject[], index: number)
 
         clone(recursive?: boolean): Container;
         contains(child: DisplayObject): boolean;
@@ -458,7 +458,7 @@ declare namespace createjs {
          */
         getInstructions(): Object[];
         static getRGB(r: number, g: number, b: number, alpha?: number): string;
-        inject(callback: (data: any) => any,  data: any): Graphics; // deprecated
+        inject(callback: (data: any) => any, data: any): Graphics; // deprecated
         isEmpty(): boolean;
         lineTo(x: number, y: number): Graphics;
         moveTo(x: number, y: number): Graphics;
@@ -503,10 +503,8 @@ declare namespace createjs {
     }
 
 
-    namespace Graphics
-        {
-        export class Arc
-            {
+    namespace Graphics {
+        export class Arc {
             constructor(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise: number);
 
             // properties
@@ -516,10 +514,9 @@ declare namespace createjs {
             startAngle: number;
             x: number;
             y: number;
-            }
+        }
 
-        export class ArcTo
-            {
+        export class ArcTo {
             constructor(x1: number, y1: number, x2: number, y2: number, radius: number);
 
             // properties
@@ -528,15 +525,13 @@ declare namespace createjs {
             x2: number;
             y2: number;
             radius: number;
-            }
+        }
 
-        export class BeginPath
-            {
+        export class BeginPath {
 
-            }
+        }
 
-        export class BezierCurveTo
-            {
+        export class BezierCurveTo {
             constructor(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number);
 
             // properties
@@ -546,25 +541,22 @@ declare namespace createjs {
             cp2y: number;
             x: number;
             y: number;
-            }
+        }
 
-        export class Circle
-            {
+        export class Circle {
             constructor(x: number, y: number, radius: number);
 
             // properties
             x: number;
             y: number;
             radius: number;
-            }
+        }
 
-        export class ClosePath
-            {
+        export class ClosePath {
 
-            }
+        }
 
-        export class Fill
-            {
+        export class Fill {
             constructor(style: Object, matrix?: Matrix2D);
 
             // properties
@@ -575,27 +567,24 @@ declare namespace createjs {
             bitmap(image: HTMLImageElement, repetition?: string): Fill;
             linearGradient(colors: number[], ratios: number[], x0: number, y0: number, x1: number, y1: number): Fill;
             radialGradient(colors: number[], ratios: number[], x0: number, y0: number, r0: number, x1: number, y1: number, r1: number): Fill;
-            }
+        }
 
-        export class LineTo
-            {
+        export class LineTo {
             constructor(x: number, y: number);
 
             // properties
             x: number;
             y: number;
-            }
+        }
 
-        export class MoveTo
-            {
+        export class MoveTo {
             constructor(x: number, y: number);
 
             x: number;
             y: number;
-            }
+        }
 
-        export class PolyStar
-            {
+        export class PolyStar {
             constructor(x: number, y: number, radius: number, sides: number, pointSize: number, angle: number);
 
             // properties
@@ -605,10 +594,9 @@ declare namespace createjs {
             sides: number;
             x: number;
             y: number;
-            }
+        }
 
-        export class QuadraticCurveTo
-            {
+        export class QuadraticCurveTo {
             constructor(cpx: number, cpy: number, x: number, y: number);
 
             // properties
@@ -616,10 +604,9 @@ declare namespace createjs {
             cpy: number;
             x: number;
             y: number;
-            }
+        }
 
-        export class Rect
-            {
+        export class Rect {
             constructor(x: number, y: number, w: number, h: number);
 
             // properties
@@ -627,10 +614,9 @@ declare namespace createjs {
             y: number;
             w: number;
             h: number;
-            }
+        }
 
-        export class RoundRect
-            {
+        export class RoundRect {
             constructor(x: number, y: number, w: number, h: number, radiusTL: number, radiusTR: number, radiusBR: number, radiusBL: number);
 
             // properties
@@ -642,10 +628,9 @@ declare namespace createjs {
             radiusTR: number;
             radiusBR: number;
             radiusBL: number;
-            }
+        }
 
-        export class Stroke
-            {
+        export class Stroke {
             constructor(style: Object, ignoreScale: boolean);
 
             // properties
@@ -656,10 +641,9 @@ declare namespace createjs {
             bitmap(image: HTMLImageElement, repetition?: string): Stroke;
             linearGradient(colors: number[], ratios: number[], x0: number, y0: number, x1: number, y1: number): Stroke;
             radialGradient(colors: number[], ratios: number[], x0: number, y0: number, r0: number, x1: number, y1: number, r1: number): Stroke;
-            }
+        }
 
-        export class StrokeStyle
-            {
+        export class StrokeStyle {
             constructor(width: number, caps: string, joints: number, miterLimit: number);
 
             // properties
@@ -667,8 +651,8 @@ declare namespace createjs {
             joints: string;
             miterLimit: number;
             width: number;
-            }
         }
+    }
 
 
 
@@ -691,7 +675,7 @@ declare namespace createjs {
         appendTransform(x: number, y: number, scaleX: number, scaleY: number, rotation: number, skewX: number, skewY: number, regX?: number, regY?: number): Matrix2D;
         clone(): Matrix2D;
         copy(matrix: Matrix2D): Matrix2D;
-        decompose(): {x: number; y: number; scaleX: number; scaleY: number; rotation: number; skewX: number; skewY: number};
+        decompose(): { x: number; y: number; scaleX: number; scaleY: number; rotation: number; skewX: number; skewY: number };
         decompose(target: Object): Matrix2D;
         equals(matrix: Matrix2D): boolean;
         identity(): Matrix2D;
@@ -898,12 +882,11 @@ declare namespace createjs {
 
     }
 
-    export class SpriteContainer extends Container
-        {
+    export class SpriteContainer extends Container {
         constructor(spriteSheet?: SpriteSheet);
 
         spriteSheet: SpriteSheet;
-        }
+    }
 
     // what is returned from SpriteSheet.getAnimation(string)
     interface SpriteSheetAnimation {
@@ -953,7 +936,7 @@ declare namespace createjs {
         timeSlice: number;
 
         // methods
-        addAnimation(name: string, frames: number[], next?: string|boolean, frequency?: number): void;
+        addAnimation(name: string, frames: number[], next?: string | boolean, frequency?: number): void;
         addFrame(source: DisplayObject, sourceRect?: Rectangle, scale?: number, setupFunction?: () => any, setupData?: Object): number;
         addMovieClip(source: MovieClip, sourceRect?: Rectangle, scale?: number, setupFunction?: () => any, setupData?: Object, labelFunction?: () => any): void;
         build(): SpriteSheet;
@@ -974,8 +957,7 @@ declare namespace createjs {
         static mergeAlpha(rgbImage: HTMLImageElement, alphaImage: HTMLImageElement, canvas?: HTMLCanvasElement): HTMLCanvasElement; // deprecated
     }
 
-    export class SpriteStage extends Stage
-        {
+    export class SpriteStage extends Stage {
         constructor(canvas: HTMLCanvasElement | string, preserveDrawingBuffer?: boolean, antialias?: boolean);
 
         // properties
@@ -990,7 +972,7 @@ declare namespace createjs {
         // methods
         clearImageTexture(image: Object): void;
         updateViewport(width: number, height: number): void;
-        }
+    }
 
     export class Stage extends Container {
         constructor(canvas: HTMLCanvasElement | string | Object);
@@ -1067,8 +1049,8 @@ declare namespace createjs {
         cacheDraw(target: DisplayObject, filters: Filter[], manager: BitmapCache): boolean;
         getBaseTexture(w?: number, h?: number): WebGLTexture | null;
         getFilterShader(filter: Filter | Object): WebGLProgram;
-        getRenderBufferTexture (w: number, h: number): WebGLTexture;
-        getTargetRenderTexture (target: DisplayObject, w: number, h: number): Object;
+        getRenderBufferTexture(w: number, h: number): WebGLTexture;
+        getTargetRenderTexture(target: DisplayObject, w: number, h: number): Object;
         protectTextureSlot(id: number, lock?: boolean): void;
         purgeTextures(count?: number): void;
         releaseTexture(item: DisplayObject | WebGLTexture | HTMLImageElement | HTMLCanvasElement): void;
@@ -1197,8 +1179,8 @@ declare namespace createjs {
     export class UID {
         // methods
         static get(): number;
-    }    
-    
+    }
+
     export class AbstractLoader extends EventDispatcher {
         // properties
         static BINARY: string;
@@ -1234,82 +1216,71 @@ declare namespace createjs {
         toString(): string;
     }
 
-    export class AbstractMediaLoader
-        {
+    export class AbstractMediaLoader {
         constructor(loadItem: Object, preferXHR: boolean, type: string);
-        }
+    }
 
-    export class AbstractRequest
-        {
+    export class AbstractRequest {
         constructor(item: LoadItem);
 
         cancel(): void;
         destroy(): void;
         load(): void;
-        }
+    }
 
-    export class BinaryLoader extends AbstractLoader
-        {
+    export class BinaryLoader extends AbstractLoader {
         constructor(loadItem: Object);
 
         // methods
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class CSSLoader extends AbstractLoader
-        {
+    export class CSSLoader extends AbstractLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         // methods
         canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export module DataUtils
-        {
+    export module DataUtils {
         export function parseJSON(value: string): Object;
         export function parseXML(text: string, type: string): XMLDocument;
-        }
+    }
 
-    export class ErrorEvent
-        {
+    export class ErrorEvent {
         constructor(title?: string, message?: string, data?: Object);
 
         // properties
         data: Object;
         message: string;
         title: string;
-        }
+    }
 
-    export class ImageLoader extends AbstractLoader
-        {
+    export class ImageLoader extends AbstractLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class JavaScriptLoader extends AbstractLoader
-        {
+    export class JavaScriptLoader extends AbstractLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class JSONLoader extends AbstractLoader
-        {
+    export class JSONLoader extends AbstractLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class JSONPLoader extends AbstractLoader
-        {
+    export class JSONPLoader extends AbstractLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class LoadItem
-        {
+    export class LoadItem {
         // properties
         callback: string;
         crossOrigin: boolean;
@@ -1328,10 +1299,9 @@ declare namespace createjs {
         // methods
         static create(value: LoadItem | string | Object): Object | LoadItem;
         set(props: Object): LoadItem;
-        }
+    }
 
-    export class LoadQueue extends AbstractLoader
-        {
+    export class LoadQueue extends AbstractLoader {
         constructor(preferXHR?: boolean, basePath?: string, crossOrigin?: string | boolean);
 
         // properties
@@ -1359,27 +1329,23 @@ declare namespace createjs {
         unregisterLoader(loader: AbstractLoader): void;
     }
 
-    export class ManifestLoader extends AbstractLoader
-        {
+    export class ManifestLoader extends AbstractLoader {
         constructor(loadItem: LoadItem | Object);
 
         // methods
         static canLoadItem(item: LoadItem | Object): boolean;
-        }
+    }
 
-    export class MediaTagRequest
-        {
+    export class MediaTagRequest {
         constructor(loadItem: LoadItem, tag: HTMLAudioElement | HTMLVideoElement, srcAttribute: string);
-        }
+    }
 
-    export class PreloadJS
-        {
+    export class PreloadJS {
         static buildDate: string;
         static version: string;
-        }
+    }
 
-    export class ProgressEvent
-        {
+    export class ProgressEvent {
         constructor(loaded: number, total?: number);
 
         // properties
@@ -1389,10 +1355,9 @@ declare namespace createjs {
 
         // methods
         clone(): ProgressEvent;
-        }
+    }
 
-    export class RequestUtils
-        {
+    export class RequestUtils {
         // properties
         static ABSOLUTE_PATH: RegExp;
         static EXTENSION_PATT: RegExp;
@@ -1410,66 +1375,57 @@ declare namespace createjs {
         static isText(type: string): boolean;
         static isVideoTag(item: Object): boolean;
         static parseURI(path: string): Object;
-        }
+    }
 
-    export class SoundLoader extends AbstractLoader
-        {
+    export class SoundLoader extends AbstractLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class SpriteSheetLoader extends AbstractLoader
-        {
+    export class SpriteSheetLoader extends AbstractLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class SVGLoader extends AbstractLoader
-        {
+    export class SVGLoader extends AbstractLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class TagRequest
-        {
+    export class TagRequest {
 
-        }
+    }
 
-    export class TextLoader extends AbstractLoader
-        {
+    export class TextLoader extends AbstractLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class VideoLoader extends AbstractLoader
-        {
+    export class VideoLoader extends AbstractLoader {
         constructor(loadItem: Object, preferXHR: boolean);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class XHRRequest extends AbstractLoader
-        {
+    export class XHRRequest extends AbstractLoader {
         constructor(item: Object);
 
         // methods
         getAllResponseHeaders(): string;
         getResponseHeader(header: string): string;
-        }
+    }
 
-    export class XMLLoader extends AbstractLoader
-        {
+    export class XMLLoader extends AbstractLoader {
         constructor(loadItem: Object);
 
         static canLoadItem(item: Object): boolean;
-        }
+    }
 
-    export class AbstractPlugin
-        {
+    export class AbstractPlugin {
         // methods
         create(src: string, startTime: number, duration: number): AbstractSoundInstance;
         getVolume(): number;
@@ -1482,10 +1438,9 @@ declare namespace createjs {
         removeSound(src: string): void;
         setMute(value: boolean): boolean;
         setVolume(value: number): boolean;
-        }
+    }
 
-    export class AbstractSoundInstance extends EventDispatcher
-        {
+    export class AbstractSoundInstance extends EventDispatcher {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
 
         // properties
@@ -1519,19 +1474,17 @@ declare namespace createjs {
         setPosition(value: number): AbstractSoundInstance;
         setVolume(value: number): AbstractSoundInstance;
         stop(): AbstractSoundInstance;
-        }
+    }
 
-    export class FlashAudioLoader extends AbstractLoader
-        {
+    export class FlashAudioLoader extends AbstractLoader {
         // properties
         flashId: string;
 
         // methods
         setFlash(flash: Object): void;
-        }
+    }
 
-    export class FlashAudioPlugin extends AbstractPlugin
-        {
+    export class FlashAudioPlugin extends AbstractPlugin {
         // properties
         flashReady: boolean;
         showOutput: boolean;
@@ -1539,12 +1492,11 @@ declare namespace createjs {
 
         // methods
         static isSupported(): boolean;
-        }
+    }
 
-    export class FlashAudioSoundInstance extends AbstractSoundInstance
-        {
+    export class FlashAudioSoundInstance extends AbstractSoundInstance {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
-        }
+    }
 
     /**
      * @deprecated - use FlashAudioPlugin
@@ -1566,14 +1518,13 @@ declare namespace createjs {
         static isSupported(): boolean;
         preload(src: string, instance: Object): void;
         register(src: string, instances: number): Object;
-        removeAllSounds (): void;
+        removeAllSounds(): void;
         removeSound(src: string): void;
         setMute(value: boolean): boolean;
         setVolume(value: number): boolean;
     }
 
-    export class HTMLAudioPlugin extends AbstractPlugin
-        {
+    export class HTMLAudioPlugin extends AbstractPlugin {
         constructor();
 
         // properties
@@ -1583,34 +1534,30 @@ declare namespace createjs {
 
         // methods
         static isSupported(): boolean;
-        }
+    }
 
-    export class HTMLAudioSoundInstance extends AbstractSoundInstance
-        {
+    export class HTMLAudioSoundInstance extends AbstractSoundInstance {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
-        }
+    }
 
-    export class HTMLAudioTagPool
-        {
+    export class HTMLAudioTagPool {
 
-        }
+    }
 
-    export class PlayPropsConfig
-	{
-	delay:number;
-	duration:number;
-	interrupt:string;
-	loop:number;
-	offset:number;
-	pan:number;
-	startTime:number;
-	volume:number;
-	static create( value:PlayPropsConfig|any ): PlayPropsConfig;
-	set ( props:any ): PlayPropsConfig;
-	}
+    export class PlayPropsConfig {
+        delay: number;
+        duration: number;
+        interrupt: string;
+        loop: number;
+        offset: number;
+        pan: number;
+        startTime: number;
+        volume: number;
+        static create(value: PlayPropsConfig | any): PlayPropsConfig;
+        set(props: any): PlayPropsConfig;
+    }
 
-    export class Sound extends EventDispatcher
-        {
+    export class Sound extends EventDispatcher {
         // properties
         static activePlugin: Object;
         static alternateExtensions: any[];
@@ -1626,8 +1573,8 @@ declare namespace createjs {
         static PLAY_INTERRUPTED: string;
         static PLAY_SUCCEEDED: string;
         static SUPPORTED_EXTENSIONS: string[];
-	static muted: boolean;
-	static volume: number;
+        static muted: boolean;
+        static volume: number;
         static capabilities: any;
 
         // methods
@@ -1682,13 +1629,11 @@ declare namespace createjs {
         static version: string;
     }
 
-    export class WebAudioLoader
-        {
+    export class WebAudioLoader {
         static context: AudioContext;
-        }
+    }
 
-    export class WebAudioPlugin extends AbstractPlugin
-        {
+    export class WebAudioPlugin extends AbstractPlugin {
         constructor();
 
         // properties
@@ -1700,10 +1645,9 @@ declare namespace createjs {
         // methods
         static isSupported(): boolean;
         static playEmptySound(): void;
-        }
+    }
 
-    export class WebAudioSoundInstance extends AbstractSoundInstance
-        {
+    export class WebAudioSoundInstance extends AbstractSoundInstance {
         constructor(src: string, startTime: number, duration: number, playbackResource: Object);
 
         // properties
@@ -1712,7 +1656,7 @@ declare namespace createjs {
         gainNode: GainNode;
         panNode: PannerNode;
         sourceNode: AudioNode;
-        }
+    }
 
     export class CSSPlugin {
         constructor();
@@ -1795,7 +1739,7 @@ declare namespace createjs {
     */
 
     export class Timeline extends EventDispatcher {
-        constructor (tweens: Tween[], labels: Object, props: Object);
+        constructor(tweens: Tween[], labels: Object, props: Object);
 
         // properties
         duration: number;
@@ -1865,5 +1809,5 @@ declare namespace createjs {
 }
 
 declare module 'createjs-module' {
-  export = createjs;
+    export = createjs;
 }

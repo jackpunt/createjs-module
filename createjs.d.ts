@@ -16,7 +16,7 @@
 // Library documentation : http://www.createjs.com/Docs/TweenJS/modules/TweenJS.html
 
 // rename the native MouseEvent, to avoid conflict with createjs's MouseEvent
-interface NativeMouseEvent extends MouseEvent {}
+interface NativeMouseEvent extends MouseEvent { }
 declare namespace createjs {
   export class Event {
     constructor(type: string, bubbles: boolean, cancelable: boolean);
@@ -495,13 +495,7 @@ declare namespace createjs {
     y: number;
 
     // methods
-    cache(
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-      scale?: number
-    ): void;
+    cache(x: number, y: number, width: number, height: number, scale?: number, options?: { useGL?: ("new" | "stage" | StageGL) }): void;
     clone(): DisplayObject;
     draw(ctx: CanvasRenderingContext2D, ignoreCache?: boolean): boolean;
     getBounds(): Rectangle;
@@ -919,7 +913,7 @@ declare namespace createjs {
       radius: number;
     }
 
-    export class BeginPath {}
+    export class BeginPath { }
 
     export class BezierCurveTo {
       constructor(
@@ -949,7 +943,7 @@ declare namespace createjs {
       radius: number;
     }
 
-    export class ClosePath {}
+    export class ClosePath { }
 
     export class Fill {
       constructor(style: Object, matrix?: Matrix2D);
@@ -2221,7 +2215,7 @@ declare namespace createjs {
     static canLoadItem(item: Object): boolean;
   }
 
-  export class TagRequest {}
+  export class TagRequest { }
 
   export class TextLoader extends AbstractLoader {
     constructor(loadItem: Object);
@@ -2392,7 +2386,7 @@ declare namespace createjs {
     );
   }
 
-  export class HTMLAudioTagPool {}
+  export class HTMLAudioTagPool { }
 
   export class PlayPropsConfig {
     delay: number;
