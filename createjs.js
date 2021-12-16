@@ -3708,6 +3708,7 @@ this.createjs = this.createjs || {};
      *     <tr><td>dc</td><td>{{#crossLink "Graphics/drawCircle"}}{{/crossLink}} </td>
      *     <td>de</td><td>{{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} </td></tr>
      *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} </td>
+     *     <tr><td>dp</td><td>{{#crossLink "Graphics/drawPolygon"}}{{/crossLink}} </td>
      *     <td>p</td><td>{{#crossLink "Graphics/decodePath"}}{{/crossLink}} </td></tr>
      * </table>
      *
@@ -4559,6 +4560,25 @@ this.createjs = this.createjs || {};
         return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
     };
 
+	/**
+	* Draws a polygon from array of point arrays.
+	*
+	*      myGraphics.beginFill("#FF0").drawPolygon([100, 100], [150, 50], [200,100], [200,200], [100,200]);
+	*      // makes a house shape
+	*
+	* A tiny API method "pg" also exists.
+	*
+	* @method drawPolygon
+	* @param {Array} points An array of [x,y] points.
+	* @param {Boolean} close Whether to close the polygon - default is true.
+	* @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	* @chainable
+	**/
+
+	p.drawPolygon = function(points, close) { // Dan Zen 4/2/21
+		return this.append(new G.Polygon(points, close));
+	};
+
     /**
      * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
      * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
@@ -5126,6 +5146,17 @@ this.createjs = this.createjs || {};
      **/
     p.dp = p.drawPolyStar;
 
+	 /**
+	 * Shortcut to drawPolygon.
+	 * @method pg
+	 * @param {Array} points An array of [x,y] points.
+	 * @param {Boolean} close Whether to close the polygon - default is true.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 * @protected
+	 **/
+      p.pg = p.drawPolygon;
+
     /**
      * Shortcut to decodePath.
      * @method p
@@ -5563,9 +5594,11 @@ this.createjs = this.createjs || {};
      * @method bitmap
      * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image  Must be loaded prior to creating a bitmap fill, or the fill will be empty.
      * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
+     * @param {Matrix2D} [matrix] Optional. Specifies a transformation matrix for the bitmap fill. This transformation will be applied relative to the parent transform.
      * @return {Fill} Returns this Fill object for chaining or assignment.
      */
-    p.bitmap = function (image, repetition) {
+    p.bitmap = function(image, repetition, matrix) {
+        if (matrix) this.matrix = matrix;
         if (image.naturalWidth || image.getContext || image.readyState >= 2) {
             var o = this.style = Graphics._ctx.createPattern(image, repetition || "");
             o.props = { image: image, repetition: repetition, type: "bitmap" };
@@ -5956,12 +5989,56 @@ this.createjs = this.createjs || {};
             angle += a;
             if (ps != 1) {
                 ctx.lineTo(x + Math.cos(angle) * radius * ps, y + Math.sin(angle) * radius * ps);
+                if (i == sides) break;
             }
             angle += a;
             ctx.lineTo(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius);
         }
         ctx.closePath();
     };
+
+    /**
+     	* Graphics command object. See {{#crossLink "Graphics/drawPolygon"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+     	* @class Polygon
+     	* @constructor
+     	* @param {Array} points
+     	* @param {Boolean} close
+     	**/
+    	/**
+     	* @property points
+     	* @type Array
+     	*/
+   	/**
+     	* @property close
+     	* @type Boolean
+     	*/
+    	/**
+     	* Execute the Graphics command in the provided Canvas context.
+     	* @method exec
+     	* @param {CanvasRenderingContext2D} ctx The canvas rendering context
+     	*/
+	(G.Polygon = function(points, close) { // Dan Zen 4/2/21
+		this.points = points; 
+		if (close==null) close=true;
+		this.close = close;
+	}).prototype.exec = function(ctx) {
+		var points = this.points, close = this.close;
+
+		var p, fp, sp;
+		fp = points[0];
+		ctx.moveTo(fp[0], fp[1]);			
+		for (var i=1; i<points.length; i++) {
+			p = points[i];			
+			if (i==1) sp = [p[0], p[1]];
+			ctx.lineTo(p[0], p[1]);								
+		}	
+		if (close) {
+			ctx.lineTo(fp[0], fp[1]);
+			ctx.lineTo(sp[0], sp[1]); // go around to second point to get correct end bevel/miter
+			ctx.closePath();
+		}
+
+	};	
 
     // docced above.
     Graphics.beginCmd = new G.BeginPath(); // so we don't have to instantiate multiple instances.
@@ -9510,7 +9587,11 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.REGULAR_VARYING_HEADER = (
-		"precision highp float;" +
+		"#ifdef GL_FRAGMENT_PRECISION_HIGH \n"+
+		"precision highp float; \n"+
+		"#else \n"+
+		"precision mediump float; \n"+
+		"#endif \n"+
 
 		"varying vec2 vTextureCoord;" +
 		"varying lowp float indexPicker;" +
@@ -9605,7 +9686,11 @@ this.createjs = this.createjs||{};
 	 * @readonly
 	 */
 	StageGL.COVER_VARYING_HEADER = (
-		"precision highp float;" +	//this is usually essential for filter math
+		"#ifdef GL_FRAGMENT_PRECISION_HIGH \n"+
+		"precision highp float; \n"+
+		"#else \n"+
+		"precision mediump float; \n"+
+		"#endif \n"+
 
 		"varying vec2 vTextureCoord;"
 	);
@@ -10289,6 +10374,7 @@ this.createjs = this.createjs||{};
 		} else if (item._webGLRenderStyle === 2) {
 			// this is a Bitmap class
 			foundImage = item.image;
+            if (foundImage.getImage) { foundImage = foundImage.getImage(); }
 		} else if (item._webGLRenderStyle === 1) {
 			// this is a SpriteSheet, we can't tell which image we used from the list easily so remove them all!
 			for (i = 0, l = item.spriteSheet._images.length; i < l; i++) {
@@ -13703,6 +13789,8 @@ this.createjs = this.createjs||{};
 		var o=this, fps = o.framerate;
 		while ((o = o.parent) && fps === null) { if (o.mode === independent) { fps = o._framerate; } }
 		this._framerate = fps;
+
+        if (this.totalFrames <= 1) { return; }
 		
 		// calculate how many frames to advance:
 		var t = (fps !== null && fps !== -1 && time !== null) ? time/(1000/fps) + this._t : 1;
@@ -15547,7 +15635,7 @@ this.createjs = this.createjs||{};
 		if (!cacheCanvas) { return null; }
 		if (this.cacheID !== this._cacheDataURLID) {
 			this._cacheDataURLID = this.cacheID;
-			this._cacheDataURL = cacheCanvas.toDataURL ? cacheCanvas.toDataURL(type, encoderOptions) : null;
+			this._cacheDataURL = cacheCanvas.getCacheDataURL ? cacheCanvas.getCacheDataURL(type, encoderOptions) : null;
 		}
 		return this._cacheDataURL;
 	};
