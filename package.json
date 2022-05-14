@@ -1,8 +1,8 @@
 {
-    "name": "@thegraid/createjs-module",
+    "name": "@thegraid/easeljs-module",
     "version": "1.1.2",
-    "description": "Collection of libraries in the CreateJS suite for Angular and Ionic. Updated to latest version of CreateJS with types.",
-    "author": "CamelCoding - VSz <v.szabolcs@camelcoding.com>",
+    "description": "just easeljs as a module",
+    "author": "Jack Punt @thegraid.com",
     "main": "./createjs.js",
     "types": "./createjs.d.ts",
     "repository": {
