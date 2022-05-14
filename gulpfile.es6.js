@@ -40,7 +40,8 @@ function compile() {
     ])
         .pipe(concat('createjs.js'))
         .pipe(insert.prepend('var createjs = (this.createjs = (this.createjs || {}));\n'))
-        .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;'))
+        .pipe(insert.append(`\n/* Compiled: ${new Date()} */`))
+        .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;\n'))
         .pipe(gulp.dest(DEST.CREATE));
 }
 
