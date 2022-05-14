@@ -1,6 +1,6 @@
 # CreateJS library module for Angular and Ionic
 
-This is the createjs-0.8.2 collection.
+This is the createjs-1.0.0 collection. (TTBOMK: it includes StageGL things)
 ***Now with typings!!!***
 
 * EaselJS
