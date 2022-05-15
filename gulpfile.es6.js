@@ -9,7 +9,7 @@ const VERSIONS = {
     PRELOAD: '1.0.0',
     SOUNDL: '1.0.0',
     TWEEN: '1.0.0',
-    CREATE: '1.0.0'
+    CREATE: '1.1.2'
 };
 
 const SRC = {
@@ -26,7 +26,7 @@ const DEST = {
 function string_src(filename, string) {
     var src = require('stream').Readable({ objectMode: true });
     src._read = function () {
-        this.push(new gutil.File({ cwd: '', base: '', path: filename, contents: new Buffer(string) }));
+        this.push(new gutil.File({ cwd: '', base: '', path: filename, contents: Buffer.from(string) }));
         this.push(null)
     };
     return src
