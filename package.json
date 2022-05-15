@@ -1,6 +1,6 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.1.2",
+    "version": "1.1.2-c",
     "description": "just easeljs as a module",
     "author": "Jack Punt @thegraid.com",
     "main": "./createjs.js",

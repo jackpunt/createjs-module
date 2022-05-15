@@ -5,7 +5,8 @@ import insert from 'gulp-insert';
 import gutil from 'gulp-util';
 
 const VERSIONS = {
-    EASEL: '1.0.0'
+    EASEL: '1.0.0',
+    CREATE: '1.1.2-c'
 };
 
 const SRC = {
