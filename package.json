@@ -1,6 +1,6 @@
 {
     "name": "@thegraid/createjs-module",
-    "version": "1.1.2",
+    "version": "1.1.2-b",
     "description": "Collection of libraries in the CreateJS suite for Angular and Ionic. Updated to latest version of CreateJS with types.",
     "author": "CamelCoding - VSz <v.szabolcs@camelcoding.com>",
     "main": "./createjs.js",
