@@ -1,13 +1,13 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.1.2-c",
+    "version": "1.1.2-e",
     "description": "just easeljs as a module",
     "author": "Jack Punt @thegraid.com",
-    "main": "./createjs.js",
-    "types": "./createjs.d.ts",
+    "main": "./easeljs.js",
+    "types": "./easeljs.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jackpunt/createjs-module"
+        "url": "https://github.com/jackpunt/easeljs-module"
     },
     "scripts": {
         "pub": "npm run build; npm version ${1:-patch}; npm publish --access public",
