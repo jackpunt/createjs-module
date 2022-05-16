@@ -10,6 +10,7 @@
         "url": "https://github.com/jackpunt/createjs-module/tree/easeljs"
     },
     "scripts": {
+        "ignore": "the final [17 line] patch for Date()",
         "diff-patch": "diff -c easeljs.js easeljs-patched.js | tail -r | tail -n +17 | tail -r > easeljs.js.patch",
         "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run run-patch",
         "run-patch": "patch < easeljs.js.patch",
