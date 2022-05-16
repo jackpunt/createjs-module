@@ -33,6 +33,6 @@
         "tweenjs": "^1.0.2"
     },
     "dependencies": {
-        "@types/createjs": "0.0.29"
+        "@types/createjs": "^0.0.29"
     }
 }
