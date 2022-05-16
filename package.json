@@ -4,6 +4,7 @@
     "description": "ESM for EaselJS (for Angluar or Ionic) with @types/createjs.",
     "author": "TheGraid <thegraid@gmail.com>",
     "main": "./easeljs.js",
+    "types": "./easeljs.d.ts",
     "type": "module",
     "repository": {
         "type": "git",
