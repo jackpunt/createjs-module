@@ -1,16 +1,18 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.1.3-w",
+    "version": "1.1.2-w",
     "description": "ESM for EaselJS (for Angluar or Ionic) with @types/createjs.",
     "author": "TheGraid <thegraid@gmail.com>",
     "main": "./easeljs.js",
     "types": "./easeljs.d.ts",
-    "type": "module",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jackpunt/easeljs-module"
+        "url": "https://github.com/jackpunt/createjs-module/tree/easeljs"
     },
     "scripts": {
+        "diff-patch": "diff -c easeljs.js easeljs-patched.js | tail -r | tail -n +17 | tail -r > easeljs.js.patch",
+        "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run run-patch",
+        "run-patch": "patch < easeljs.js.patch",
         "pub": "npm run build; npm version ${1:-patch}; npm publish --access public",
         "build": "gulp",
         "build:package": "gulp package",

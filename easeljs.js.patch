@@ -1,0 +1,16 @@
+*** easeljs.js	2022-05-13 22:41:48.000000000 -0700
+--- easeljs-patched.js	2022-05-16 12:34:59.000000000 -0700
+***************
+*** 1413,1419 ****
+  	 * @static
+  	 * @private
+  	 **/
+! 	var w=window, now=w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow;
+  	Ticker._getTime = function() {
+  		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
+  	};
+--- 1413,1419 ----
+  	 * @static
+  	 * @private
+  	 **/
+! 	var w=window, now=w&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
