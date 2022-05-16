@@ -4,7 +4,7 @@
     "description": "just easeljs as a module",
     "author": "Jack Punt @thegraid.com",
     "main": "./easeljs.js",
-    "types": "./easeljs.d.ts",
+    "type": "module",
     "repository": {
         "type": "git",
         "url": "https://github.com/jackpunt/easeljs-module"
