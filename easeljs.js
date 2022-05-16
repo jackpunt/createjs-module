@@ -1413,7 +1413,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @private
 	 **/
-	var w=window, now=w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow;
+	var w=window, now=w&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
 	Ticker._getTime = function() {
 		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
 	};
