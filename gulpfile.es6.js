@@ -1,3 +1,4 @@
+import cp from 'child_process';
 import fs from 'fs';
 import gulp from 'gulp';
 import concat from 'gulp-concat';
@@ -16,6 +17,10 @@ const SRC = {
 const DEST = {
     CREATE: './'
 };
+const TRNL = "tr -d '\r' < easeljs-raw.js > easeljs.js";
+function execTrnlTask() {
+    return cp.exec(TRNL, (error, stdout, stderr) => { })
+}
 
 function string_src(filename, string) {
     var src = require('stream').Readable({ objectMode: true });
@@ -29,7 +34,7 @@ function compile() {
     return gulp.src([
         SRC.EASEL
     ])
-        .pipe(concat('easeljs.js'))
+        .pipe(concat('easeljs-raw.js'))
         .pipe(insert.prepend('var createjs = (this.createjs = (this.createjs || {}));\n'))
         .pipe(insert.append(`\n/* Easel Compiled: ${new Date()} */`))
         .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;\n'))
@@ -44,6 +49,6 @@ function doPackage() {
     .pipe(gulp.dest(DEST.CREATE));
 }
 
-gulp.task('compile', gulp.series(compile));
+gulp.task('compile', gulp.series(compile, execTrnlTask));
 gulp.task('package', gulp.series(doPackage));
 gulp.task('default', gulp.series(compile, doPackage));

@@ -1,4 +1,5 @@
 var createjs = (this.createjs = (this.createjs || {}));
+var ww; try { ww = window} catch { ww = false }
 /*!
 * EaselJS
 * Visit http://createjs.com/ for documentation, updates and examples.
@@ -1413,7 +1414,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @private
 	 **/
-	var w=window, now=w&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
+	 var w=ww&&window, now=ww&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
 	Ticker._getTime = function() {
 		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
 	};
@@ -3922,7 +3923,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 * @type {CanvasRenderingContext2D}
 	 **/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
 	if (canvas.getContext) {
 		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
@@ -6346,7 +6347,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @protected
 	 **/
-	var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas")); // prevent errors on load in browsers without canvas.
 	if (canvas.getContext) {
 		DisplayObject._hitTestCanvas = canvas;
 		DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -7937,7 +7938,7 @@ this.createjs = this.createjs||{};
 		 * @property canvas
 		 * @type HTMLCanvasElement | Object
 		 **/
-		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+		this.canvas = (typeof canvas == "string") ? ww&&document.getElementById(canvas) : canvas;
 	
 		/**
 		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
@@ -11999,7 +12000,7 @@ this.createjs = this.createjs||{};
 	 * @type CanvasRenderingContext2D
 	 * @private
 	 **/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
 	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
 	
 	
@@ -13361,7 +13362,7 @@ this.createjs = this.createjs||{};
 	 * @type CanvasRenderingContext2D
 	 * @protected
 	*/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
 	if (canvas.getContext) {
 		SpriteSheetUtils._workingCanvas = canvas;
 		SpriteSheetUtils._workingContext = canvas.getContext("2d");
@@ -13848,7 +13849,7 @@ this.createjs = this.createjs||{};
 			if (o.w > x) { x = o.w; }
 			y += o.h;
 			if (!o.h || !frames.length) {
-				var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+				var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;
@@ -16649,5 +16650,5 @@ this.createjs = this.createjs || {};
 	s.buildDate = /*=date*/"Thu, 14 Sep 2017 19:47:53 GMT"; // injected by build process
 
 })();
-/* Easel Compiled: Mon May 16 2022 12:34:59 GMT-0700 (Pacific Daylight Time) */
+/* Easel Compiled: Mon May 16 2022 21:06:59 GMT-0700 (Pacific Daylight Time) */
 if(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;

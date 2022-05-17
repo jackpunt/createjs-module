@@ -1,5 +1,13 @@
-*** easeljs.js	2022-05-13 22:41:48.000000000 -0700
---- easeljs-patched.js	2022-05-16 12:34:59.000000000 -0700
+*** easeljs.js	2022-05-16 21:06:59.000000000 -0700
+--- easeljs-patched.js	2022-05-16 21:06:58.000000000 -0700
+***************
+*** 1,4 ****
+--- 1,5 ----
+  var createjs = (this.createjs = (this.createjs || {}));
++ var ww; try { ww = window} catch { ww = false }
+  /*!
+  * EaselJS
+  * Visit http://createjs.com/ for documentation, updates and examples.
 ***************
 *** 1413,1419 ****
   	 * @static
@@ -9,8 +17,113 @@
   	Ticker._getTime = function() {
   		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
   	};
---- 1413,1419 ----
+--- 1414,1420 ----
   	 * @static
   	 * @private
   	 **/
-! 	var w=window, now=w&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
+! 	 var w=ww&&window, now=ww&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
+  	Ticker._getTime = function() {
+  		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
+  	};
+***************
+*** 3922,3928 ****
+  	 * @protected
+  	 * @type {CanvasRenderingContext2D}
+  	 **/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+  	if (canvas.getContext) {
+  		Graphics._ctx = canvas.getContext("2d");
+  		canvas.width = canvas.height = 1;
+--- 3923,3929 ----
+  	 * @protected
+  	 * @type {CanvasRenderingContext2D}
+  	 **/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+  	if (canvas.getContext) {
+  		Graphics._ctx = canvas.getContext("2d");
+  		canvas.width = canvas.height = 1;
+***************
+*** 6346,6352 ****
+  	 * @static
+  	 * @protected
+  	 **/
+! 	var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
+  	if (canvas.getContext) {
+  		DisplayObject._hitTestCanvas = canvas;
+  		DisplayObject._hitTestContext = canvas.getContext("2d");
+--- 6347,6353 ----
+  	 * @static
+  	 * @protected
+  	 **/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas")); // prevent errors on load in browsers without canvas.
+  	if (canvas.getContext) {
+  		DisplayObject._hitTestCanvas = canvas;
+  		DisplayObject._hitTestContext = canvas.getContext("2d");
+***************
+*** 7937,7943 ****
+  		 * @property canvas
+  		 * @type HTMLCanvasElement | Object
+  		 **/
+! 		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+  	
+  		/**
+  		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+--- 7938,7944 ----
+  		 * @property canvas
+  		 * @type HTMLCanvasElement | Object
+  		 **/
+! 		this.canvas = (typeof canvas == "string") ? ww&&document.getElementById(canvas) : canvas;
+  	
+  		/**
+  		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+***************
+*** 11999,12005 ****
+  	 * @type CanvasRenderingContext2D
+  	 * @private
+  	 **/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+  	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
+  	
+  	
+--- 12000,12006 ----
+  	 * @type CanvasRenderingContext2D
+  	 * @private
+  	 **/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+  	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
+  	
+  	
+***************
+*** 13361,13367 ****
+  	 * @type CanvasRenderingContext2D
+  	 * @protected
+  	*/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
+  	if (canvas.getContext) {
+  		SpriteSheetUtils._workingCanvas = canvas;
+  		SpriteSheetUtils._workingContext = canvas.getContext("2d");
+--- 13362,13368 ----
+  	 * @type CanvasRenderingContext2D
+  	 * @protected
+  	*/
+! 	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+  	if (canvas.getContext) {
+  		SpriteSheetUtils._workingCanvas = canvas;
+  		SpriteSheetUtils._workingContext = canvas.getContext("2d");
+***************
+*** 13848,13854 ****
+  			if (o.w > x) { x = o.w; }
+  			y += o.h;
+  			if (!o.h || !frames.length) {
+! 				var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
+  				canvas.width = this._getSize(x,this.maxWidth);
+  				canvas.height = this._getSize(y,this.maxHeight);
+  				this._data.images[img] = canvas;
+--- 13849,13855 ----
+  			if (o.w > x) { x = o.w; }
+  			y += o.h;
+  			if (!o.h || !frames.length) {
+! 				var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+  				canvas.width = this._getSize(x,this.maxWidth);
+  				canvas.height = this._getSize(y,this.maxHeight);
+  				this._data.images[img] = canvas;
