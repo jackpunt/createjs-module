@@ -1,5 +1,5 @@
-*** easeljs.js	2022-05-16 21:06:59.000000000 -0700
---- easeljs-patched.js	2022-05-16 21:06:58.000000000 -0700
+*** easeljs.js	2022-05-17 11:16:49.000000000 -0700
+--- easeljs-patched.js	2022-05-17 11:16:47.000000000 -0700
 ***************
 *** 1,4 ****
 --- 1,5 ----
@@ -9,6 +9,47 @@
   * EaselJS
   * Visit http://createjs.com/ for documentation, updates and examples.
 ***************
+*** 630,636 ****
+  	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
+  	 * the event is dispatched.
+  	 * @param {Object} [scope] The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
+! 	 * @param {Boolean} [once=false] If true, the listener will remove itself after the first time it is triggered.
+  	 * @param {*} [data] Arbitrary data that will be included as the second parameter when the listener is called.
+  	 * @param {Boolean} [useCapture=false] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+  	 * @return {Function} Returns the anonymous function that was created and assigned as the listener. This is needed to remove the listener later using .removeEventListener.
+--- 631,637 ----
+  	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
+  	 * the event is dispatched.
+  	 * @param {Object} [scope] The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
+! 	 * @param {Boolean} [once=false] If true, the listener is removed before the first time it is triggered.
+  	 * @param {*} [data] Arbitrary data that will be included as the second parameter when the listener is called.
+  	 * @param {Boolean} [useCapture=false] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+  	 * @return {Function} Returns the anonymous function that was created and assigned as the listener. This is needed to remove the listener later using .removeEventListener.
+***************
+*** 641,650 ****
+  			listener = listener.handleEvent;
+  		}
+  		scope = scope||this;
+! 		return this.addEventListener(type, function(evt) {
+! 				listener.call(scope, evt, data);
+! 				once&&evt.remove();
+! 			}, useCapture);
+  	};
+  
+  	/**
+--- 642,652 ----
+  			listener = listener.handleEvent;
+  		}
+  		scope = scope||this;
+! 		let listnr = function (evt) {
+! 			once&&this.removeEventListener(type, listnr)
+! 			listener.call(scope, evt, data);
+! 		}
+! 		return this.addEventListener(type, listnr, useCapture);
+  	};
+  
+  	/**
+***************
 *** 1413,1419 ****
   	 * @static
   	 * @private
@@ -17,7 +58,7 @@
   	Ticker._getTime = function() {
   		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
   	};
---- 1414,1420 ----
+--- 1415,1421 ----
   	 * @static
   	 * @private
   	 **/
@@ -34,7 +75,7 @@
   	if (canvas.getContext) {
   		Graphics._ctx = canvas.getContext("2d");
   		canvas.width = canvas.height = 1;
---- 3923,3929 ----
+--- 3924,3930 ----
   	 * @protected
   	 * @type {CanvasRenderingContext2D}
   	 **/
@@ -51,7 +92,7 @@
   	if (canvas.getContext) {
   		DisplayObject._hitTestCanvas = canvas;
   		DisplayObject._hitTestContext = canvas.getContext("2d");
---- 6347,6353 ----
+--- 6348,6354 ----
   	 * @static
   	 * @protected
   	 **/
@@ -68,7 +109,7 @@
   	
   		/**
   		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
---- 7938,7944 ----
+--- 7939,7945 ----
   		 * @property canvas
   		 * @type HTMLCanvasElement | Object
   		 **/
@@ -85,7 +126,7 @@
   	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
   	
   	
---- 12000,12006 ----
+--- 12001,12007 ----
   	 * @type CanvasRenderingContext2D
   	 * @private
   	 **/
@@ -102,7 +143,7 @@
   	if (canvas.getContext) {
   		SpriteSheetUtils._workingCanvas = canvas;
   		SpriteSheetUtils._workingContext = canvas.getContext("2d");
---- 13362,13368 ----
+--- 13363,13369 ----
   	 * @type CanvasRenderingContext2D
   	 * @protected
   	*/
@@ -119,7 +160,7 @@
   				canvas.width = this._getSize(x,this.maxWidth);
   				canvas.height = this._getSize(y,this.maxHeight);
   				this._data.images[img] = canvas;
---- 13849,13855 ----
+--- 13850,13856 ----
   			if (o.w > x) { x = o.w; }
   			y += o.h;
   			if (!o.h || !frames.length) {
