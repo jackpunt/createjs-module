@@ -12,9 +12,9 @@
     "scripts": {
         "ignore": "the final [14 line] patch for Date()",
         "diff-patch": "diff -c easeljs.js easeljs-patched.js | tail -r | tail -n +14 | tail -r > easeljs.js.patch",
-        "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run run-patch",
-        "run-patch": "patch < easeljs.js.patch",
-        "pub": "npm run build; npm version ${1:-patch}; npm publish --access public",
+        "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run patch",
+        "patch": "patch < easeljs.js.patch",
+        "pub": "npm run build; npm run patch; npm version ${1:-patch}; npm publish --access public",
         "build": "gulp",
         "build:package": "gulp package",
         "build:compile": "gulp compile"
