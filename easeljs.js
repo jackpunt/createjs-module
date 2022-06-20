@@ -642,8 +642,8 @@ this.createjs = this.createjs||{};
 			listener = listener.handleEvent;
 		}
 		scope = scope||this;
-		let listnr = function (evt) {
-			once&&this.removeEventListener(type, listnr)
+		let d=this,listnr = function (evt) {
+			once&&d.removeEventListener(type, listnr)
 			listener.call(scope, evt, data);
 		}
 		return this.addEventListener(type, listnr, useCapture);
