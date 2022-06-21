@@ -5,14 +5,17 @@
     "author": "TheGraid <thegraid@gmail.com>",
     "main": "./createjs.js",
     "types": "./createjs.d.ts",
-    "type": "module",
     "repository": {
         "type": "git",
         "url": "https://github.com/jackpunt/createjs-module"
     },
     "scripts": {
-        "pub": "npm run build; npm version ${1:-patch}; npm publish --access public",
-        "build": "gulp",
+        "ignore": "the final [14 line] patch for Date()",
+        "diff-patch": "diff -c createjs.js createjs-patched.js | tail -r | tail -n +14 | tail -r > createjs.js.patch",
+        "make-patch": "cp createjs.js createjs-patched.js; gulp compile; npm run diff-patch ; npm run patch",
+        "patch": "patch < createjs.js.patch",
+        "pub": "npm run build; npm run patch; npm version ${1:-patch}; npm publish --access public",
+        "build": "gulp compile",
         "build:package": "gulp package",
         "build:compile": "gulp compile"
     },
