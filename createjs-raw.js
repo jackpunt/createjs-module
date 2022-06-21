@@ -1,5 +1,4 @@
 var createjs = (this.createjs = (this.createjs || {}));
-var ww; try { ww = window} catch { ww = false }
 /*!
 * EaselJS
 * Visit http://createjs.com/ for documentation, updates and examples.
@@ -631,7 +630,7 @@ this.createjs = this.createjs||{};
 	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
 	 * the event is dispatched.
 	 * @param {Object} [scope] The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
-	 * @param {Boolean} [once=false] If true, the listener is removed before the first time it is triggered.
+	 * @param {Boolean} [once=false] If true, the listener will remove itself after the first time it is triggered.
 	 * @param {*} [data] Arbitrary data that will be included as the second parameter when the listener is called.
 	 * @param {Boolean} [useCapture=false] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
 	 * @return {Function} Returns the anonymous function that was created and assigned as the listener. This is needed to remove the listener later using .removeEventListener.
@@ -642,11 +641,10 @@ this.createjs = this.createjs||{};
 			listener = listener.handleEvent;
 		}
 		scope = scope||this;
-		let d=this,listnr = function (evt) {
-			once&&d.removeEventListener(type, listnr, useCapture)
-			listener.call(scope, evt, data);
-		}
-		return this.addEventListener(type, listnr, useCapture);
+		return this.addEventListener(type, function(evt) {
+				listener.call(scope, evt, data);
+				once&&evt.remove();
+			}, useCapture);
 	};
 
 	/**
@@ -1415,7 +1413,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @private
 	 **/
-	 var w=ww&&window, now=ww&&(w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow);
+	var w=window, now=w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow;
 	Ticker._getTime = function() {
 		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
 	};
@@ -3924,7 +3922,7 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 * @type {CanvasRenderingContext2D}
 	 **/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
 		Graphics._ctx = canvas.getContext("2d");
 		canvas.width = canvas.height = 1;
@@ -6348,7 +6346,7 @@ this.createjs = this.createjs||{};
 	 * @static
 	 * @protected
 	 **/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas")); // prevent errors on load in browsers without canvas.
+	var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); // prevent errors on load in browsers without canvas.
 	if (canvas.getContext) {
 		DisplayObject._hitTestCanvas = canvas;
 		DisplayObject._hitTestContext = canvas.getContext("2d");
@@ -7939,7 +7937,7 @@ this.createjs = this.createjs||{};
 		 * @property canvas
 		 * @type HTMLCanvasElement | Object
 		 **/
-		this.canvas = (typeof canvas == "string") ? ww&&document.getElementById(canvas) : canvas;
+		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
 	
 		/**
 		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
@@ -12001,7 +11999,7 @@ this.createjs = this.createjs||{};
 	 * @type CanvasRenderingContext2D
 	 * @private
 	 **/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
 	
 	
@@ -13363,7 +13361,7 @@ this.createjs = this.createjs||{};
 	 * @type CanvasRenderingContext2D
 	 * @protected
 	*/
-	var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+	var canvas = (createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"));
 	if (canvas.getContext) {
 		SpriteSheetUtils._workingCanvas = canvas;
 		SpriteSheetUtils._workingContext = canvas.getContext("2d");
@@ -13850,7 +13848,7 @@ this.createjs = this.createjs||{};
 			if (o.w > x) { x = o.w; }
 			y += o.h;
 			if (!o.h || !frames.length) {
-				var canvas = (createjs.createCanvas?createjs.createCanvas():ww&&document.createElement("canvas"));
+				var canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas");
 				canvas.width = this._getSize(x,this.maxWidth);
 				canvas.height = this._getSize(y,this.maxHeight);
 				this._data.images[img] = canvas;
@@ -33170,12 +33168,10 @@ this.createjs = this.createjs||{};
 			listener = listener.handleEvent;
 		}
 		scope = scope||this;
-		let d=this,listnr = function (evt) {
-			once&&d.removeEventListener(type, listnr, useCapture)
-			listener.call(scope, evt, data);
-		}
-		return this.addEventListener(type, listnr, useCapture);
-
+		return this.addEventListener(type, function(evt) {
+				listener.call(scope, evt, data);
+				once&&evt.remove();
+			}, useCapture);
 	};
 
 	/**
