@@ -1,3 +1,6 @@
+// gulpfile.js  -> require("gulpfile.es6")
+
+import cp from 'child_process';
 import fs from 'fs';
 import gulp from 'gulp';
 import concat from 'gulp-concat';
@@ -22,6 +25,10 @@ const SRC = {
 const DEST = {
     CREATE: './'
 };
+const TRNL = "tr -d '\r' < createjs-raw.js > createjs.js";
+function execTrnlTask() {
+    return cp.exec(TRNL, (error, stdout, stderr) => { })
+}
 
 function string_src(filename, string) {
     var src = require('stream').Readable({ objectMode: true });
@@ -38,9 +45,9 @@ function compile() {
         SRC.SOUND,
         SRC.TWEEN
     ])
-        .pipe(concat('createjs.js'))
+        .pipe(concat('createjs-raw.js'))
         .pipe(insert.prepend('var createjs = (this.createjs = (this.createjs || {}));\n'))
-        .pipe(insert.append(`\n/* Compiled: ${new Date()} */`))
+        .pipe(insert.append(`\n/* Createjs Compiled: ${new Date()} */`))
         .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;\n'))
         .pipe(gulp.dest(DEST.CREATE));
 }
@@ -53,6 +60,6 @@ function doPackage() {
     .pipe(gulp.dest(DEST.CREATE));
 }
 
-gulp.task('compile', gulp.series(compile));
+gulp.task('compile', gulp.series(compile, execTrnlTask));
 gulp.task('package', gulp.series(doPackage));
 gulp.task('default', gulp.series(compile, doPackage));
