@@ -643,7 +643,7 @@ this.createjs = this.createjs||{};
 		}
 		scope = scope||this;
 		let d=this,listnr = function (evt) {
-			once&&d.removeEventListener(type, listnr)
+			once&&d.removeEventListener(type, listnr, useCapture)
 			listener.call(scope, evt, data);
 		}
 		return this.addEventListener(type, listnr, useCapture);
@@ -16651,5 +16651,5 @@ this.createjs = this.createjs || {};
 	s.buildDate = /*=date*/"Thu, 14 Sep 2017 19:47:53 GMT"; // injected by build process
 
 })();
-/* Easel Compiled: Tue May 17 2022 11:16:49 GMT-0700 (Pacific Daylight Time) */
+/* Easel Compiled: Mon Jun 20 2022 17:02:04 GMT-0700 (Pacific Daylight Time) */
 if(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;

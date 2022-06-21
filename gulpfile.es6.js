@@ -7,7 +7,7 @@ import gutil from 'gulp-util';
 
 const VERSIONS = {
     EASEL: '1.0.0',
-    CREATE: '1.1.5'
+    CREATE: '1.1.8'
 };
 
 const SRC = {
