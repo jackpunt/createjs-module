@@ -8610,6 +8610,7 @@ this.createjs = this.createjs||{};
 			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
 			return;
 		}
+		if (this.stage.canvas) {
 		var o = this._getPointerData(-1);
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
 		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
@@ -8658,6 +8659,7 @@ this.createjs = this.createjs||{};
 
 		if (oldTarget != target) {
 			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
+		}
 		}
 		
 		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
@@ -16651,5 +16653,5 @@ this.createjs = this.createjs || {};
 	s.buildDate = /*=date*/"Thu, 14 Sep 2017 19:47:53 GMT"; // injected by build process
 
 })();
-/* Easel Compiled: Mon Jun 20 2022 17:02:04 GMT-0700 (Pacific Daylight Time) */
+/* Easel Compiled: Sat Jun 25 2022 15:20:31 GMT-0700 (Pacific Daylight Time) */
 if(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;
