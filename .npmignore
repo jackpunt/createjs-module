@@ -1,4 +1,5 @@
-# sync with .npmignore !
+createjs.js.patch
+# include .gitignore
 .DS_STORE
 .idea
 *.iml
