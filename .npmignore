@@ -1,4 +1,5 @@
-# sync with .npmignore !
+easeljs.js.patch
+# include .gitignore
 .DS_STORE
 .idea
 *.iml
