@@ -118,6 +118,26 @@
   		/**
   		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 ***************
+*** 8608,8613 ****
+--- 8610,8616 ----
+  			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
+  			return;
+  		}
++ 		if (this.stage.canvas) {
+  		var o = this._getPointerData(-1);
+  		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
+  		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+***************
+*** 8657,8662 ****
+--- 8660,8666 ----
+  		if (oldTarget != target) {
+  			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
+  		}
++ 		}
+  		
+  		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
+  	};
+***************
 *** 11999,12005 ****
   	 * @type CanvasRenderingContext2D
   	 * @private

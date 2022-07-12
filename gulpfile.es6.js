@@ -12,7 +12,7 @@ const VERSIONS = {
     PRELOAD: '1.0.0',
     SOUNDL: '1.0.0',
     TWEEN: '1.0.0',
-    CREATE: '1.1.2'
+    CREATE: '1.1.8'
 };
 
 const SRC = {

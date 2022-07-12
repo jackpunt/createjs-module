@@ -8610,6 +8610,7 @@ this.createjs = this.createjs||{};
 			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
 			return;
 		}
+		if (this.stage.canvas) {
 		var o = this._getPointerData(-1);
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
 		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
@@ -8658,6 +8659,7 @@ this.createjs = this.createjs||{};
 
 		if (oldTarget != target) {
 			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
+		}
 		}
 		
 		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
