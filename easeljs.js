@@ -7376,12 +7376,13 @@ this.createjs = this.createjs||{};
 	 *
 	 *      addChildAt(child1, child2, ..., index);
 	 *
-	 * The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list,
-	 * you could use:
+	 * For example, to add myShape under otherShape in the display list, you could use:
 	 *
 	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
 	 *
-	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
+	 * This would also bump otherShape's index up by one.
+	 * 
+	 * The index works like the first parameter of splice(), so -1 inserts before the last child.
 	 *
 	 * @method addChildAt
 	 * @param {DisplayObject} child The display object to add.
