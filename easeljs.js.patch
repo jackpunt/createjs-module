@@ -1,13 +1,195 @@
-*** easeljs.js	2022-06-25 15:20:31.000000000 -0700
---- easeljs-patched.js	2022-06-25 15:20:29.000000000 -0700
+*** easeljs.js	2023-08-15 23:38:16.000000000 -0700
+--- easeljs-patched.js	2023-08-15 23:38:15.000000000 -0700
 ***************
 *** 1,4 ****
---- 1,5 ----
-  var createjs = (this.createjs = (this.createjs || {}));
-+ var ww; try { ww = window} catch { ww = false }
+! var createjs = (this.createjs = (this.createjs || {}));
   /*!
   * EaselJS
   * Visit http://createjs.com/ for documentation, updates and examples.
+--- 1,6 ----
+! // var createjs = (this.createjs = (this.createjs || {}));
+! var createjs = {};
+! var ww; try { ww = window} catch { ww = false }
+  /*!
+  * EaselJS
+  * Visit http://createjs.com/ for documentation, updates and examples.
+***************
+*** 32,38 ****
+  // extend.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+--- 34,40 ----
+  // extend.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+***************
+*** 68,74 ****
+  // promote.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+--- 70,76 ----
+  // promote.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+***************
+*** 128,134 ****
+  // indexOf.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+--- 130,136 ----
+  // indexOf.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+***************
+*** 160,166 ****
+  // UID.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+  (function() {
+  	"use strict";
+--- 162,168 ----
+  // UID.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+  (function() {
+  	"use strict";
+***************
+*** 206,212 ****
+  // deprecate.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+--- 208,214 ----
+  // deprecate.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+  /**
+   * @class Utility Methods
+***************
+*** 248,257 ****
+  // Event.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  // constructor:
+  	/**
+--- 250,259 ----
+  // Event.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  // constructor:
+  	/**
+***************
+*** 266,272 ****
+  	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+  	 * @constructor
+  	 **/
+! 	function Event(type, bubbles, cancelable) {
+  		
+  	
+  	// public properties:
+--- 268,274 ----
+  	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+  	 * @constructor
+  	 **/
+! export function Event(type, bubbles, cancelable) {
+  		
+  	
+  	// public properties:
+***************
+*** 456,471 ****
+  	};
+  
+  	createjs.Event = Event;
+! }());
+  
+  //##############################################################################
+  // EventDispatcher.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 458,473 ----
+  	};
+  
+  	createjs.Event = Event;
+! // }());
+  
+  //##############################################################################
+  // EventDispatcher.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 523,529 ****
+  	 * @class EventDispatcher
+  	 * @constructor
+  	 **/
+! 	function EventDispatcher() {
+  	
+  	
+  	// private properties:
+--- 525,531 ----
+  	 * @class EventDispatcher
+  	 * @constructor
+  	 **/
+! export function EventDispatcher() {
+  	
+  	
+  	// private properties:
 ***************
 *** 630,636 ****
   	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
@@ -17,7 +199,7 @@
   	 * @param {*} [data] Arbitrary data that will be included as the second parameter when the listener is called.
   	 * @param {Boolean} [useCapture=false] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
   	 * @return {Function} Returns the anonymous function that was created and assigned as the listener. This is needed to remove the listener later using .removeEventListener.
---- 631,637 ----
+--- 632,638 ----
   	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
   	 * the event is dispatched.
   	 * @param {Object} [scope] The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
@@ -37,7 +219,7 @@
   	};
   
   	/**
---- 642,652 ----
+--- 643,653 ----
   			listener = listener.handleEvent;
   		}
   		scope = scope||this;
@@ -50,7 +232,59 @@
   
   	/**
 ***************
-*** 1413,1419 ****
+*** 837,852 ****
+  
+  
+  	createjs.EventDispatcher = EventDispatcher;
+! }());
+  
+  //##############################################################################
+  // Ticker.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 840,855 ----
+  
+  
+  	createjs.EventDispatcher = EventDispatcher;
+! // }());
+  
+  //##############################################################################
+  // Ticker.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 872,878 ****
+  	 * @uses EventDispatcher
+  	 * @static
+  	 **/
+! 	function Ticker() {
+  		throw "Ticker cannot be instantiated.";
+  	}
+  
+--- 875,881 ----
+  	 * @uses EventDispatcher
+  	 * @static
+  	 **/
+! export function Ticker() {
+  		throw "Ticker cannot be instantiated.";
+  	}
+  
+***************
+*** 1413,1435 ****
   	 * @static
   	 * @private
   	 **/
@@ -58,7 +292,23 @@
   	Ticker._getTime = function() {
   		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
   	};
---- 1415,1421 ----
+  
+  
+  	createjs.Ticker = Ticker;
+! }());
+  
+  //##############################################################################
+  // VideoBuffer.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 1416,1438 ----
   	 * @static
   	 * @private
   	 **/
@@ -66,6 +316,507 @@
   	Ticker._getTime = function() {
   		return ((now&&now.call(w.performance))||(new Date().getTime())) - Ticker._startTime;
   	};
+  
+  
+  	createjs.Ticker = Ticker;
+! // }());
+  
+  //##############################################################################
+  // VideoBuffer.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 1445,1451 ****
+  	 * @param {HTMLVideoElement} video The HTML video element to buffer.
+  	 * @constructor
+  	 **/
+! 	function VideoBuffer(video) {
+  		
+  	// private properties:
+  		/**
+--- 1448,1454 ----
+  	 * @param {HTMLVideoElement} video The HTML video element to buffer.
+  	 * @constructor
+  	 **/
+! export function VideoBuffer(video) {
+  		
+  	// private properties:
+  		/**
+***************
+*** 1520,1535 ****
+  
+  
+  	createjs.VideoBuffer = VideoBuffer;
+! }());
+  
+  //##############################################################################
+  // MouseEvent.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 1523,1538 ----
+  
+  
+  	createjs.VideoBuffer = VideoBuffer;
+! // }());
+  
+  //##############################################################################
+  // MouseEvent.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 1551,1557 ****
+  	 * @extends Event
+  	 * @constructor
+  	 **/
+! 	function MouseEvent(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY, relatedTarget) {
+  		this.Event_constructor(type, bubbles, cancelable);
+  		
+  		
+--- 1554,1560 ----
+  	 * @extends Event
+  	 * @constructor
+  	 **/
+! export function MouseEvent(type, bubbles, cancelable, stageX, stageY, nativeEvent, pointerID, primary, rawX, rawY, relatedTarget) {
+  		this.Event_constructor(type, bubbles, cancelable);
+  		
+  		
+***************
+*** 1691,1706 ****
+  
+  
+  	createjs.MouseEvent = createjs.promote(MouseEvent, "Event");
+! }());
+  
+  //##############################################################################
+  // Matrix2D.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 1694,1709 ----
+  
+  
+  	createjs.MouseEvent = createjs.promote(MouseEvent, "Event");
+! // }());
+  
+  //##############################################################################
+  // Matrix2D.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 1724,1730 ****
+  	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+  	 * @constructor
+  	 **/
+! 	function Matrix2D(a, b, c, d, tx, ty) {
+  		this.setValues(a,b,c,d,tx,ty);
+  		
+  	// public properties:
+--- 1727,1733 ----
+  	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+  	 * @constructor
+  	 **/
+! export function Matrix2D(a, b, c, d, tx, ty) {
+  		this.setValues(a,b,c,d,tx,ty);
+  		
+  	// public properties:
+***************
+*** 2193,2208 ****
+  
+  
+  	createjs.Matrix2D = Matrix2D;
+! }());
+  
+  //##############################################################################
+  // DisplayProps.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  	/**
+  	 * Used for calculating and encapsulating display related properties.
+--- 2196,2211 ----
+  
+  
+  	createjs.Matrix2D = Matrix2D;
+! // }());
+  
+  //##############################################################################
+  // DisplayProps.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! //(function() {
+! //	"use strict";
+  
+  	/**
+  	 * Used for calculating and encapsulating display related properties.
+***************
+*** 2214,2220 ****
+  	 * @param {Number} [matrix] A transformation matrix. Defaults to a new identity matrix.
+  	 * @constructor
+  	 **/
+! 	function DisplayProps(visible, alpha, shadow, compositeOperation, matrix) {
+  		this.setValues(visible, alpha, shadow, compositeOperation, matrix);
+  		
+  	// public properties:
+--- 2217,2223 ----
+  	 * @param {Number} [matrix] A transformation matrix. Defaults to a new identity matrix.
+  	 * @constructor
+  	 **/
+! export function DisplayProps(visible, alpha, shadow, compositeOperation, matrix) {
+  		this.setValues(visible, alpha, shadow, compositeOperation, matrix);
+  		
+  	// public properties:
+***************
+*** 2350,2365 ****
+  // private methods:
+  
+  	createjs.DisplayProps = DisplayProps;
+! })();
+  
+  //##############################################################################
+  // Point.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 2353,2368 ----
+  // private methods:
+  
+  	createjs.DisplayProps = DisplayProps;
+! //})();
+  
+  //##############################################################################
+  // Point.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 2375,2381 ****
+  	 * @param {Number} [y=0] Y position.
+  	 * @constructor
+  	 **/
+! 	function Point(x, y) {
+  	 	this.setValues(x, y);
+  	 	
+  	 	
+--- 2378,2384 ----
+  	 * @param {Number} [y=0] Y position.
+  	 * @constructor
+  	 **/
+! export function Point(x, y) {
+  	 	this.setValues(x, y);
+  	 	
+  	 	
+***************
+*** 2443,2458 ****
+  	
+  	
+  	createjs.Point = Point;
+! }());
+  
+  //##############################################################################
+  // Rectangle.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 2446,2461 ----
+  	
+  	
+  	createjs.Point = Point;
+! // }());
+  
+  //##############################################################################
+  // Rectangle.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 2470,2476 ****
+  	 * @param {Number} [height=0] The height of the Rectangle.
+  	 * @constructor
+  	 **/
+! 	function Rectangle(x, y, width, height) {
+  		this.setValues(x, y, width, height);
+  		
+  		
+--- 2473,2479 ----
+  	 * @param {Number} [height=0] The height of the Rectangle.
+  	 * @constructor
+  	 **/
+! export function Rectangle(x, y, width, height) {
+  		this.setValues(x, y, width, height);
+  		
+  		
+***************
+*** 2651,2666 ****
+  	
+  	
+  	createjs.Rectangle = Rectangle;
+! }());
+  
+  //##############################################################################
+  // ButtonHelper.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 2654,2669 ----
+  	
+  	
+  	createjs.Rectangle = Rectangle;
+! // }());
+  
+  //##############################################################################
+  // ButtonHelper.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 2697,2703 ****
+  	 * null, then the default state of the hitArea will be used. *
+  	 * @constructor
+  	 */
+! 	function ButtonHelper(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
+  		if (!target.addEventListener) { return; }
+  	
+  	
+--- 2700,2706 ----
+  	 * null, then the default state of the hitArea will be used. *
+  	 * @constructor
+  	 */
+! export function ButtonHelper(target, outLabel, overLabel, downLabel, play, hitArea, hitLabel) {
+  		if (!target.addEventListener) { return; }
+  	
+  	
+***************
+*** 2884,2899 ****
+  
+  
+  	createjs.ButtonHelper = ButtonHelper;
+! }());
+  
+  //##############################################################################
+  // Shadow.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 2887,2902 ----
+  
+  
+  	createjs.ButtonHelper = ButtonHelper;
+! // }());
+  
+  //##############################################################################
+  // Shadow.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 2912,2918 ****
+  	 * @param {Number} offsetY The y offset of the shadow in pixels.
+  	 * @param {Number} blur The size of the blurring effect.
+  	 **/
+! 	function Shadow(color, offsetX, offsetY, blur) {
+  		
+  		
+  	// public properties:
+--- 2915,2921 ----
+  	 * @param {Number} offsetY The y offset of the shadow in pixels.
+  	 * @param {Number} blur The size of the blurring effect.
+  	 **/
+! export function Shadow(color, offsetX, offsetY, blur) {
+  		
+  		
+  	// public properties:
+***************
+*** 2980,2995 ****
+  	
+  
+  	createjs.Shadow = Shadow;
+! }());
+  
+  //##############################################################################
+  // SpriteSheet.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 2983,2998 ----
+  	
+  
+  	createjs.Shadow = Shadow;
+! // }());
+  
+  //##############################################################################
+  // SpriteSheet.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 3161,3167 ****
+  	 * @param {Object} data An object describing the SpriteSheet data.
+  	 * @extends EventDispatcher
+  	 **/
+! 	function SpriteSheet(data) {
+  		this.EventDispatcher_constructor();
+  
+  
+--- 3164,3170 ----
+  	 * @param {Object} data An object describing the SpriteSheet data.
+  	 * @extends EventDispatcher
+  	 **/
+! export function SpriteSheet(data) {
+  		this.EventDispatcher_constructor();
+  
+  
+***************
+*** 3579,3594 ****
+  
+  
+  	createjs.SpriteSheet = createjs.promote(SpriteSheet, "EventDispatcher");
+! }());
+  
+  //##############################################################################
+  // Graphics.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 3582,3597 ----
+  
+  
+  	createjs.SpriteSheet = createjs.promote(SpriteSheet, "EventDispatcher");
+! // }());
+  
+  //##############################################################################
+  // Graphics.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 3687,3693 ****
+  	 * @class Graphics
+  	 * @constructor
+  	 **/
+! 	function Graphics() {
+  
+  
+  	// public properties
+--- 3690,3696 ----
+  	 * @class Graphics
+  	 * @constructor
+  	 **/
+! export function Graphics() {
+  
+  
+  	// public properties
 ***************
 *** 3922,3928 ****
   	 * @protected
@@ -75,7 +826,7 @@
   	if (canvas.getContext) {
   		Graphics._ctx = canvas.getContext("2d");
   		canvas.width = canvas.height = 1;
---- 3924,3930 ----
+--- 3925,3931 ----
   	 * @protected
   	 * @type {CanvasRenderingContext2D}
   	 **/
@@ -83,6 +834,58 @@
   	if (canvas.getContext) {
   		Graphics._ctx = canvas.getContext("2d");
   		canvas.width = canvas.height = 1;
+***************
+*** 5931,5946 ****
+  
+  
+  	createjs.Graphics = Graphics;
+! }());
+  
+  //##############################################################################
+  // DisplayObject.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 5934,5949 ----
+  
+  
+  	createjs.Graphics = Graphics;
+! // }());
+  
+  //##############################################################################
+  // DisplayObject.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 5954,5960 ****
+  	 * @extends EventDispatcher
+  	 * @constructor
+  	 **/
+! 	function DisplayObject() {
+  		this.EventDispatcher_constructor();
+  
+  
+--- 5957,5963 ----
+  	 * @extends EventDispatcher
+  	 * @constructor
+  	 **/
+! export function DisplayObject() {
+  		this.EventDispatcher_constructor();
+  
+  
 ***************
 *** 6346,6352 ****
   	 * @static
@@ -92,7 +895,7 @@
   	if (canvas.getContext) {
   		DisplayObject._hitTestCanvas = canvas;
   		DisplayObject._hitTestContext = canvas.getContext("2d");
---- 6348,6354 ----
+--- 6349,6355 ----
   	 * @static
   	 * @protected
   	 **/
@@ -100,6 +903,138 @@
   	if (canvas.getContext) {
   		DisplayObject._hitTestCanvas = canvas;
   		DisplayObject._hitTestContext = canvas.getContext("2d");
+***************
+*** 7182,7197 ****
+  	};
+  
+  	createjs.DisplayObject = createjs.promote(DisplayObject, "EventDispatcher");
+! }());
+  
+  //##############################################################################
+  // Container.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  	
+  
+  // constructor:
+--- 7185,7200 ----
+  	};
+  
+  	createjs.DisplayObject = createjs.promote(DisplayObject, "EventDispatcher");
+! // }());
+  
+  //##############################################################################
+  // Container.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  	
+  
+  // constructor:
+***************
+*** 7216,7222 ****
+   * @extends DisplayObject
+   * @constructor
+   **/
+! 	function Container() {
+  		this.DisplayObject_constructor();
+  		
+  	// public properties:
+--- 7219,7225 ----
+   * @extends DisplayObject
+   * @constructor
+   **/
+! export function Container() {
+  		this.DisplayObject_constructor();
+  		
+  	// public properties:
+***************
+*** 7374,7385 ****
+  	 *
+  	 *      addChildAt(child1, child2, ..., index);
+  	 *
+! 	 * The index must be between 0 and numChildren. For example, to add myShape under otherShape in the display list,
+! 	 * you could use:
+  	 *
+  	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
+  	 *
+! 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
+  	 *
+  	 * @method addChildAt
+  	 * @param {DisplayObject} child The display object to add.
+--- 7377,7389 ----
+  	 *
+  	 *      addChildAt(child1, child2, ..., index);
+  	 *
+! 	 * For example, to add myShape under otherShape in the display list, you could use:
+  	 *
+  	 *      container.addChildAt(myShape, container.getChildIndex(otherShape));
+  	 *
+! 	 * This would also bump otherShape's index up by one.
+! 	 * 
+! 	 * The index works like the first parameter of splice(), so -1 inserts before the last child.
+  	 *
+  	 * @method addChildAt
+  	 * @param {DisplayObject} child The display object to add.
+***************
+*** 7866,7881 ****
+  
+  
+  	createjs.Container = createjs.promote(Container, "DisplayObject");
+! }());
+  
+  //##############################################################################
+  // Stage.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 7870,7885 ----
+  
+  
+  	createjs.Container = createjs.promote(Container, "DisplayObject");
+! // }());
+  
+  //##############################################################################
+  // Stage.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 7902,7908 ****
+  	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
+  	 * of a canvas object in the current document.
+  	 **/
+! 	function Stage(canvas) {
+  		this.Container_constructor();
+  	
+  	
+--- 7906,7912 ----
+  	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
+  	 * of a canvas object in the current document.
+  	 **/
+! export function Stage(canvas) {
+  		this.Container_constructor();
+  	
+  	
 ***************
 *** 7937,7943 ****
   		 * @property canvas
@@ -109,7 +1044,7 @@
   	
   		/**
   		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
---- 7939,7945 ----
+--- 7941,7947 ----
   		 * @property canvas
   		 * @type HTMLCanvasElement | Object
   		 **/
@@ -119,7 +1054,7 @@
   		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 ***************
 *** 8608,8613 ****
---- 8610,8616 ----
+--- 8612,8618 ----
   			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
   			return;
   		}
@@ -129,7 +1064,7 @@
   		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 ***************
 *** 8657,8662 ****
---- 8660,8666 ----
+--- 8662,8668 ----
   		if (oldTarget != target) {
   			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
   		}
@@ -137,6 +1072,277 @@
   		
   		nextStage&&nextStage._testMouseOver(clear, owner || target && this, eventTarget || isEventTarget && this);
   	};
+***************
+*** 8702,8714 ****
+  
+  
+  	createjs.Stage = createjs.promote(Stage, "Container");
+! }());
+  
+  //##############################################################################
+  // StageGL.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+  /*
+   * README IF EDITING:
+--- 8708,8720 ----
+  
+  
+  	createjs.Stage = createjs.promote(Stage, "Container");
+! // }());
+  
+  //##############################################################################
+  // StageGL.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+  /*
+   * README IF EDITING:
+***************
+*** 8728,8735 ****
+   * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+   */
+  
+! (function () {
+! 	"use strict";
+  
+  	/**
+  	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
+--- 8734,8741 ----
+   * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
+   */
+  
+! // (function () {
+! //	"use strict";
+  
+  	/**
+  	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
+***************
+*** 8797,8803 ****
+  	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
+  	 * information.
+  	 */
+! 	function StageGL(canvas, options) {
+  		this.Stage_constructor(canvas);
+  
+  		if (options !== undefined) {
+--- 8803,8809 ----
+  	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
+  	 * information.
+  	 */
+! export function StageGL(canvas, options) {
+  		this.Stage_constructor(canvas);
+  
+  		if (options !== undefined) {
+***************
+*** 11101,11115 ****
+  	};
+  
+  	createjs.StageGL = createjs.promote(StageGL, "Stage");
+! }());
+  
+  //##############################################################################
+  // Bitmap.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+  	
+  	/**
+  	 * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
+--- 11107,11121 ----
+  	};
+  
+  	createjs.StageGL = createjs.promote(StageGL, "Stage");
+! // }());
+  
+  //##############################################################################
+  // Bitmap.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+  	
+  	/**
+  	 * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
+***************
+*** 11141,11147 ****
+  	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+  	 * If the latter, a new Image instance with the URL as its src will be used.
+  	 **/
+! 	function Bitmap(imageOrUri) {
+  		this.DisplayObject_constructor();
+  		
+  		
+--- 11147,11153 ----
+  	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+  	 * If the latter, a new Image instance with the URL as its src will be used.
+  	 **/
+! export function Bitmap(imageOrUri) {
+  		this.DisplayObject_constructor();
+  		
+  		
+***************
+*** 11306,11321 ****
+  
+  	
+  	createjs.Bitmap = createjs.promote(Bitmap, "DisplayObject");
+! }());
+  
+  //##############################################################################
+  // Sprite.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 11312,11327 ----
+  
+  	
+  	createjs.Bitmap = createjs.promote(Bitmap, "DisplayObject");
+! // }());
+  
+  //##############################################################################
+  // Sprite.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 11342,11348 ****
+  	 * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+  	 * @param {String|Number} [frameOrAnimation] The frame number or animation to play initially.
+  	 **/
+! 	function Sprite(spriteSheet, frameOrAnimation) {
+  		this.DisplayObject_constructor();
+  		
+  		
+--- 11348,11354 ----
+  	 * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+  	 * @param {String|Number} [frameOrAnimation] The frame number or animation to play initially.
+  	 **/
+! export function Sprite(spriteSheet, frameOrAnimation) {
+  		this.DisplayObject_constructor();
+  		
+  		
+***************
+*** 11759,11774 ****
+  
+  
+  	createjs.Sprite = createjs.promote(Sprite, "DisplayObject");
+! }());
+  
+  //##############################################################################
+  // Shape.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 11765,11780 ----
+  
+  
+  	createjs.Sprite = createjs.promote(Sprite, "DisplayObject");
+! // }());
+  
+  //##############################################################################
+  // Shape.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 11795,11801 ****
+  	 * @constructor
+  	 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
+  	 **/
+! 	function Shape(graphics) {
+  		this.DisplayObject_constructor();
+  		
+  		
+--- 11801,11807 ----
+  	 * @constructor
+  	 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
+  	 **/
+! export function Shape(graphics) {
+  		this.DisplayObject_constructor();
+  		
+  		
+***************
+*** 11866,11881 ****
+  
+  
+  	createjs.Shape = createjs.promote(Shape, "DisplayObject");
+! }());
+  
+  //##############################################################################
+  // Text.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 11872,11887 ----
+  
+  
+  	createjs.Shape = createjs.promote(Shape, "DisplayObject");
+! // }());
+  
+  //##############################################################################
+  // Text.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 11908,11914 ****
+  	 * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
+  	 * "#F00", "red", or "#FF0000").
+  	 **/
+! 	function Text(text, font, color) {
+  		this.DisplayObject_constructor();
+  		
+  		
+--- 11914,11920 ----
+  	 * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
+  	 * "#F00", "red", or "#FF0000").
+  	 **/
+! export function Text(text, font, color) {
+  		this.DisplayObject_constructor();
+  		
+  		
 ***************
 *** 11999,12005 ****
   	 * @type CanvasRenderingContext2D
@@ -146,7 +1352,7 @@
   	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
   	
   	
---- 12003,12009 ----
+--- 12005,12011 ----
   	 * @type CanvasRenderingContext2D
   	 * @private
   	 **/
@@ -154,6 +1360,162 @@
   	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
   	
   	
+***************
+*** 12261,12276 ****
+  
+  
+  	createjs.Text = createjs.promote(Text, "DisplayObject");
+! }());
+  
+  //##############################################################################
+  // BitmapText.js
+  //##############################################################################
+  
+! this.createjs = this.createjs || {};
+  
+! (function () {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 12267,12282 ----
+  
+  
+  	createjs.Text = createjs.promote(Text, "DisplayObject");
+! // }());
+  
+  //##############################################################################
+  // BitmapText.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs || {};
+  
+! // (function () {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 12289,12295 ****
+  	 * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
+  	 * @constructor
+  	 **/
+! 	function BitmapText(text, spriteSheet) {
+  		this.Container_constructor();
+  		
+  		
+--- 12295,12301 ----
+  	 * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
+  	 * @constructor
+  	 **/
+! export function BitmapText(text, spriteSheet) {
+  		this.Container_constructor();
+  		
+  		
+***************
+*** 12592,12607 ****
+  
+  
+  	createjs.BitmapText = createjs.promote(BitmapText, "Container");
+! }());
+  
+  //##############################################################################
+  // MovieClip.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 12598,12613 ----
+  
+  
+  	createjs.BitmapText = createjs.promote(BitmapText, "Container");
+! // }());
+  
+  //##############################################################################
+  // MovieClip.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 12658,12664 ****
+  	 * @extends Container
+  	 * @constructor
+  	 **/
+! 	function MovieClip(props) {
+  		this.Container_constructor();
+  		!MovieClip.inited&&MovieClip.init(); // static init
+  		
+--- 12664,12670 ----
+  	 * @extends Container
+  	 * @constructor
+  	 **/
+! export function MovieClip(props) {
+  		this.Container_constructor();
+  		!MovieClip.inited&&MovieClip.init(); // static init
+  		
+***************
+*** 13322,13337 ****
+  		if (prop === "startPosition") { return (ratio === 1 ? step.props[prop] : step.prev.props[prop]); }
+  	};
+  
+! }());
+  
+  //##############################################################################
+  // SpriteSheetUtils.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  	
+  	
+  // constructor:
+--- 13328,13343 ----
+  		if (prop === "startPosition") { return (ratio === 1 ? step.props[prop] : step.prev.props[prop]); }
+  	};
+  
+! // }());
+  
+  //##############################################################################
+  // SpriteSheetUtils.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  	
+  	
+  // constructor:
+***************
+*** 13343,13349 ****
+  	 * @class SpriteSheetUtils
+  	 * @static
+  	 **/
+! 	function SpriteSheetUtils() {
+  		throw "SpriteSheetUtils cannot be instantiated";
+  	}
+  
+--- 13349,13355 ----
+  	 * @class SpriteSheetUtils
+  	 * @static
+  	 **/
+! export function SpriteSheetUtils() {
+  		throw "SpriteSheetUtils cannot be instantiated";
+  	}
+  
 ***************
 *** 13361,13367 ****
   	 * @type CanvasRenderingContext2D
@@ -163,7 +1525,7 @@
   	if (canvas.getContext) {
   		SpriteSheetUtils._workingCanvas = canvas;
   		SpriteSheetUtils._workingContext = canvas.getContext("2d");
---- 13365,13371 ----
+--- 13367,13373 ----
   	 * @type CanvasRenderingContext2D
   	 * @protected
   	*/
@@ -171,6 +1533,58 @@
   	if (canvas.getContext) {
   		SpriteSheetUtils._workingCanvas = canvas;
   		SpriteSheetUtils._workingContext = canvas.getContext("2d");
+***************
+*** 13472,13487 ****
+  
+  
+  	createjs.SpriteSheetUtils = SpriteSheetUtils;
+! }());
+  
+  //##############################################################################
+  // SpriteSheetBuilder.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 13478,13493 ----
+  
+  
+  	createjs.SpriteSheetUtils = SpriteSheetUtils;
+! // }());
+  
+  //##############################################################################
+  // SpriteSheetBuilder.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 13502,13508 ****
+  	 * @extends EventDispatcher
+  	 * @constructor
+  	 **/
+! 	function SpriteSheetBuilder(framerate) {
+  		this.EventDispatcher_constructor();
+  		
+  	// public properties:
+--- 13508,13514 ----
+  	 * @extends EventDispatcher
+  	 * @constructor
+  	 **/
+! export function SpriteSheetBuilder(framerate) {
+  		this.EventDispatcher_constructor();
+  		
+  	// public properties:
 ***************
 *** 13848,13854 ****
   			if (o.w > x) { x = o.w; }
@@ -180,7 +1594,7 @@
   				canvas.width = this._getSize(x,this.maxWidth);
   				canvas.height = this._getSize(y,this.maxHeight);
   				this._data.images[img] = canvas;
---- 13852,13858 ----
+--- 13854,13860 ----
   			if (o.w > x) { x = o.w; }
   			y += o.h;
   			if (!o.h || !frames.length) {
@@ -188,3 +1602,552 @@
   				canvas.width = this._getSize(x,this.maxWidth);
   				canvas.height = this._getSize(y,this.maxHeight);
   				this._data.images[img] = canvas;
+***************
+*** 13984,13999 ****
+  
+  
+  	createjs.SpriteSheetBuilder = createjs.promote(SpriteSheetBuilder, "EventDispatcher");
+! }());
+  
+  //##############################################################################
+  // DOMElement.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 13990,14005 ----
+  
+  
+  	createjs.SpriteSheetBuilder = createjs.promote(SpriteSheetBuilder, "EventDispatcher");
+! // }());
+  
+  //##############################################################################
+  // DOMElement.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 14033,14039 ****
+  	 * @constructor
+  	 * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
+  	 */
+! 	function DOMElement(htmlElement) {
+  		this.DisplayObject_constructor();
+  		
+  		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
+--- 14039,14045 ----
+  	 * @constructor
+  	 * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
+  	 */
+! export function DOMElement(htmlElement) {
+  		this.DisplayObject_constructor();
+  		
+  		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
+***************
+*** 14252,14267 ****
+  
+  
+  	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
+! }());
+  
+  //##############################################################################
+  // Filter.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 14258,14273 ----
+  
+  
+  	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
+! // }());
+  
+  //##############################################################################
+  // Filter.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 14294,14300 ****
+  	 * @class Filter
+  	 * @constructor
+  	 **/
+! 	function Filter() {
+  		/**
+  		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+  		 * @property usesContext
+--- 14300,14306 ----
+  	 * @class Filter
+  	 * @constructor
+  	 **/
+! export function Filter() {
+  		/**
+  		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+  		 * @property usesContext
+***************
+*** 14413,14428 ****
+  
+  
+  	createjs.Filter = Filter;
+! }());
+  
+  //##############################################################################
+  // BitmapCache.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 14419,14434 ----
+  
+  
+  	createjs.Filter = Filter;
+! // }());
+  
+  //##############################################################################
+  // BitmapCache.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 14447,14453 ****
+  	 * @class BitmapCache
+  	 * @constructor
+  	 **/
+! 	function BitmapCache() {
+  
+  		// public:
+  		/**
+--- 14453,14459 ----
+  	 * @class BitmapCache
+  	 * @constructor
+  	 **/
+! export function BitmapCache() {
+  
+  		// public:
+  		/**
+***************
+*** 14940,14955 ****
+  	};
+  
+  	createjs.BitmapCache = BitmapCache;
+! }());
+  
+  //##############################################################################
+  // BlurFilter.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 14946,14961 ----
+  	};
+  
+  	createjs.BitmapCache = BitmapCache;
+! // }());
+  
+  //##############################################################################
+  // BlurFilter.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 14978,14984 ****
+  	 * @param {Number} [blurY=0] The vertical blur radius in pixels.
+  	 * @param {Number} [quality=1] The number of blur iterations.
+  	 **/
+! 	function BlurFilter( blurX, blurY, quality) {
+  		this.Filter_constructor();
+  
+  		// public properties:
+--- 14984,14990 ----
+  	 * @param {Number} [blurY=0] The vertical blur radius in pixels.
+  	 * @param {Number} [quality=1] The number of blur iterations.
+  	 **/
+! export function BlurFilter(blurX, blurY, quality) {
+  		this.Filter_constructor();
+  
+  		// public properties:
+***************
+*** 15387,15402 ****
+  	};
+  
+  	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
+! }());
+  
+  //##############################################################################
+  // AlphaMapFilter.js
+  //##############################################################################
+  
+! this.createjs = this.createjs || {};
+  
+! (function () {
+! 	"use strict";
+  	
+  	
+  // constructor:
+--- 15393,15408 ----
+  	};
+  
+  	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
+! // }());
+  
+  //##############################################################################
+  // AlphaMapFilter.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs || {};
+  
+! // (function () {
+! //	"use strict";
+  	
+  	
+  // constructor:
+***************
+*** 15429,15435 ****
+  	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+  	 * result. This should be exactly the same dimensions as the target.
+  	 **/
+! 	function AlphaMapFilter(alphaMap) {
+  		this.Filter_constructor();
+  	
+  	// public properties:
+--- 15435,15441 ----
+  	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+  	 * result. This should be exactly the same dimensions as the target.
+  	 **/
+! export function AlphaMapFilter(alphaMap) {
+  		this.Filter_constructor();
+  	
+  	// public properties:
+***************
+*** 15555,15570 ****
+  
+  
+  	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter, "Filter");
+! }());
+  
+  //##############################################################################
+  // AlphaMaskFilter.js
+  //##############################################################################
+  
+! this.createjs = this.createjs || {};
+  
+! (function () {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 15561,15576 ----
+  
+  
+  	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter, "Filter");
+! // }());
+  
+  //##############################################################################
+  // AlphaMaskFilter.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs || {};
+  
+! // (function () {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 15596,15602 ****
+  	 * @constructor
+  	 * @param {HTMLImageElement|HTMLCanvasElement} mask
+  	 **/
+! 	function AlphaMaskFilter(mask) {
+  		this.Filter_constructor();
+  	
+  	// public properties:
+--- 15602,15608 ----
+  	 * @constructor
+  	 * @param {HTMLImageElement|HTMLCanvasElement} mask
+  	 **/
+! export function AlphaMaskFilter(mask) {
+  		this.Filter_constructor();
+  	
+  	// public properties:
+***************
+*** 15689,15704 ****
+  
+  
+  	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter, "Filter");
+! }());
+  
+  //##############################################################################
+  // ColorFilter.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 15695,15710 ----
+  
+  
+  	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter, "Filter");
+! // }());
+  
+  //##############################################################################
+  // ColorFilter.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 15734,15740 ****
+  	 * @constructor
+  	 * @extends Filter
+  	 **/
+! 	function ColorFilter(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
+  		this.Filter_constructor();
+  
+  	// public properties:
+--- 15740,15746 ----
+  	 * @constructor
+  	 * @extends Filter
+  	 **/
+! export function ColorFilter(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
+  		this.Filter_constructor();
+  
+  	// public properties:
+***************
+*** 15855,15870 ****
+  
+  
+  	createjs.ColorFilter = createjs.promote(ColorFilter, "Filter");
+! }());
+  
+  //##############################################################################
+  // ColorMatrix.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 15861,15876 ----
+  
+  
+  	createjs.ColorFilter = createjs.promote(ColorFilter, "Filter");
+! // }());
+  
+  //##############################################################################
+  // ColorMatrix.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 15885,15891 ****
+  	 * @param {Number} hue
+  	 * @constructor
+  	 **/
+! 	function ColorMatrix(brightness, contrast, saturation, hue) {
+  		this.setColor(brightness, contrast, saturation, hue);
+  	}
+  	var p = ColorMatrix.prototype;
+--- 15891,15897 ----
+  	 * @param {Number} hue
+  	 * @constructor
+  	 **/
+! export function ColorMatrix(brightness, contrast, saturation, hue) {
+  		this.setColor(brightness, contrast, saturation, hue);
+  	}
+  	var p = ColorMatrix.prototype;
+***************
+*** 16199,16214 ****
+  
+  
+  	createjs.ColorMatrix = ColorMatrix;
+! }());
+  
+  //##############################################################################
+  // ColorMatrixFilter.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 16205,16220 ----
+  
+  
+  	createjs.ColorMatrix = ColorMatrix;
+! // }());
+  
+  //##############################################################################
+  // ColorMatrixFilter.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 16237,16243 ****
+  	 * @param {Array | ColorMatrix} matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
+  	 * class.
+  	 **/
+! 	function ColorMatrixFilter(matrix) {
+  		this.Filter_constructor();
+  
+  	// public properties:
+--- 16243,16249 ----
+  	 * @param {Array | ColorMatrix} matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
+  	 * class.
+  	 **/
+! export function ColorMatrixFilter(matrix) {
+  		this.Filter_constructor();
+  
+  	// public properties:
+***************
+*** 16328,16343 ****
+  	};
+  
+  	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter, "Filter");
+! }());
+  
+  //##############################################################################
+  // Touch.js
+  //##############################################################################
+  
+! this.createjs = this.createjs||{};
+  
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 16334,16349 ----
+  	};
+  
+  	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter, "Filter");
+! // }());
+  
+  //##############################################################################
+  // Touch.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs||{};
+  
+! // (function() {
+! //	"use strict";
+  
+  
+  // constructor:
+***************
+*** 16360,16366 ****
+   * @class Touch
+   * @static
+   **/
+! 	function Touch() {
+  		throw "Touch cannot be instantiated";
+  	}
+  
+--- 16366,16372 ----
+   * @class Touch
+   * @static
+   **/
+! export function Touch() {
+  		throw "Touch cannot be instantiated";
+  	}
+  
+***************
+*** 16614,16626 ****
+  
+  
+  	createjs.Touch = Touch;
+! }());
+  
+  //##############################################################################
+  // version.js
+  //##############################################################################
+  
+! this.createjs = this.createjs || {};
+  
+  (function() {
+  	"use strict";
+--- 16620,16632 ----
+  
+  
+  	createjs.Touch = Touch;
+! // }());
+  
+  //##############################################################################
+  // version.js
+  //##############################################################################
+  
+! // this.createjs = this.createjs || {};
+  
+  (function() {
+  	"use strict";

@@ -5,3 +5,4 @@
 node_modules
 easeljs-patched.js
 easeljs-raw.js
+*.tgz

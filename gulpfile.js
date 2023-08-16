@@ -1,2 +1,2 @@
-require('babel/register');
-require('./gulpfile.es6');
+// import 'babel/register';
+import './gulpfile.es6.js';

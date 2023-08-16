@@ -1,9 +1,10 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.1.9",
+    "version": "1.2.0",
     "description": "ESM for EaselJS (for Angluar or Ionic) with @types/createjs.",
     "author": "TheGraid <thegraid@gmail.com>",
     "main": "./easeljs.js",
+    "type": "module",
     "types": "./easeljs.d.ts",
     "repository": {
         "type": "git",
@@ -11,6 +12,7 @@
     },
     "scripts": {
         "ignore": "the final [14 line] patch for Date()",
+        "tgz": "rm -rf *.tgz; npm pack",
         "diff-patch": "diff -c easeljs.js easeljs-patched.js | tail -r | tail -n +14 | tail -r > easeljs.js.patch",
         "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run patch",
         "patch": "patch < easeljs.js.patch",
