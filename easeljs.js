@@ -149,13 +149,13 @@ createjs.promote = function(subclass, prefix) {
  */
 createjs.indexOf = function (array, searchElement){
 	"use strict";
-
-	for (var i = 0,l=array.length; i < l; i++) {
-		if (searchElement === array[i]) {
-			return i;
-		}
-	}
-	return -1;
+	return array.indexOf(searchElement);
+	// for (var i = 0,l=array.length; i < l; i++) {
+	// 	if (searchElement === array[i]) {
+	// 		return i;
+	// 	}
+	// }
+	// return -1;
 };
 
 //##############################################################################
@@ -164,8 +164,8 @@ createjs.indexOf = function (array, searchElement){
 
 // this.createjs = this.createjs||{};
 
-(function() {
-	"use strict";
+// (function() {
+// 	"use strict";
 
 
 // constructor:
@@ -175,7 +175,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @class UID
 	 * @static
 	 **/
-	function UID() {
+export function UID() {
 		throw "UID cannot be instantiated";
 	}
 
@@ -202,7 +202,7 @@ createjs.indexOf = function (array, searchElement){
 
 
 	createjs.UID = UID;
-}());
+// }());
 
 //##############################################################################
 // deprecate.js
@@ -558,6 +558,7 @@ export function EventDispatcher() {
 	 * prototype.
 	 **/
 	EventDispatcher.initialize = function(target) {
+		var p = EventDispatcher.prototype;   // after modulization: var p gets otherwise bound below...
 		target.addEventListener = p.addEventListener;
 		target.on = p.on;
 		target.removeEventListener = target.off =  p.removeEventListener;
@@ -16655,5 +16656,5 @@ export function Touch() {
 	s.buildDate = /*=date*/"Thu, 14 Sep 2017 19:47:53 GMT"; // injected by build process
 
 })();
-/* Easel Compiled: Tue Aug 15 2023 23:43:27 GMT-0700 (Pacific Daylight Time) */
+/* Easel Compiled: Sat Sep 23 2023 17:22:32 GMT-0700 (Pacific Daylight Time) */
 if(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;

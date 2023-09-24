@@ -1,5 +1,5 @@
-*** easeljs.js	2023-08-15 23:38:16.000000000 -0700
---- easeljs-patched.js	2023-08-15 23:38:15.000000000 -0700
+*** easeljs.js	Sat Sep 23 17:22:32 2023
+--- easeljs-patched.js	Sat Sep 23 17:22:31 2023
 ***************
 *** 1,4 ****
 ! var createjs = (this.createjs = (this.createjs || {}));
@@ -65,24 +65,79 @@
   /**
    * @class Utility Methods
 ***************
-*** 160,166 ****
+*** 147,169 ****
+   */
+  createjs.indexOf = function (array, searchElement){
+  	"use strict";
+! 
+! 	for (var i = 0,l=array.length; i < l; i++) {
+! 		if (searchElement === array[i]) {
+! 			return i;
+! 		}
+! 	}
+! 	return -1;
+  };
+  
+  //##############################################################################
   // UID.js
   //##############################################################################
   
 ! this.createjs = this.createjs||{};
   
-  (function() {
+! (function() {
+! 	"use strict";
+  
+  
+  // constructor:
+--- 149,171 ----
+   */
+  createjs.indexOf = function (array, searchElement){
   	"use strict";
---- 162,168 ----
+! 	return array.indexOf(searchElement);
+! 	// for (var i = 0,l=array.length; i < l; i++) {
+! 	// 	if (searchElement === array[i]) {
+! 	// 		return i;
+! 	// 	}
+! 	// }
+! 	// return -1;
+  };
+  
+  //##############################################################################
   // UID.js
   //##############################################################################
   
 ! // this.createjs = this.createjs||{};
   
-  (function() {
-  	"use strict";
+! // (function() {
+! // 	"use strict";
+  
+  
+  // constructor:
 ***************
-*** 206,212 ****
+*** 173,179 ****
+  	 * @class UID
+  	 * @static
+  	 **/
+! 	function UID() {
+  		throw "UID cannot be instantiated";
+  	}
+  
+--- 175,181 ----
+  	 * @class UID
+  	 * @static
+  	 **/
+! export function UID() {
+  		throw "UID cannot be instantiated";
+  	}
+  
+***************
+*** 200,212 ****
+  
+  
+  	createjs.UID = UID;
+! }());
+  
+  //##############################################################################
   // deprecate.js
   //##############################################################################
   
@@ -90,7 +145,13 @@
   
   /**
    * @class Utility Methods
---- 208,214 ----
+--- 202,214 ----
+  
+  
+  	createjs.UID = UID;
+! // }());
+  
+  //##############################################################################
   // deprecate.js
   //##############################################################################
   
@@ -191,6 +252,16 @@
   	
   	// private properties:
 ***************
+*** 556,561 ****
+--- 558,564 ----
+  	 * prototype.
+  	 **/
+  	EventDispatcher.initialize = function(target) {
++ 		var p = EventDispatcher.prototype;   // after modulization: var p gets otherwise bound below...
+  		target.addEventListener = p.addEventListener;
+  		target.on = p.on;
+  		target.removeEventListener = target.off =  p.removeEventListener;
+***************
 *** 630,636 ****
   	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
   	 * the event is dispatched.
@@ -199,7 +270,7 @@
   	 * @param {*} [data] Arbitrary data that will be included as the second parameter when the listener is called.
   	 * @param {Boolean} [useCapture=false] For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
   	 * @return {Function} Returns the anonymous function that was created and assigned as the listener. This is needed to remove the listener later using .removeEventListener.
---- 632,638 ----
+--- 633,639 ----
   	 * @param {Function | Object} listener An object with a handleEvent method, or a function that will be called when
   	 * the event is dispatched.
   	 * @param {Object} [scope] The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
@@ -219,7 +290,7 @@
   	};
   
   	/**
---- 643,653 ----
+--- 644,654 ----
   			listener = listener.handleEvent;
   		}
   		scope = scope||this;
@@ -249,7 +320,7 @@
   
   
   // constructor:
---- 840,855 ----
+--- 841,856 ----
   
   
   	createjs.EventDispatcher = EventDispatcher;
@@ -275,7 +346,7 @@
   		throw "Ticker cannot be instantiated.";
   	}
   
---- 875,881 ----
+--- 876,882 ----
   	 * @uses EventDispatcher
   	 * @static
   	 **/
@@ -308,7 +379,7 @@
   
   
   // constructor:
---- 1416,1438 ----
+--- 1417,1439 ----
   	 * @static
   	 * @private
   	 **/
@@ -341,7 +412,7 @@
   		
   	// private properties:
   		/**
---- 1448,1454 ----
+--- 1449,1455 ----
   	 * @param {HTMLVideoElement} video The HTML video element to buffer.
   	 * @constructor
   	 **/
@@ -367,7 +438,7 @@
   
   
   // constructor:
---- 1523,1538 ----
+--- 1524,1539 ----
   
   
   	createjs.VideoBuffer = VideoBuffer;
@@ -393,7 +464,7 @@
   		this.Event_constructor(type, bubbles, cancelable);
   		
   		
---- 1554,1560 ----
+--- 1555,1561 ----
   	 * @extends Event
   	 * @constructor
   	 **/
@@ -419,7 +490,7 @@
   
   
   // constructor:
---- 1694,1709 ----
+--- 1695,1710 ----
   
   
   	createjs.MouseEvent = createjs.promote(MouseEvent, "Event");
@@ -445,7 +516,7 @@
   		this.setValues(a,b,c,d,tx,ty);
   		
   	// public properties:
---- 1727,1733 ----
+--- 1728,1734 ----
   	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
   	 * @constructor
   	 **/
@@ -471,7 +542,7 @@
   
   	/**
   	 * Used for calculating and encapsulating display related properties.
---- 2196,2211 ----
+--- 2197,2212 ----
   
   
   	createjs.Matrix2D = Matrix2D;
@@ -497,7 +568,7 @@
   		this.setValues(visible, alpha, shadow, compositeOperation, matrix);
   		
   	// public properties:
---- 2217,2223 ----
+--- 2218,2224 ----
   	 * @param {Number} [matrix] A transformation matrix. Defaults to a new identity matrix.
   	 * @constructor
   	 **/
@@ -523,7 +594,7 @@
   
   
   // constructor:
---- 2353,2368 ----
+--- 2354,2369 ----
   // private methods:
   
   	createjs.DisplayProps = DisplayProps;
@@ -549,7 +620,7 @@
   	 	this.setValues(x, y);
   	 	
   	 	
---- 2378,2384 ----
+--- 2379,2385 ----
   	 * @param {Number} [y=0] Y position.
   	 * @constructor
   	 **/
@@ -575,7 +646,7 @@
   
   
   // constructor:
---- 2446,2461 ----
+--- 2447,2462 ----
   	
   	
   	createjs.Point = Point;
@@ -601,7 +672,7 @@
   		this.setValues(x, y, width, height);
   		
   		
---- 2473,2479 ----
+--- 2474,2480 ----
   	 * @param {Number} [height=0] The height of the Rectangle.
   	 * @constructor
   	 **/
@@ -627,7 +698,7 @@
   
   
   // constructor:
---- 2654,2669 ----
+--- 2655,2670 ----
   	
   	
   	createjs.Rectangle = Rectangle;
@@ -653,7 +724,7 @@
   		if (!target.addEventListener) { return; }
   	
   	
---- 2700,2706 ----
+--- 2701,2707 ----
   	 * null, then the default state of the hitArea will be used. *
   	 * @constructor
   	 */
@@ -679,7 +750,7 @@
   
   
   // constructor:
---- 2887,2902 ----
+--- 2888,2903 ----
   
   
   	createjs.ButtonHelper = ButtonHelper;
@@ -705,7 +776,7 @@
   		
   		
   	// public properties:
---- 2915,2921 ----
+--- 2916,2922 ----
   	 * @param {Number} offsetY The y offset of the shadow in pixels.
   	 * @param {Number} blur The size of the blurring effect.
   	 **/
@@ -731,7 +802,7 @@
   
   
   // constructor:
---- 2983,2998 ----
+--- 2984,2999 ----
   	
   
   	createjs.Shadow = Shadow;
@@ -757,7 +828,7 @@
   		this.EventDispatcher_constructor();
   
   
---- 3164,3170 ----
+--- 3165,3171 ----
   	 * @param {Object} data An object describing the SpriteSheet data.
   	 * @extends EventDispatcher
   	 **/
@@ -783,7 +854,7 @@
   
   
   // constructor:
---- 3582,3597 ----
+--- 3583,3598 ----
   
   
   	createjs.SpriteSheet = createjs.promote(SpriteSheet, "EventDispatcher");
@@ -809,7 +880,7 @@
   
   
   	// public properties
---- 3690,3696 ----
+--- 3691,3697 ----
   	 * @class Graphics
   	 * @constructor
   	 **/
@@ -826,7 +897,7 @@
   	if (canvas.getContext) {
   		Graphics._ctx = canvas.getContext("2d");
   		canvas.width = canvas.height = 1;
---- 3925,3931 ----
+--- 3926,3932 ----
   	 * @protected
   	 * @type {CanvasRenderingContext2D}
   	 **/
@@ -852,7 +923,7 @@
   
   
   // constructor:
---- 5934,5949 ----
+--- 5935,5950 ----
   
   
   	createjs.Graphics = Graphics;
@@ -878,7 +949,7 @@
   		this.EventDispatcher_constructor();
   
   
---- 5957,5963 ----
+--- 5958,5964 ----
   	 * @extends EventDispatcher
   	 * @constructor
   	 **/
@@ -895,7 +966,7 @@
   	if (canvas.getContext) {
   		DisplayObject._hitTestCanvas = canvas;
   		DisplayObject._hitTestContext = canvas.getContext("2d");
---- 6349,6355 ----
+--- 6350,6356 ----
   	 * @static
   	 * @protected
   	 **/
@@ -921,7 +992,7 @@
   	
   
   // constructor:
---- 7185,7200 ----
+--- 7186,7201 ----
   	};
   
   	createjs.DisplayObject = createjs.promote(DisplayObject, "EventDispatcher");
@@ -947,7 +1018,7 @@
   		this.DisplayObject_constructor();
   		
   	// public properties:
---- 7219,7225 ----
+--- 7220,7226 ----
    * @extends DisplayObject
    * @constructor
    **/
@@ -969,7 +1040,7 @@
   	 *
   	 * @method addChildAt
   	 * @param {DisplayObject} child The display object to add.
---- 7377,7389 ----
+--- 7378,7390 ----
   	 *
   	 *      addChildAt(child1, child2, ..., index);
   	 *
@@ -1001,7 +1072,7 @@
   
   
   // constructor:
---- 7870,7885 ----
+--- 7871,7886 ----
   
   
   	createjs.Container = createjs.promote(Container, "DisplayObject");
@@ -1027,7 +1098,7 @@
   		this.Container_constructor();
   	
   	
---- 7906,7912 ----
+--- 7907,7913 ----
   	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
   	 * of a canvas object in the current document.
   	 **/
@@ -1044,7 +1115,7 @@
   	
   		/**
   		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
---- 7941,7947 ----
+--- 7942,7948 ----
   		 * @property canvas
   		 * @type HTMLCanvasElement | Object
   		 **/
@@ -1054,7 +1125,7 @@
   		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 ***************
 *** 8608,8613 ****
---- 8612,8618 ----
+--- 8613,8619 ----
   			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
   			return;
   		}
@@ -1064,7 +1135,7 @@
   		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 ***************
 *** 8657,8662 ****
---- 8662,8668 ----
+--- 8663,8669 ----
   		if (oldTarget != target) {
   			this._dispatchMouseEvent(target, "mouseover", true, -1, o, e, oldTarget);
   		}
@@ -1087,7 +1158,7 @@
   
   /*
    * README IF EDITING:
---- 8708,8720 ----
+--- 8709,8721 ----
   
   
   	createjs.Stage = createjs.promote(Stage, "Container");
@@ -1111,7 +1182,7 @@
   
   	/**
   	 * A StageGL instance is the root level {{#crossLink "Container"}}{{/crossLink}} for an WebGL-optimized display list,
---- 8734,8741 ----
+--- 8735,8742 ----
    * Slot: A space on the GPU into which textures can be loaded for use in a batch, using "ActiveTexture" switches texture slot.
    */
   
@@ -1129,7 +1200,7 @@
   		this.Stage_constructor(canvas);
   
   		if (options !== undefined) {
---- 8803,8809 ----
+--- 8804,8810 ----
   	 * `purgeTextures(autoPurge)` every `autoPurge/2` draws. See {{#crossLink "StageGL/purgeTextures"}}{{/crossLink}} for more
   	 * information.
   	 */
@@ -1154,7 +1225,7 @@
   	
   	/**
   	 * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
---- 11107,11121 ----
+--- 11108,11122 ----
   	};
   
   	createjs.StageGL = createjs.promote(StageGL, "Stage");
@@ -1179,7 +1250,7 @@
   		this.DisplayObject_constructor();
   		
   		
---- 11147,11153 ----
+--- 11148,11154 ----
   	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
   	 * If the latter, a new Image instance with the URL as its src will be used.
   	 **/
@@ -1205,7 +1276,7 @@
   
   
   // constructor:
---- 11312,11327 ----
+--- 11313,11328 ----
   
   	
   	createjs.Bitmap = createjs.promote(Bitmap, "DisplayObject");
@@ -1231,7 +1302,7 @@
   		this.DisplayObject_constructor();
   		
   		
---- 11348,11354 ----
+--- 11349,11355 ----
   	 * dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
   	 * @param {String|Number} [frameOrAnimation] The frame number or animation to play initially.
   	 **/
@@ -1257,7 +1328,7 @@
   
   
   // constructor:
---- 11765,11780 ----
+--- 11766,11781 ----
   
   
   	createjs.Sprite = createjs.promote(Sprite, "DisplayObject");
@@ -1283,7 +1354,7 @@
   		this.DisplayObject_constructor();
   		
   		
---- 11801,11807 ----
+--- 11802,11808 ----
   	 * @constructor
   	 * @param {Graphics} graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
   	 **/
@@ -1309,7 +1380,7 @@
   
   
   // constructor:
---- 11872,11887 ----
+--- 11873,11888 ----
   
   
   	createjs.Shape = createjs.promote(Shape, "DisplayObject");
@@ -1335,7 +1406,7 @@
   		this.DisplayObject_constructor();
   		
   		
---- 11914,11920 ----
+--- 11915,11921 ----
   	 * @param {String} [color] The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
   	 * "#F00", "red", or "#FF0000").
   	 **/
@@ -1352,7 +1423,7 @@
   	if (canvas.getContext) { Text._workingContext = canvas.getContext("2d"); canvas.width = canvas.height = 1; }
   	
   	
---- 12005,12011 ----
+--- 12006,12012 ----
   	 * @type CanvasRenderingContext2D
   	 * @private
   	 **/
@@ -1378,7 +1449,7 @@
   
   
   // constructor:
---- 12267,12282 ----
+--- 12268,12283 ----
   
   
   	createjs.Text = createjs.promote(Text, "DisplayObject");
@@ -1404,7 +1475,7 @@
   		this.Container_constructor();
   		
   		
---- 12295,12301 ----
+--- 12296,12302 ----
   	 * @param {SpriteSheet} [spriteSheet=null] The spritesheet that defines the character glyphs.
   	 * @constructor
   	 **/
@@ -1430,7 +1501,7 @@
   
   
   // constructor:
---- 12598,12613 ----
+--- 12599,12614 ----
   
   
   	createjs.BitmapText = createjs.promote(BitmapText, "Container");
@@ -1456,7 +1527,7 @@
   		this.Container_constructor();
   		!MovieClip.inited&&MovieClip.init(); // static init
   		
---- 12664,12670 ----
+--- 12665,12671 ----
   	 * @extends Container
   	 * @constructor
   	 **/
@@ -1482,7 +1553,7 @@
   	
   	
   // constructor:
---- 13328,13343 ----
+--- 13329,13344 ----
   		if (prop === "startPosition") { return (ratio === 1 ? step.props[prop] : step.prev.props[prop]); }
   	};
   
@@ -1508,7 +1579,7 @@
   		throw "SpriteSheetUtils cannot be instantiated";
   	}
   
---- 13349,13355 ----
+--- 13350,13356 ----
   	 * @class SpriteSheetUtils
   	 * @static
   	 **/
@@ -1525,7 +1596,7 @@
   	if (canvas.getContext) {
   		SpriteSheetUtils._workingCanvas = canvas;
   		SpriteSheetUtils._workingContext = canvas.getContext("2d");
---- 13367,13373 ----
+--- 13368,13374 ----
   	 * @type CanvasRenderingContext2D
   	 * @protected
   	*/
@@ -1551,7 +1622,7 @@
   
   
   // constructor:
---- 13478,13493 ----
+--- 13479,13494 ----
   
   
   	createjs.SpriteSheetUtils = SpriteSheetUtils;
@@ -1577,7 +1648,7 @@
   		this.EventDispatcher_constructor();
   		
   	// public properties:
---- 13508,13514 ----
+--- 13509,13515 ----
   	 * @extends EventDispatcher
   	 * @constructor
   	 **/
@@ -1594,7 +1665,7 @@
   				canvas.width = this._getSize(x,this.maxWidth);
   				canvas.height = this._getSize(y,this.maxHeight);
   				this._data.images[img] = canvas;
---- 13854,13860 ----
+--- 13855,13861 ----
   			if (o.w > x) { x = o.w; }
   			y += o.h;
   			if (!o.h || !frames.length) {
@@ -1620,7 +1691,7 @@
   
   
   // constructor:
---- 13990,14005 ----
+--- 13991,14006 ----
   
   
   	createjs.SpriteSheetBuilder = createjs.promote(SpriteSheetBuilder, "EventDispatcher");
@@ -1646,7 +1717,7 @@
   		this.DisplayObject_constructor();
   		
   		if (typeof(htmlElement)=="string") { htmlElement = document.getElementById(htmlElement); }
---- 14039,14045 ----
+--- 14040,14046 ----
   	 * @constructor
   	 * @param {HTMLElement} htmlElement A reference or id for the DOM element to manage.
   	 */
@@ -1672,7 +1743,7 @@
   
   
   // constructor:
---- 14258,14273 ----
+--- 14259,14274 ----
   
   
   	createjs.DOMElement = createjs.promote(DOMElement, "DisplayObject");
@@ -1698,7 +1769,7 @@
   		/**
   		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
   		 * @property usesContext
---- 14300,14306 ----
+--- 14301,14307 ----
   	 * @class Filter
   	 * @constructor
   	 **/
@@ -1724,7 +1795,7 @@
   
   
   // constructor:
---- 14419,14434 ----
+--- 14420,14435 ----
   
   
   	createjs.Filter = Filter;
@@ -1750,7 +1821,7 @@
   
   		// public:
   		/**
---- 14453,14459 ----
+--- 14454,14460 ----
   	 * @class BitmapCache
   	 * @constructor
   	 **/
@@ -1776,7 +1847,7 @@
   
   
   // constructor:
---- 14946,14961 ----
+--- 14947,14962 ----
   	};
   
   	createjs.BitmapCache = BitmapCache;
@@ -1802,7 +1873,7 @@
   		this.Filter_constructor();
   
   		// public properties:
---- 14984,14990 ----
+--- 14985,14991 ----
   	 * @param {Number} [blurY=0] The vertical blur radius in pixels.
   	 * @param {Number} [quality=1] The number of blur iterations.
   	 **/
@@ -1828,7 +1899,7 @@
   	
   	
   // constructor:
---- 15393,15408 ----
+--- 15394,15409 ----
   	};
   
   	createjs.BlurFilter = createjs.promote(BlurFilter, "Filter");
@@ -1854,7 +1925,7 @@
   		this.Filter_constructor();
   	
   	// public properties:
---- 15435,15441 ----
+--- 15436,15442 ----
   	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
   	 * result. This should be exactly the same dimensions as the target.
   	 **/
@@ -1880,7 +1951,7 @@
   
   
   // constructor:
---- 15561,15576 ----
+--- 15562,15577 ----
   
   
   	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter, "Filter");
@@ -1906,7 +1977,7 @@
   		this.Filter_constructor();
   	
   	// public properties:
---- 15602,15608 ----
+--- 15603,15609 ----
   	 * @constructor
   	 * @param {HTMLImageElement|HTMLCanvasElement} mask
   	 **/
@@ -1932,7 +2003,7 @@
   
   
   // constructor:
---- 15695,15710 ----
+--- 15696,15711 ----
   
   
   	createjs.AlphaMaskFilter = createjs.promote(AlphaMaskFilter, "Filter");
@@ -1958,7 +2029,7 @@
   		this.Filter_constructor();
   
   	// public properties:
---- 15740,15746 ----
+--- 15741,15747 ----
   	 * @constructor
   	 * @extends Filter
   	 **/
@@ -1984,7 +2055,7 @@
   
   
   // constructor:
---- 15861,15876 ----
+--- 15862,15877 ----
   
   
   	createjs.ColorFilter = createjs.promote(ColorFilter, "Filter");
@@ -2010,7 +2081,7 @@
   		this.setColor(brightness, contrast, saturation, hue);
   	}
   	var p = ColorMatrix.prototype;
---- 15891,15897 ----
+--- 15892,15898 ----
   	 * @param {Number} hue
   	 * @constructor
   	 **/
@@ -2036,7 +2107,7 @@
   
   
   // constructor:
---- 16205,16220 ----
+--- 16206,16221 ----
   
   
   	createjs.ColorMatrix = ColorMatrix;
@@ -2062,7 +2133,7 @@
   		this.Filter_constructor();
   
   	// public properties:
---- 16243,16249 ----
+--- 16244,16250 ----
   	 * @param {Array | ColorMatrix} matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
   	 * class.
   	 **/
@@ -2088,7 +2159,7 @@
   
   
   // constructor:
---- 16334,16349 ----
+--- 16335,16350 ----
   	};
   
   	createjs.ColorMatrixFilter = createjs.promote(ColorMatrixFilter, "Filter");
@@ -2114,7 +2185,7 @@
   		throw "Touch cannot be instantiated";
   	}
   
---- 16366,16372 ----
+--- 16367,16373 ----
    * @class Touch
    * @static
    **/
@@ -2137,7 +2208,7 @@
   
   (function() {
   	"use strict";
---- 16620,16632 ----
+--- 16621,16633 ----
   
   
   	createjs.Touch = Touch;
