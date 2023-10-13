@@ -16656,5 +16656,5 @@ export function Touch() {
 	s.buildDate = /*=date*/"Thu, 14 Sep 2017 19:47:53 GMT"; // injected by build process
 
 })();
-/* Easel Compiled: Sat Sep 23 2023 17:22:32 GMT-0700 (Pacific Daylight Time) */
+/* Easel Compiled: Fri Oct 13 2023 14:11:32 GMT-0700 (Pacific Daylight Time) */
 if(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;

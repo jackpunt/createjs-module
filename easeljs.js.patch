@@ -1,5 +1,5 @@
-*** easeljs.js	Sat Sep 23 17:22:32 2023
---- easeljs-patched.js	Sat Sep 23 17:22:31 2023
+*** easeljs.js	Fri Oct 13 14:11:32 2023
+--- easeljs-patched.js	Fri Oct 13 14:11:31 2023
 ***************
 *** 1,4 ****
 ! var createjs = (this.createjs = (this.createjs || {}));
@@ -974,6 +974,23 @@
   	if (canvas.getContext) {
   		DisplayObject._hitTestCanvas = canvas;
   		DisplayObject._hitTestContext = canvas.getContext("2d");
+***************
+*** 6697,6703 ****
+  	 * @return {String} The image data url for the cache.
+  	 **/
+  	p.getCacheDataURL = function() {
+! 		return this.bitmapCache?this.bitmapCache.getDataURL():null;
+  	};
+  
+  	/**
+--- 6701,6707 ----
+  	 * @return {String} The image data url for the cache.
+  	 **/
+  	p.getCacheDataURL = function() {
+! 		return this.bitmapCache?this.bitmapCache.getCacheDataURL():null;
+  	};
+  
+  	/**
 ***************
 *** 7182,7197 ****
   	};
