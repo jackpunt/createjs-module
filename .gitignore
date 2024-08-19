@@ -2,6 +2,7 @@
 .DS_STORE
 .idea
 *.iml
+*.tgz
 node_modules
 createjs-patched.js
 createjs-raw.js
