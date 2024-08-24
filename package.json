@@ -1,6 +1,6 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.2.2",
+    "version": "1.3.0",
     "description": "ESM for EaselJS (for Angluar or Ionic) with @types/createjs.",
     "author": "TheGraid <thegraid@gmail.com>",
     "main": "./easeljs.js",
@@ -12,7 +12,7 @@
     },
     "scripts": {
         "ignore": "the final [14 line] patch for Date()",
-        "tgz": "rm -rf *.tgz; npm pack",
+        "tgz": "rm -rf *.tgz; npm pack; date",
         "diff-patch": "diff -c easeljs.js easeljs-patched.js | tail -r | tail -n +14 | tail -r > easeljs.js.patch",
         "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run patch",
         "patch": "patch < easeljs.js.patch",
@@ -33,6 +33,7 @@
         "gulp": "^4.0.2",
         "gulp-concat": "^2.6.1",
         "gulp-insert": "^0.5.0",
+        "gulp-replace": "^1.1.4",
         "gulp-util": "^3.0.6",
         "preloadjs": "^1.0.1",
         "soundjs": "^1.0.1",

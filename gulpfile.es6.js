@@ -4,6 +4,7 @@ import gulp from 'gulp';
 import concat from 'gulp-concat';
 import insert from 'gulp-insert';
 import gutil from 'gulp-util';
+import replace from 'gulp-replace';
 
 const VERSIONS = {
     EASEL: '1.0.0',
@@ -11,7 +12,7 @@ const VERSIONS = {
 };
 
 const SRC = {
-    EASEL: `./node_modules/easeljs/lib/easeljs.js`
+    EASEL: `../EaselJS/lib/easeljs.js`
 };
 
 const DEST = {
@@ -35,8 +36,23 @@ function compile() {
         SRC.EASEL
     ])
         .pipe(concat('easeljs-raw.js'))
-        .pipe(insert.prepend('var createjs = (this.createjs = (this.createjs || {}));\n'))
+        // Fix some things and convert to module format
+        .pipe(replace(/(this.createjs =)/g, '\/\/ $1')) // or just delete them
+        .pipe(replace(/(var ww =)/g, '\/\/ $1'))         // or just delete them
+        .pipe(insert.prepend('// var createjs = (this.createjs = (this.createjs || {}));\nvar createjs = {};\nvar ww; try { ww = window} catch { ww = false }\n'))
+        // unwrap the (function() { ... })()}, keeping the ...
+        .pipe(replace(/\n(\(function ?\(\) ?\{)/g,'\n// $1'))
+        // sic! From (August 23rd, 2012 2:02 PM) e640d39 "Change to namespace implementation."
+        .pipe(replace('}());', '// }());'))
+        // DisplayProps.js came later, and got it right:
+        .pipe(replace('Props;\n})()', 'Props;\n//})()'))
+        // module is always strict:
+        .pipe(replace('\n\t"use strict";','\n//\t"use strict";'))
+        // export all the classname functions:
+        .pipe(replace(/\n\tfunction ([A-Z])/g, '\nexport function $1'))
+        // Bookkeepig timestamp
         .pipe(insert.append(`\n/* Easel Compiled: ${new Date()} */`))
+        // The actual "module" definition: credit to albary3 
         .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;\n'))
         .pipe(gulp.dest(DEST.CREATE));
 }
