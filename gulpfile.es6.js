@@ -7,8 +7,8 @@ import gutil from 'gulp-util';
 import replace from 'gulp-replace';
 
 const VERSIONS = {
-    EASEL: '1.0.0',
-    CREATE: '1.1.8'
+    EASEL: '1.0.4',
+    CREATE: '1.3.0'
 };
 
 const SRC = {
