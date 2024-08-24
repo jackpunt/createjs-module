@@ -5,10 +5,11 @@ import concat from 'gulp-concat';
 import insert from 'gulp-insert';
 import gutil from 'gulp-util';
 import replace from 'gulp-replace';
+import stream from 'stream';
 
 const VERSIONS = {
-    EASEL: '1.0.4',
-    CREATE: '1.3.0'
+    EASEL: '1.0.4',   // Version of easeljs.js 
+    CREATE: '1.4.0',  // Version of easeljs-module; is injected to package.json
 };
 
 const SRC = {
@@ -24,7 +25,7 @@ function execTrnlTask() {
 }
 
 function string_src(filename, string) {
-    var src = require('stream').Readable({ objectMode: true });
+    var src = stream.Readable({ objectMode: true });
     src._read = function () {
         this.push(new gutil.File({ cwd: '', base: '', path: filename, contents: Buffer.from(string) }));
         this.push(null)
@@ -51,13 +52,13 @@ function compile() {
         // export all the classname functions:
         .pipe(replace(/\n\tfunction ([A-Z])/g, '\nexport function $1'))
         // Bookkeepig timestamp
-        .pipe(insert.append(`\n/* Easel Compiled: ${new Date()} */`))
+        .pipe(insert.append(`\n/* easeljs-module@${VERSIONS.CREATE} Compiled: ${new Date()} */`))
         // The actual "module" definition: credit to albary3 
         .pipe(insert.append('\nif(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;\n'))
         .pipe(gulp.dest(DEST.CREATE));
 }
 
-
+/** rewrite local package.json with ${VERSIONS.CREATE} */
 function doPackage() {
     let pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
     pkg.version = VERSIONS.CREATE;

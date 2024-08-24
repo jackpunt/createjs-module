@@ -1,6 +1,6 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "description": "ESM for EaselJS (for Angluar or Ionic) with @types/createjs.",
     "author": "TheGraid <thegraid@gmail.com>",
     "main": "./easeljs.js",
@@ -17,9 +17,10 @@
         "make-patch": "cp easeljs.js easeljs-patched.js; gulp compile; npm run diff-patch ; npm run patch",
         "patch": "patch < easeljs.js.patch",
         "pub": "npm run build; npm run patch; npm version ${1:-patch}; npm publish --access public",
-        "build": "gulp compile",
-        "build:package": "gulp package",
-        "build:compile": "gulp compile"
+        "NOTE": "gulp default -> (compile, doPackage); but it is not working",
+        "build": "npm run compile; npm run package",
+        "package": "gulp package",
+        "compile": "gulp compile"
     },
     "license": "MIT",
     "keywords": [
