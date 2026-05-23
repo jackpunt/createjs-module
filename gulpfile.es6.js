@@ -8,8 +8,8 @@ import replace from 'gulp-replace';
 import stream from 'stream';
 
 const VERSIONS = {
-    EASEL: '1.0.4',   // Version of easeljs.js 
-    CREATE: '1.4.0',  // Version of easeljs-module; is injected to package.json
+    EASEL: '1.0.5',   // Version of easeljs.js 
+    CREATE: '1.4.1',  // Version of easeljs-module; is injected to package.json
 };
 
 const SRC = {

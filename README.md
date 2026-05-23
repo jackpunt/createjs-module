@@ -1,6 +1,17 @@
 # EaselJS library module for Angular and Ionic
 
-This is jackpunt/EaselJS/easeljs-1.0.4 collection as ESM with @types/createjs
+What it does: the grunt compile edits the extant easeljs.js file to wrap the various bits as functions in a module.
+
+Copy in easeljs.js and <code> cd build; npm run build; </code>
+
+The resulting package is loadable as a module (as shown below)
+
+<b>TODO:</b> someday stream edit the EaselJS original source to use ecmascript class and methods.
+<br>because someday, we will want and need tsc to generate the real, correct .d.ts file(s).
+
+<b>Note:</b> this easeljs branch is up-to-date, the branch for larger createjs-module has been untouched for a long time.
+
+Updated to jackpunt/EaselJS/easeljs-1.0.5 collection as ESM with @types/createjs
 
 Forked from CreateJS/EaselJS/easeljs-1.0.3 with fixes
 
