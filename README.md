@@ -9,6 +9,10 @@ The resulting package is loadable as a module (as shown below)
 <b>TODO:</b> someday stream edit the EaselJS original source to use ecmascript class and methods.
 <br>because someday, we will want and need tsc to generate the real, correct .d.ts file(s).
 
+<b>Note:</b> used this to extract index.d.ts from @types/createjs (createjs-lib/index.d.ts & easeljs/index.d.ts):
+<br><code>grep "export class" index.d.ts | sed -E 's/^    export class ([a-zA-Z_0-9]+).*$/    export import \1 = createjs.\1;/' | sed -E 's/    export class ([a-zA-Z_0-9]+).*$/export import \1 = createjs.Graphics.\1;/' </code>
+<br>Copy from README.md, this view is not escaped...
+
 <b>Note:</b> this easeljs branch is up-to-date, the branch for larger createjs-module has been untouched for a long time.
 
 Updated to jackpunt/EaselJS/easeljs-1.0.5 collection as ESM with @types/createjs
