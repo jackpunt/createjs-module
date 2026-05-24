@@ -17814,8 +17814,8 @@ export function Touch() {
 	 * @type String
 	 * @static
 	 **/
-	s.buildDate = /*=date*/"Sat, 23 May 2026 03:48:11 GMT"; // injected by build process
+	s.buildDate = /*=date*/"Sat, 23 May 2026 22:54:00 GMT"; // injected by build process
 
 })();
-/* easeljs-module@1.4.1 Compiled: Sat May 23 2026 14:08:20 GMT-0700 (Pacific Daylight Time) */
+/* easeljs-module@1.4.2 Compiled: Sat May 23 2026 17:46:17 GMT-0700 (Pacific Daylight Time) */
 if(typeof module !== "undefined" && typeof module.exports !== "undefined") module.exports = this.createjs;

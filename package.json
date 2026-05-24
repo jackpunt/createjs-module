@@ -1,6 +1,6 @@
 {
     "name": "@thegraid/easeljs-module",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "ESM for EaselJS (for Angluar or Ionic) with @types/createjs.",
     "author": "jackpunt",
     "main": "./easeljs.js",

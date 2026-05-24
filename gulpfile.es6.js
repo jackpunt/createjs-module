@@ -9,7 +9,7 @@ import stream from 'stream';
 
 const VERSIONS = {
     EASEL: '1.0.5',   // Version of easeljs.js 
-    CREATE: '1.4.1',  // Version of easeljs-module; is injected to package.json
+    CREATE: '1.4.2',  // Version of easeljs-module; is injected to package.json
 };
 
 const SRC = {

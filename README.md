@@ -2,7 +2,7 @@
 
 What it does: the grunt compile edits the extant easeljs.js file to wrap the various bits as functions in a module.
 
-Copy in easeljs.js and <code> cd build; npm run build; </code>
+Copy in easeljs.js, set EASEL and CREATE versions in gulpfile.es6.js; then <code>npm run build; </code>
 
 The resulting package is loadable as a module (as shown below)
 
