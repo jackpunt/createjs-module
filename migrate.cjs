@@ -1,24 +1,42 @@
 const fs = require('fs');
 const path = require('path');
 
-const sourceFile = path.join(__dirname, 'createjs-source.js');
-const outputFile = path.join(__dirname, 'createjs-clean.ts');
+// process.argv[0] is node, process.argv[1] is the script path, process.argv[2] is our file argument
+const inputFile = process.argv[2] ?? 'createjs-source';
+
+const sourceFile = path.join(__dirname, `${inputFile}.js`);
+const outputFile = path.join(__dirname, `${inputFile}.ts`);
 
 try {
 	let code = fs.readFileSync(sourceFile, 'utf8');
 	console.log("Processing source file and neutralizing TS2339 errors...");
 
 	// Step 0: Convert the global var assignment into an exported namespace block
-	code = code.replace(/^var\s+createjs\s*=\s*\{\}\s*;?/m, 'export namespace createjs {');
+	code = code.replace(/^var\s+createjs\s*=\s*\{\}\s*;?/m, `// ${new Date()}\nexport namespace createjs {`);
 
 	// Step 0.5: Append a dynamic index signature directly inside the namespace boundary
-	code = code.replace(
-		'export namespace createjs {',
-		'export namespace createjs {\n\t[key: string]: any;\n'
-	);
+	// code = code.replace(
+	// 	'export namespace createjs {',
+	// 	'export namespace createjs {\n\t[key: string]: any;\n'
+	// );
+
+  code = code.replace(
+    'export namespace createjs {',
+    'export namespace createjs {\n\t// Use interface merging to support open indexing\n\texport interface DynamicIndexer {\n\t\t[key: string]: any;\n\t}\n'
+  );
 
 	// 1. Remove prototype variable alias boilerplate: var p = ClassName.prototype;
 	code = code.replace(/^[\t ]*var\s+p\s*=\s*([A-Za-z0-9_]+)\.prototype\s*;?/gm, '');
+  // TODO: var.p = createjs.extend(SubClass, createjs.SuperClass)
+  
+  // TODO: handle EventDispatcher.extend(Class) what is 'p' ?
+  // static initialize(target, p = EventDispatcher.prototype) { // 7.1
+
+  // TODO:'top-level' executable code that is now in the static section of class Foo
+  // --- how to invoke createjs.deprecate() [etc]
+  // --- static { Class.invoke_any(); }
+  // TODO:'top-level' declarations that are in static section of namespace createjs {}
+  
 
 	// 2. Map and inject inheritance hooks by looking ahead for createjs.extend macros
 	code = code.replace(
@@ -51,7 +69,7 @@ try {
 			// Generate explicit 'any' class property definitions
 			let propertyDeclarations = '';
 			uniqueProperties.forEach(prop => {
-				propertyDeclarations += `\t${prop}: any;\n`;
+				propertyDeclarations += `\tdeclare ${prop}: any; // 2.5\n`;
 			});
 
 			// Reconstruct the block with the properties declared at the top of the class frame
@@ -62,10 +80,23 @@ try {
 		}
 	);
 
+  // 2.6 declare 'parent' for EventDispatcher
+  code = code.replace(
+    /(class EventDispatcher {)/, '$1\n\tdeclare parent: any; // 2.6'
+  )
+
 	// 3. Convert prototype method declarations to modern ES6 class methods
 	code = code.replace(
 		/^[\t ]*p\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
 		'\t$1($2) {'
+	);
+
+  // 3.5. Convert prototype shortcut method aliases to ES6 class properties
+	// Finds: p.off = p.removeEventListener;
+	// Converts to: off = this.removeEventListener;
+	code = code.replace(
+		/^[\t ]*p\.([A-Za-z0-9_]+)\s*=\s*p\.([A-Za-z0-9_]+)\s*;?/gm,
+		'\t$1 = this.$2; //3.5'
 	);
 
 	// 4. Strip out residual structural macros that are no longer needed
@@ -77,20 +108,66 @@ try {
 	// 6. Close the ES6 class definition blocks before the IIFE wrapper closes
 	code = code.replace(/^[\t ]*\/\/\s*\}\(\)\);/gm, '}\n// }());');
 
-	// 7. Convert legacy static method assignments to modern trailing definitions
+	// 7.0 Convert legacy static method assignments to modern trailing definitions for namespace createjs
 	code = code.replace(
-		/^([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
-		'$1.$2 = function($3) {'
+		/^(\s*)(createjs)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
+		'$1export function $3($4) { // 7.0'
 	);
+
+	// 7.1 Convert Classname.method = function() to static method(); when Classname is NOT createjs
+	code = code.replace(
+		/^\s*(?!createjs)([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
+		'  static $2($3) { // 7.1'
+	);
+
+  // 7.2 Fix EventDispatcher.initialize(target)
+  code = code.replace(
+    'initialize(target) {', 'initialize(target, p = EventDispatcher.prototype) { // 7.2'
+  );
+
+  // 7.5. Convert legacy static property assignments to modern trailing assignments
+	// Finds: EventDispatcher.someProperty = true;  or  EventDispatcher.DEFAULT_TIMEOUT = 1000;
+	// Converts to: EventDispatcher.someProperty = true; (ensuring it bypasses structural parsing blocks)
+  // Leave createjs.item or this.item or o.item as given
+	code = code.replace(
+		/^(\t|  )([A-Z][A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*(?!function)([^;]+);/gm,
+		'\tstatic $3 = $4; // 7.5'
+	);
+
+  // 7.6a. Capture single lines starting with createjs., preserving trailing comments
+	// Finds: \tcreatejs.EventDispatcher.initialize(Ticker); // inject EventDispatcher methods.
+	// Converts to: \tstatic { createjs.EventDispatcher.initialize(Ticker); } // inject EventDispatcher methods.
+	code = code.replace(
+		/^\t(createjs\.[A-Za-z0-9_.]+\([^)]*\);?)(.*)$/gm,
+		'\tstatic { $1 }$2 // 7.6a'
+	);
+
+	// 7.6b. Capture 'try {' blocks starting with a tab, up to the next empty line
+	// Finds: \ttry { ... \n\t} catch(e) {} down to an empty line hook
+	// Converts to: \tstatic {\n\ttry { ... \n\t}\n\t}
+	code = code.replace(
+		/(^\ttry\s*\{[\s\S]*?)(?=\n\s*\n)/gm,
+		(match) => {
+			return `\tstatic {\n\t${match.trim().replace(/\n/g, '\n\t')} // 7.6b\n\t}`;
+		}
+	);
+
+  // 7.9 Arcane wrap window.xxx(Cancel|Request)AnimattionFrame with (window as any).xxxCancel...
+  code = code.replace(
+    /\|\| window\.([a-z]*(Cancel|Request)AnimationFrame[ ;])/g, '|| (window as any).$1'
+  );
 
 	// 8. Insert the closing namespace bracket directly in front of the final export line
 	code = code.replace(
 		/^(if\(typeof module !== "undefined"[\s\S]*?module\.exports\s*=\s*this\.createjs;?)/m,
-		'}\n$1'
+		'}// 8.0\n$1'
 	);
 
+  // 9. Tweak js for ts typing; one place in EventDispatcher.dispatchEvent
+  code = code.replace('1+(i==0)', '1+(i==0?1:0)');
+
 	fs.writeFileSync(outputFile, code, 'utf8');
-	console.log("Refactoring complete! Output saved to: createjs-clean.ts");
+	console.log(`Refactoring complete! Output saved to: ${outputFile}`);
 
 } catch (error) {
 	console.error("An error occurred during migration processing:", error.message);
