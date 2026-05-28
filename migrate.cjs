@@ -144,8 +144,8 @@ try {
 
 	// 7.1 Convert Classname.method = function() to static method(); when Classname is NOT createjs
 	code = code.replace(
-		/^[\t ]*(?!createjs)([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
-		'\t\tstatic $2($3) { // 7.1 $1.$2 = function($3)'
+		/^([\t ]*)(?!createjs)([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
+		'$1static $3($4) { // 7.1 $2.$3 = function($4)'
 	);
 
 	// 7.2 Fix EventDispatcher.initialize(target)
@@ -183,12 +183,6 @@ try {
 	// 7.7 fix Event constructor optional args
 	code = code.replace('constructor(type, bubbles, cancelable) {', 
 											`constructor(type: string, bubbles=false, cancelable=false) { // 7.7`);
-
-	// 7.9 Ticker: Arcane wrap window.xxx(Cancel|Request)AnimationFrame with (window as any).xxxCancel...
-	code = code.replace(
-		/\|\| window\.([a-z]*(Cancel|Request)AnimationFrame[ ;])/g, '|| (window as any).$1'
-	);
-	code = code.replace( /\|\| w\.performance\./g, '|| (w as any).performance.');
 
 	// 8. Insert the closing namespace bracket directly in front of the final export line
 	code = code.replace(
