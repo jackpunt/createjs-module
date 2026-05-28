@@ -14,30 +14,30 @@ try {
 	// Step 0: Convert the global var assignment into an exported namespace block
 	code = code.replace(/^var\s+createjs\s*=\s*\{\}\s*;?/m, `// ${new Date()}\nexport namespace createjs {`);
 
-	// Step 0.5: Append a dynamic index signature directly inside the namespace boundary
-	// code = code.replace(
-	// 	'export namespace createjs {',
-	// 	'export namespace createjs {\n\t[key: string]: any;\n'
-	// );
+  // Step 0.5: Scan the file for sub-modules and declare their classes at the top
+	// Catches: createjs.EaselJS = createjs.EaselJS || {};
+	const subClasses = new Set();
+	const subClassRegex = /createjs\.([A-Za-z0-9_]+)\s*=\s*createjs\.\1/g;
+	let subClassMatch;
 
-  code = code.replace(
-    'export namespace createjs {',
-    'export namespace createjs {\n\t// Use interface merging to support open indexing\n\texport interface DynamicIndexer {\n\t\t[key: string]: any;\n\t}\n'
-  );
+	while ((subClassMatch = subClassRegex.exec(code)) !== null) {
+		subClasses.add(subClassMatch[1]);
+	}
+
+	let classDeclarations = '\n';
+	subClasses.forEach(className => {
+		classDeclarations += `\texport class ${className} {} // 0.5\n`;
+	});
+
+	// Inject all classes cleanly at the very top of the namespace block
+	code = code.replace(
+		'export namespace createjs {',
+		`export namespace createjs {${classDeclarations}`
+	);
 
 	// 1. Remove prototype variable alias boilerplate: var p = ClassName.prototype;
 	code = code.replace(/^[\t ]*var\s+p\s*=\s*([A-Za-z0-9_]+)\.prototype\s*;?/gm, '');
-  // TODO: var.p = createjs.extend(SubClass, createjs.SuperClass)
   
-  // TODO: handle EventDispatcher.extend(Class) what is 'p' ?
-  // static initialize(target, p = EventDispatcher.prototype) { // 7.1
-
-  // TODO:'top-level' executable code that is now in the static section of class Foo
-  // --- how to invoke createjs.deprecate() [etc]
-  // --- static { Class.invoke_any(); }
-  // TODO:'top-level' declarations that are in static section of namespace createjs {}
-  
-
 	// 2. Map and inject inheritance hooks by looking ahead for createjs.extend macros
 	code = code.replace(
 		/^export\s+function\s+([A-Za-z0-9_]+)\s*\(([^)]*)\)\s*\{/gm,
@@ -69,7 +69,7 @@ try {
 			// Generate explicit 'any' class property definitions
 			let propertyDeclarations = '';
 			uniqueProperties.forEach(prop => {
-				propertyDeclarations += `\tdeclare ${prop}: any; // 2.5\n`;
+				propertyDeclarations += `\tdeclare ${prop}; // 2.5\n`;
 			});
 
 			// Reconstruct the block with the properties declared at the top of the class frame
@@ -80,15 +80,43 @@ try {
 		}
 	);
 
-  // 2.6 declare 'parent' for EventDispatcher
+  // 2.7. Scan for dynamic event properties and inject them into class Event
+	// Must run AFTER Step 2 converts constructors to classes!
+	const eventProperties = new Set();
+	const eventPropRegex = /\bevent\.([a-z0-9_]+)\s*=/gi;
+	let eventMatch;
+
+	while ((eventMatch = eventPropRegex.exec(code)) !== null) {
+		if (eventMatch[1] !== 'toString' && eventMatch[1] !== 'clone') {
+			eventProperties.add(eventMatch[1]);
+		}
+	}
+
+	let eventDeclarations = '';
+	eventProperties.forEach(prop => {
+		eventDeclarations += `\tdeclare ${prop}; // 2.7\n`;
+	});
+
+	// Diagnostic Log Output to terminal
+	// console.log(`\n--- [Diagnostic] Found ${eventProperties.size} Event Properties ---`);
+	// console.log(eventDeclarations || "\t(No properties matched)");
+	// console.log("------------------------------------------------\n");
+
+	// Inject the properties right at the top of the Event class body
+	code = code.replace(
+		/(export class Event(?:\s+extends\s+[A-Za-z0-9_]+)?\s*\{)/g,
+		`$1\n${eventDeclarations}`
+	);
+
+  // 2.9 declare 'parent' for EventDispatcher
   code = code.replace(
-    /(class EventDispatcher {)/, '$1\n\tdeclare parent: any; // 2.6'
+    /(class EventDispatcher {)/, '$1\n\tdeclare parent: any; // 2.9'
   )
 
 	// 3. Convert prototype method declarations to modern ES6 class methods
 	code = code.replace(
 		/^[\t ]*p\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
-		'\t$1($2) {'
+		'\t$1($2) { // 3.0'
 	);
 
   // 3.5. Convert prototype shortcut method aliases to ES6 class properties
@@ -155,6 +183,9 @@ try {
   // 7.9 Arcane wrap window.xxx(Cancel|Request)AnimattionFrame with (window as any).xxxCancel...
   code = code.replace(
     /\|\| window\.([a-z]*(Cancel|Request)AnimationFrame[ ;])/g, '|| (window as any).$1'
+  );
+  code = code.replace(
+    /\|\| w\.performance\./g, '|| (w as any).'
   );
 
 	// 8. Insert the closing namespace bracket directly in front of the final export line
