@@ -14,7 +14,7 @@ try {
 	// Step 0: Convert the global var assignment into an exported namespace block
 	code = code.replace(/^var\s+createjs\s*=\s*\{\}\s*;?/m, `// ${new Date()}\nexport namespace createjs {`);
 
-  // Step 0.5: Scan the file for sub-modules and declare their classes at the top
+	// Step 0.5: Scan the file for sub-modules and declare their classes at the top
 	// Catches: createjs.EaselJS = createjs.EaselJS || {};
 	const subClasses = new Set();
 	const subClassRegex = /createjs\.([A-Za-z0-9_]+)\s*=\s*createjs\.\1/g;
@@ -37,14 +37,14 @@ try {
 
 	// 1. Remove prototype variable alias boilerplate: var p = ClassName.prototype;
 	code = code.replace(/^[\t ]*var\s+p\s*=\s*([A-Za-z0-9_]+)\.prototype\s*;?/gm, '');
-  
+
 	// 2. Map and inject inheritance hooks by looking ahead for createjs.extend macros
 	code = code.replace(
 		/^export\s+function\s+([A-Za-z0-9_]+)\s*\(([^)]*)\)\s*\{/gm,
 		(match, className, args) => {
 			const extendRegex = new RegExp(`createjs\\.extend\\(${className},\\s*([A-Za-z0-9_]+)\\)`);
 			const hasParent = code.match(extendRegex);
-			
+
 			if (hasParent) {
 				const parentClassName = hasParent[1];
 				return `export class ${className} extends ${parentClassName} {\n\tconstructor(${args}) {`;
@@ -61,7 +61,7 @@ try {
 			// Find all distinct property assignments inside this specific constructor block
 			const propertyMatches = constructorBody.matchAll(/this\.([A-Za-z0-9_]+)\s*=/g);
 			const uniqueProperties = new Set();
-			
+
 			for (const propMatch of propertyMatches) {
 				uniqueProperties.add(propMatch[1]);
 			}
@@ -80,7 +80,7 @@ try {
 		}
 	);
 
-  // 2.7. Scan for dynamic event properties and inject them into class Event
+	// 2.7. Scan for dynamic event properties and inject them into class Event
 	// Must run AFTER Step 2 converts constructors to classes!
 	const eventProperties = new Set();
 	const eventPropRegex = /\bevent\.([a-z0-9_]+)\s*=/gi;
@@ -108,10 +108,10 @@ try {
 		`$1\n${eventDeclarations}`
 	);
 
-  // 2.9 declare 'parent' for EventDispatcher
-  code = code.replace(
-    /(class EventDispatcher {)/, '$1\n\tdeclare parent: any; // 2.9'
-  )
+	// 2.9 declare 'parent' for EventDispatcher
+	code = code.replace(
+		/(class EventDispatcher {)/, '$1\n\tdeclare parent: any; // 2.9'
+	)
 
 	// 3. Convert prototype method declarations to modern ES6 class methods
 	code = code.replace(
@@ -119,7 +119,7 @@ try {
 		'\t$1($2) { // 3.0'
 	);
 
-  // 3.5. Convert prototype shortcut method aliases to ES6 class properties
+	// 3.5. Convert prototype shortcut method aliases to ES6 class properties
 	// Finds: p.off = p.removeEventListener;
 	// Converts to: off = this.removeEventListener;
 	code = code.replace(
@@ -138,35 +138,35 @@ try {
 
 	// 7.0 Convert legacy static method assignments to modern trailing definitions for namespace createjs
 	code = code.replace(
-		/^(\s*)(createjs)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
-		'$1export function $3($4) { // 7.0'
+		/^([\t ]*)(createjs)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
+		'$1export function $3($4) { // 7.0 $2.$3 = function($4)'
 	);
 
 	// 7.1 Convert Classname.method = function() to static method(); when Classname is NOT createjs
 	code = code.replace(
-		/^\s*(?!createjs)([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
-		'  static $2($3) { // 7.1'
+		/^[\t ]*(?!createjs)([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*function\s*\(([^)]*)\)\s*\{/gm,
+		'\t\tstatic $2($3) { // 7.1 $1.$2 = function($3)'
 	);
 
-  // 7.2 Fix EventDispatcher.initialize(target)
-  code = code.replace(
-    'initialize(target) {', 'initialize(target, p = EventDispatcher.prototype) { // 7.2'
-  );
+	// 7.2 Fix EventDispatcher.initialize(target)
+	code = code.replace(
+		'initialize(target) {', 'initialize(target, p = EventDispatcher.prototype) { // 7.2'
+	);
 
-  // 7.5. Convert legacy static property assignments to modern trailing assignments
+	// 7.5. Convert legacy static property assignments to modern trailing assignments
 	// Finds: EventDispatcher.someProperty = true;  or  EventDispatcher.DEFAULT_TIMEOUT = 1000;
 	// Converts to: EventDispatcher.someProperty = true; (ensuring it bypasses structural parsing blocks)
-  // Leave createjs.item or this.item or o.item as given
+	// Leave createjs.item or this.item or o.item as given
 	code = code.replace(
-		/^(\t|  )([A-Z][A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*(?!function)([^;]+);/gm,
-		'\tstatic $3 = $4; // 7.5'
+		/^(?:\t|  )([A-Z][A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*=\s*(?!function)([^;]+);/gm,
+		'\tstatic $2 = $3; // 7.5 removing classname'
 	);
 
-  // 7.6a. Capture single lines starting with createjs., preserving trailing comments
+	// 7.6a. Capture single lines starting with createjs., preserving trailing comments
 	// Finds: \tcreatejs.EventDispatcher.initialize(Ticker); // inject EventDispatcher methods.
 	// Converts to: \tstatic { createjs.EventDispatcher.initialize(Ticker); } // inject EventDispatcher methods.
 	code = code.replace(
-		/^\t(createjs\.[A-Za-z0-9_.]+\([^)]*\);?)(.*)$/gm,
+		/^(?:\t|  )(createjs\.[A-Za-z0-9_.]+\([^)]*\);?)(.*)$/gm,
 		'\tstatic { $1 }$2 // 7.6a'
 	);
 
@@ -174,19 +174,21 @@ try {
 	// Finds: \ttry { ... \n\t} catch(e) {} down to an empty line hook
 	// Converts to: \tstatic {\n\ttry { ... \n\t}\n\t}
 	code = code.replace(
-		/(^\ttry\s*\{[\s\S]*?)(?=\n\s*\n)/gm,
+		/(^(?:\t|  )try\s*\{[\s\S]*?)(?=\n\s*\n)/gm,
 		(match) => {
 			return `\tstatic {\n\t${match.trim().replace(/\n/g, '\n\t')} // 7.6b\n\t}`;
 		}
 	);
 
-  // 7.9 Arcane wrap window.xxx(Cancel|Request)AnimattionFrame with (window as any).xxxCancel...
-  code = code.replace(
-    /\|\| window\.([a-z]*(Cancel|Request)AnimationFrame[ ;])/g, '|| (window as any).$1'
-  );
-  code = code.replace(
-    /\|\| w\.performance\./g, '|| (w as any).'
-  );
+	// 7.7 fix Event constructor optional args
+	code = code.replace('constructor(type, bubbles, cancelable) {', 
+											`constructor(type: string, bubbles=false, cancelable=false) { // 7.7`);
+
+	// 7.9 Ticker: Arcane wrap window.xxx(Cancel|Request)AnimationFrame with (window as any).xxxCancel...
+	code = code.replace(
+		/\|\| window\.([a-z]*(Cancel|Request)AnimationFrame[ ;])/g, '|| (window as any).$1'
+	);
+	code = code.replace( /\|\| w\.performance\./g, '|| (w as any).performance.');
 
 	// 8. Insert the closing namespace bracket directly in front of the final export line
 	code = code.replace(
@@ -194,16 +196,16 @@ try {
 		'}// 8.0\n$1'
 	);
 
-  // 9. Tweak js for ts typing; one place in EventDispatcher.dispatchEvent
-  code = code.replace('1+(i==0)', '1+(i==0?1:0)');
+	// 9. Tweak js for ts typing; one place in EventDispatcher.dispatchEvent
+	code = code.replace('1+(i==0)', '1+(i==0?1:0)');
 
-  // 10. declare statics for class EaselJS
-  code = code.replace('class EaselJS {}', `class EaselJS {
+	// 10. declare statics for class EaselJS
+	code = code.replace('class EaselJS {}', `class EaselJS {
     static version: string;
     static buildDate: string;
   }`)
-  code = code.replace('createjs.EaselJS || {};', `createjs.EaselJS || {} as typeof EaselJS;`)
-  code = code.replace('module.exports = this.createjs', `module.exports = createjs`)
+	code = code.replace('createjs.EaselJS || {};', `createjs.EaselJS || {} as typeof EaselJS;`)
+	code = code.replace('module.exports = this.createjs', `module.exports = createjs`)
 
 	fs.writeFileSync(outputFile, code, 'utf8');
 	console.log(`Refactoring complete! Output saved to: ${outputFile}`);
