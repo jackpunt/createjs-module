@@ -197,6 +197,14 @@ try {
   // 9. Tweak js for ts typing; one place in EventDispatcher.dispatchEvent
   code = code.replace('1+(i==0)', '1+(i==0?1:0)');
 
+  // 10. declare statics for class EaselJS
+  code = code.replace('class EaselJS {}', `class EaselJS {
+    static version: string;
+    static buildDate: string;
+  }`)
+  code = code.replace('createjs.EaselJS || {};', `createjs.EaselJS || {} as typeof EaselJS;`)
+  code = code.replace('module.exports = this.createjs', `module.exports = createjs`)
+
 	fs.writeFileSync(outputFile, code, 'utf8');
 	console.log(`Refactoring complete! Output saved to: ${outputFile}`);
 
