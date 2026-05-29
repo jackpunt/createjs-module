@@ -1,10 +1,18 @@
 // process easeljs-module/easeljs.js into typescript syntax
 //
+// node migrate.cjs        # convert easeljs.js into easeljs.ts
+// node extract-types.cjs  # morphs easeljs.ts --> types/easeljs.d.ts
+//
+// TODO: see if ./types/easeljs.d.ts is a good as @types/easeljs.d.ts
+// TODO: integrate the mods already in EaselJS
+// TODO: integrate with transformations in build/gruntfile
+// TODO: apply these transformations to files in EaselJS, push the whole thing to tsc!
+//
 const fs = require('fs');
 const path = require('path');
 
 // process.argv[0] is node, process.argv[1] is the script path, process.argv[2] is our file argument
-const inputFile = process.argv[2] ?? 'createjs-source';
+const inputFile = process.argv[2] ?? 'easeljs';
 
 const sourceFile = path.join(__dirname, `${inputFile}.js`);
 const outputFile = path.join(__dirname, `${inputFile}.ts`);

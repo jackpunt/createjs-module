@@ -5,7 +5,8 @@ const fs = require("fs");
 // 1. Initialize project with allowJs and checkJs turned ON
 const project = new Project({
     compilerOptions: {
-        target: 99, // ESNext
+	    useInMemoryFileSystem: true,
+			target: 99, // ESNext
         allowJs: true,
         checkJs: true,
         declaration: true,
@@ -15,7 +16,8 @@ const project = new Project({
 });
 
 // 2. Read your file contents
-const tsFilePath = path.join(__dirname, "createjs-source.ts");
+const inputFile = process.argv[2] ?? 'easeljs';
+const tsFilePath = path.join(__dirname, `${inputFile}.ts`); // migrate generated .ts
 let code = fs.readFileSync(tsFilePath, "utf8");
 
 /* * 3. The Fix: We temporarily strip 'export namespace createjs {' and '}' 
@@ -26,7 +28,7 @@ code = code.replace(/export\s+namespace\s+createjs\s*\{/, "");
 code = code.replace(/\}\s*$/, ""); // Strips the very last closing brace
 
 // Create the virtual JavaScript source file inside the compiler memory
-const virtualJsFile = project.createSourceFile("createjs.js", code);
+const virtualJsFile = project.createSourceFile(`/tmp/${inputFile}.js`, code);
 
 // 4. Extract the emit payload stream
 const emitOutput = virtualJsFile.getEmitOutput();
@@ -48,7 +50,6 @@ if (emitOutput.getEmitSkipped()) {
         
         fs.mkdirSync(path.dirname(filePath), { recursive: true });
         fs.writeFileSync(filePath, content, "utf8");
-				// fs.unlinkSync(path.join(__dirname, "createjs-temp.js"));
         console.log(`Success! Strongly-typed definition file generated at: ${filePath}`);
     }
 }
