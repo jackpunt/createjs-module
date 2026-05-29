@@ -86,7 +86,7 @@ try {
 			// Generate explicit 'any' class property definitions
 			let propertyDeclarations = '';
 			uniqueProperties.forEach(prop => {
-				propertyDeclarations += `\tdeclare ${prop}; // 2.5\n`;
+				propertyDeclarations += `\t${prop}; // 2.5\n`;
 			});
 
 			// Reconstruct the block with the properties declared at the top of the class frame
@@ -111,7 +111,7 @@ try {
 
 	let eventDeclarations = '';
 	eventProperties.forEach(prop => {
-		eventDeclarations += `\tdeclare ${prop}; // 2.7\n`;
+		eventDeclarations += `\t${prop}; // 2.7\n`;
 	});
 
 	// Diagnostic Log Output to terminal
@@ -127,7 +127,7 @@ try {
 
 	// 2.9 declare 'parent' for EventDispatcher
 	code = code.replace(
-		/(class EventDispatcher {)/, '$1\n\tdeclare parent: any; // 2.9'
+		/(class EventDispatcher {)/, '$1\n\tparent: Container; // 2.9'
 	)
 	code = code.replace(
 		/(var G = Graphics;)/, 'G = Graphics; // 2.9'
