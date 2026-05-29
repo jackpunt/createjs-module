@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "lib": ["DOM", "ES2022"],
+    "types": [ "node"],
+    
+    // Silence "implicitly has an 'any' type" errors
+    "noImplicitAny": false,
+
+    // Forces TypeScript to skip checking library type definitions 
+    "skipLibCheck": true,
+
+    // Allow JavaScript and loose type checks for compiling definitions
+    "allowJs": true,
+    "strict": false,
+    
+    // Tell tsc to only emit the declaration (.d.ts) file
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./types"
+  },
+  "include": [
+    "*.ts"
+  ]
+}
